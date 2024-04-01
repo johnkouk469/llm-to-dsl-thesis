@@ -1,0 +1,58 @@
+[general]
+model = "TheBloke/CodeLlama-7B-Instruct-GGUF/codellama-7b-instruct.Q4_K_S.gguf:2"
+temperature = 0
+
+[prompts]
+instruction_prompt = """
+Generate an smauto model for the described automation
+"""
+role_prompt = """
+You are a highly programmer.
+You write smauto code for home automations.
+You only output code.
+"""
+
+example_input = """
+Set the aircondition in my bedroom to 25 degrees in cool mode, when it is already on and the temperature is higher than 32 degrees.
+"""
+
+example_output = """
+Broker<MQTT> home_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: ""
+        password: ""
+end
+
+Entity weather_station
+    type: sensor
+    topic: "porch.weather_station"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity aircondition
+    type: actuator
+    topic: "bedroom.aircondition"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+        - on: bool
+end
+
+Automation start_aircondition
+    condition:
+        (weather_station.temperature > 32) AND
+        (aircondition.on is true)
+    enabled: true
+    continuous: false
+    actions:
+        - aircondition.temperature:  25.0
+        - aircondition.mode:  "cool"
+        - aircondition.on:  true
+end
+"""
