@@ -7,7 +7,7 @@ instruction_prompt = """
 Generate an smauto model for the described automation
 """
 role_prompt = """
-You are a highly programmer.
+You are a highly skilled programmer.
 You write smauto code for home automations.
 You only output code.
 """
@@ -19,320 +19,202 @@ An SmAuto model contains information about the various devices in the smart envi
 """
 
 entities = """
-Entities are your connected smart devices that send and receive information using a message broker. Entities have the following required properties:
-
-A unique name
-A broker to connect to
-A topic to send/receive messages
-A set of attributes
-------
-Attributes are what define the structure and the type of information in the messages the Entity sends to the communication broker.
-------
-Entity definitions follow the syntax of the below examples, for both sensor and actuator types.
-
-Entity weather_station
-    type: sensor
-    freq: 5
-    topic: "bedroom.weather_station"
-    broker: cloud_broker
+1. Define Your Entities:
+    - Each entity represents a smart device.
+    - Assign a unique name to each entity.
+    - Specify a message broker for the entity to connect to.
+    - Define a topic for sending and receiving messages.
+    - List the attributes that describe the entity’s data.
+2. Structure Entity Attributes:
+    - Attributes determine the data structure and type for messages.
+    - Supported attribute types include int, float, bool, str, time, list, and dict.
+3. Entity Syntax:
+    - Use the following syntax to define entities:
+>>>>>
+Entity <name>
+    type: <sensor/actuator/hybrid>
+    topic: "<topic>"
+    broker: <broker_name>
     attributes:
-        - temperature: float
-        - humidity: float
-        - pressure: float
+        - <attribute_name>: <data_type>
+    [description: "<description>"]
+    [freq: <frequency>]
 end
-
-Entity bedroom_lamp
-    type: actuator
-    topic: "bedroom.lamp"
-    broker: cloud_platform_issel
-    attributes:
-        - power: bool
-end
-------
-The difference between actuators and sensors is that sensors are considered "Producers" while actuators are "Consumers" in the environment.
-Sensor Entities have an extra property, that is the freq to set the publishing frequency of either physical or virtual.
-------
-An entity consists of:
-
-type: The Entity type. Can be sensor, actuator or hybrid
-topic: The Topic in the Broker used by the Entity to send and receive messages. Note that / should be substituted with . (e.g: bedroom/aircondition -> bedroom.aircondition).
-broker: The name property of a previously defined Broker which the Entity uses to communicate.
-attributes: Attributes have a name and a type. As can be seen in the above example, HA-Auto supports int, float, string, bool, list and dictionary types. Note that nested dictionaries are also supported.
-description (Optional): A description of the Entity
-freq (Optional): Used for Entities of type "sensor" to set the msg publishing rate
-------
-Notice that each Entity has it's own reference to a Broker, thus the metamodel allows for communicating with Entities which are connected to different message brokers. This allows for definining automation for multi-broker architectures.
-------
-Supported data types for Attributes:
-
-int: Integer numerical values
-float: Floating point numerical values
-bool: Boolean (true/false) values
-str: String values
-time: Time values (e.g. 01:25)
-list: List / Array
-dict: Dictionary
-------
-Attribute value generation for virtual Entities
-SmAuto provides a code generator which can be utilized to transform Entities models into executable source code in Python. This feature of the language enables end-to-end generation of the objects (sensors, actuators, robots) which send and receive data based on their models. Thus it can be used to generate while virtual smart environments and directly dig into defining and testing automations.
-
-For this purpose, the language supports (Optional) definition of a Value Generator and a Noise to be applied on each attribute of an Entity of type sensor separately.
-------
-Entity weather_station
-    type: sensor
-    freq: 5
-    topic: "smauto.bme"
-    broker: home_mqtt_broker
-    attributes:
-        - temperature: float -> gaussian(10, 20, 5) with noise gaussian(1,1)
-        - humidity: float -> linear(1, 0.2) with noise uniform (0, 1)
-        - pressure: float -> constant(0.5)
-end
-------
-The above example utilizes this feature of the language. Each attribute can define it's own value and noise generators, using a simple grammar as evident below:
--> <ValueGenerator> with noise <NoiseGenerator>
-------
-Supported Value Generators:
-
-Constant: constant(value). Constant value
-Linear: linear(min, step). Linear function
-Saw: saw(min, max, step). Saw function.
-Gaussian: gaussian(value, maxValue, sigma). Gaussian function
-Replay: replay([values], times). Replay from a list of values. The times parameter can be used to force replay iterations to a specific value. If times=-1 then values will be replayed infinitely.
-ReplayFile: replayFile("FILE_PATH"). Replay data from a file.
-
-Supported Noise Generators:
-
-Uniform: uniform(min, max).
-Gaussian: gaussian(mean, sigma).
-Value generation and Noise are optional in the language and are features used by the Virtual Entity generator to transform Entity models into executable code.
-------
+<<<<<
+    - Replace / with . in topics (e.g., bedroom/aircondition to bedroom.aircondition).
+4. Distinguish Between Sensors and Actuators:
+    - Sensors (type: sensor) are data producers with an additional freq property to set the data publishing frequency.
+    - Actuators (type: actuator) are data consumers.
+5. Multi-Broker Communication:
+    - Each entity can reference a different broker, allowing for multi-broker architectures.
+6. Value Generation for Virtual Entities:
+    - Optionally define a Value Generator and Noise Generator for each sensor attribute:
+>>>>>
+- <attribute_name>: <data_type> -> <ValueGenerator> with noise <NoiseGenerator>
+<<<<<
+    - Utilize supported value generators like constant, linear, saw, gaussian, replay, and replayFile.
+    - Use noise generators like uniform and gaussian.
 """
 
 brokers = """
-The Broker acts as the communication layer for messages where each device has its own Topic which is basically a mailbox for sending and receiving messages. SmartAutomation DSL supports Brokers which support the MQTT, AMQP and Redis protocols. You can define a Broker using the syntax in the following example:
-------
-Broker<MQTT> upstairs_broker
-    host: "localhost"
-    port: 1883
+1. Understand the Broker’s Role:
+    - The broker serves as the central communication layer.
+    - Each device communicates through a unique topic, acting as its mailbox.
+2. Choose the Protocol:
+Decide on the protocol your broker will support: MQTT, AMQP, or Redis.
+3. Define the Broker:
+    - Use the following syntax to define a broker:
+>>>>>
+Broker<Protocol_Type> broker_name
+    host: "host_address"
+    port: port_number
     auth:
-        username: "my_username"
-        password: "my_password"
+        username: "username"
+        password: "password"
+    [vhost: "vhost_parameter"]
+    [topicExchange: "exchange_parameter"]
+    [rpcExchange: "exchange_parameter"]
+    [db: database_number]
 end
-------
-type: The first line can be MQTT, AMQP or Redis according to the Broker type
-host: Host IP address or hostname for the Broker
-port: Broker Port number
-auth: Authentication credentials. Unified for all communication brokers.
-username: Username used for authentication
-password: Password used for authentication
-vhost (Optional): Vhost parameter. Only for AMQP brokers
-vhost (Optional): Vhost parameter. Only for AMQP brokers
-topicExchange (Optional): (Optional) Exchange parameter. Only for AMQP brokers.
-rpcExchange (FUTURE SUPPORT): Exchange parameter. Only for AMQP brokers.
-db (Optional): Database number parameter. Only for Redis brokers.
-------
+<<<<<
+    - Replace Protocol_Type with MQTT, AMQP, or Redis.
+    - Fill in the broker_name, host_address, port_number, username, and password.
+4. Configure the Broker:
+    - host: Specify the IP address or hostname of the broker.
+    - port: Enter the port number for the broker.
+    - auth: Provide authentication credentials (username and password).
+    - vhost (Optional for AMQP): Define the virtual host parameter.
+    - topicExchange (Optional for AMQP): Specify the exchange parameter for topics.
+    - rpcExchange (Future support for AMQP): Indicate the exchange parameter for RPC.
+    - db (Optional for Redis): State the database number.
 """
 
 automations = """
-Automations allow the execution of a set of actions when a condition is met. Actions are performed by sending messages to Entities.
-------
-You can define an Automation using the syntax in the following example:
-
-Automation start_aircondition
-    condition: 
-        (
-            (thermometer.temperature > 32) AND 
-            (humidity.humidity > 30)
-        ) AND (aircondition.on == true)
-    enabled: true
-    continuous: false
+1. Define Automations:
+    - Automations are sets of actions executed when specific conditions are met.
+    - These actions are directed towards entities, which are your smart devices.
+2. Write the Automation Syntax:
+    - Use the following structure to define an automation:
+>>>>>
+Automation <automation_name>
+    condition: <logical_expression>
+    enabled: <true/false>
+    continuous: <true/false>
     actions:
-        - aircondition.temperature:  25.0
-        - aircondition.mode:  "cool"
-        - aircondition.on:  true
+        - <entity.property>: <desired_value>
+    [checkOnce: <true/false>]
+    [after: <dependent_automations>]
+    [starts: <subsequent_automations>]
+    [stops: <other_automations>]
 end
-
-Automation start_humidifier
-    condition:
-        bedroom_humidity_sensor.humidity > 0.6
-    enabled: true
-    actions:
-        - bedroom_humidifier.power: true
-        - bedroom_humidifier.timer: -1
-    starts:
-        - stop_humidifier
-end
-
-Automation stop_humidifier
-    condition:
-        bedroom_humidity_sensor.humidity < 0.3
-    enabled: false
-    actions:
-        - bedroom_humidifier.power: false
-    starts:
-        - start_humidifier
-end
-------
-condition: The condition used to determine if actions should be run.
-enabled: Whether the Automation should be run or not.
-continuous: Whether the Automation should automatically remain enabled once its actions have been executed.
-checkOnce: The condition of the automation will run ONLY ONCE and exit.
-actions: The actions that should be run once the condition is met. See Writing Actions for more information.
-after: The automation will not start and will be hold at the IDLE state until termination of the automations listed here as dependencies.
-starts: Starts other automation after termination of the current automation.
-stops: stops other automation after termination of the current automation.
-------
+<<<<<
+    - Replace placeholders with actual values and conditions for your automation.
+3. Set Conditions:
+    - The condition field should contain logical expressions that, when true, trigger the automation.
+4. Enable or Disable Automations:
+    - The enabled field dictates whether the automation is active (true) or inactive (false).
+5. Determine Continuity:
+    - The continuous field decides if the automation should stay active after running (true) or not (false).
+6. Configure Actions:
+    - Under actions, list the operations to be performed on the entities when the conditions are met.
+7. Configure Optional Settings:
+    - checkOnce: If set to true, the automation will check the condition once and exit.
+    - after: List any automations that must finish before this one starts.
+    - starts: Specify which automations to start after this one ends.
+    - stops: Indicate which automations to stop after this one ends.
 """
 
 conditions = """
-Conditions are very similar to conditions in imperative programming languages such as Python, Java, C++ or JavaScript. You can use Entity Attributes in a condition just like a variable by referencing it in the Condition using it's Fully-Qualified Name (FQN) in dot (.) notation.
-
-entity_name.attribute_name
-------
-Below is an example of a Condition that references several attributes of more-than-one Entities.
-
-Entity corridor_temperature
-    type: sensor
-    topic: "corridor.temperature"
-    broker: home_mqtt_broker
-    freq: 10
+1. Understand Conditions:
+    - Conditions in this context work similarly to those in programming languages like Python, Java, C++, or JavaScript.
+    - Use entity attributes as variables within conditions by referencing them with their Fully-Qualified Name (FQN) using dot notation (entity_name.attribute_name).
+2. Define Entities:
+    - Define entities with their attributes, types, topics, and brokers. For example:
+>>>>>
+Entity <entity_name>
+    type: <sensor/actuator>
+    topic: "<topic_name>"
+    broker: <broker_name>
+    freq: <frequency>
     attributes:
-        - temperature: float
+        - <attribute_name>: <data_type>
 end
-
-Entity kitchen_temperature
-    type: sensor
-    topic: "kitchen.temperature"
-    broker: home_mqtt_broker
-    freq: 10
-    attributes:
-        - temperature: float
-end
-
-Entity aircondition
-    type: actuator
-    topic: "bedroom.aircondition"
-    broker: home_broker
-    attributes:
-        - temperature: float
-        - mode: str
-        - on: bool
-end
-
-Automation start_aircondition
+<<<<<
+3. Write Conditions:
+    - Format conditions using logical operators (AND, OR, NOT, etc.) and parentheses to group them correctly.
+    - For complex conditions, ensure proper nesting with parentheses, like ((condition_1) AND (condition_2)) AND (condition_3).
+4. Use Lists and Dictionaries:
+    - The language supports lists and dictionaries, but currently, you can only compare entire lists or dictionaries, not their individual elements.
+5. Apply Operators:
+    - Utilize various operators for strings, numbers, logic, booleans, lists, and dictionaries as needed.
+6. Implement Built-in Functions:
+    - Use built-in functions like mean, std, var, min, and max to process attribute values within conditions.
+7. Compose Automations:
+    - Create automations by defining conditions and the actions to be taken when those conditions are met. For example:
+>>>>>
+Automation <automation_name>
     condition:
-        (corridor_temperature.temperature > 30) AND
-        (kitchen_temperature.temperature > 30)
+        (entity_1.attribute > value) AND
+        (entity_2.attribute > value)
     actions:
-        - aircondition.temperature:  25.0
-        - aircondition.mode:  "cool"
-        - aircondition.power:  true
-        - window.state:  1
+        - entity_3.attribute: new_value
+        - entity_4.attribute: new_value
 end
-------
-Condition Formatting:
-You can combine two conditions into a more complex one using logical operators. The general format of the Condition is:
-
-(condition_1) LOGICAL_OP (condition_2)
-
-Make sure to not forget the parenthesis.
-
-condition_1 AND condition_2 AND condition_3
-
-will have to be rephrased to an equivalent like:
-
-((condition_1) AND (condition_2)) AND (condition_3)
-------
-Lists and Dictionaries:
-The language has support for Lists and Dictionaries and even nesting them. However, for now the use of lists and dictionaries in conditions are treated as full objects and their individual elements cannot be accessed and used in conditions. This means that you can compare a List to a full other List, but cannot compare individual list items. Similarly, you can compare a full dictionary to another but cannot use individual dictionary items in conditions.
-
-Nested in-language reference to Dict and List items will be supported in a future release of the language.
-------
-Operators
-String Operators: ~, !~, ==, !=, has
-Numeric Operators: >, >=, <, <=, ==, !=
-Logical Operators: AND, OR, NOT, XOR, NOR, XNOR, NAND
-BooleanValueOperator: is , is not;
-List and Dictionary Operators: ==, !=
-Build-in attribute processing functions
-The language provides buildi-in functions which can be applied to attribute references when defining a Condition.
-------
-condition:
-    (mean(bedroom_temp_sensor.temperature, 10) > 28) AND
-    (std(bedroom_temp_sensor.temperature, 10) > 1)
-
-condition:
-    bedroom_humidity_sensor.humidity in range(30, 60)
-
-condition:
-    bedroom_temp_sensor.temperature in range(24, 26) AND
-    bedroom_humidity_sensor.humidity in range(30, 60)
-
-condition:
-    var(mean(bedroom_temp_sensor.temperature, 10), 10) >= 0.1
-------
-Supported Functions:
-
-mean: The mean of the attribute buffer
-std: The standard deviation of the attribute buffer
-var: The variance of the attribute buffer
-min: The minimum value in the attribute buffer
-max: The maximum value in the attribute buffer
-------
-Writing Conditions
-Bellow you will find some example conditions.
-
-(bedroom_humidity.humidity < 0.3) AND (bedroom_humidifier.state == 0)
-
-((bedroom_human_detector.position != []) AND 
-    (bedroom_thermometer.temperature < 27.5)
-) AND (bedroom_thermostat.state == 0)
-------
+<<<<<
 """
 
 actions = """
-Actions are essentially messages to actuators in your setup such as air conditioners, lights or speakers. Each action takes a single line and has the following format:
-
-- entity_name.attribute_name: value
-------
-Where object can be a string, number, boolean (true/false), list or dictionary.
-------
-- aircondition.temperature: 25
-- aircondition.mode: "cool"
-- aircondition.power: true
-------
+1. Identify Actuators:
+    - Determine which devices in your setup are actuators (e.g., air conditioners, lights, speakers).
+2. Understand Action Messages:
+    - Actions are messages that command actuators to perform a specific operation.
+3. Format Actions:
+    - Write each action on a single line using the format:
+>>>>>
+entity_name.attribute_name: value
+<<<<<
+    - Replace entity_name with the name of your actuator, attribute_name with the property you want to control, and value with the desired setting.
+4. Determine Value Types:
+    - The value can be of various data types, including:
+        - string (e.g., “on”, “off”)
+        - number (e.g., 25, 75)
+        - boolean (e.g., true, false)
+        - list (e.g., [1, 2, 3])
+        - dictionary (e.g., {“key”: “value”})
 """
 
 rtmonitor = """
-RTMonitor is used to define the monitoring parameters of an SmAuto runtime. Compiled Automations are handled by an executor that is also configured to feed runtime information, such as logs and events (automation-related states etc).
-------
+1. Understand RTMonitor:
+    - RTMonitor sets up monitoring for the SmAuto runtime environment.
+    - It works alongside an executor that manages compiled automations and collects runtime data.
+2. Define RTMonitor:
+    - Use the following syntax to define RTMonitor in your program:
+>>>>>
 RTMonitor
-    broker: default_broker
-    namespace: "smauto.simple_home_auto"
-    eventTopic: "event"
-    logsTopic: "logs"
+    broker: <broker_name>
+    namespace: "<namespace>"
+    eventTopic: "<event_topic>"
+    logsTopic: "<logs_topic>"
 end
-------
-The properties of RTMonitor are:
-
-broker: Reference to a Broker definition
-namespace: A namespace used for constructing the URIs (prefix)
-eventsTopic: Topic to send events
-logsTopic: Topic to send logs
-------
+<<<<<
+    - Replace <broker_name> with the name of the broker you’re referencing.
+    - Set <namespace> to a prefix used for constructing URIs.
+    - Assign <event_topic> to the topic where events will be published.
+    - Designate <logs_topic> to the topic for sending logs.
+3. Configure Properties:
+    - broker: Link this to your previously defined broker.
+    - namespace: Define a unique namespace for your setup.
+    - eventTopic: Specify the topic for event messages.
+    - logsTopic: Indicate the topic for log messages.
 """
 
 constraints = """
-The language includes constraints applied to models after initialization. These constraints refer to domain-specific logical rules.
-
-Value and Noise Generators can only be applied to Entities of type "sensor" or 
+You should comply to the following constrants:
+    - Value and Noise Generators can only be applied to Entities of type "sensor" or 
 "robot".
-
-Actions can only refer Attributes of "actuator" and "robot" Entities.
-Only "actuator" and "robot" Attributes can have default values.
-The freq property can only be set only for sensor and robot Entities.
-------
+    - Actions can only refer Attributes of "actuator" and "robot" Entities.
+    - Only "actuator" and "robot" Attributes can have default values.
+    - The freq property can only be set only for sensor and robot Entities.
 """
 
 example_input = """
