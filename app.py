@@ -47,6 +47,14 @@ def get_chat_completion(content: str) -> str:
 def _assemble_chat_messages(content: str) -> list[dict]:
     """Combine all messages into a well-formatted list of dicts."""
     messages = [
+        {"role": "system", "content": SETTINGS["prompts"]["dsl_description"]},
+        {"role": "system", "content": SETTINGS["prompts"]["entities"]},
+        {"role": "system", "content": SETTINGS["prompts"]["brokers"]},
+        {"role": "system", "content": SETTINGS["prompts"]["automations"]},
+        {"role": "system", "content": SETTINGS["prompts"]["conditions"]},
+        {"role": "system", "content": SETTINGS["prompts"]["actions"]},
+        {"role": "system", "content": SETTINGS["prompts"]["rtmonitor"]},
+        {"role": "system", "content": SETTINGS["prompts"]["constraints"]},
         {"role": "system", "content": SETTINGS["prompts"]["role_prompt"]},
         {"role": "user", "content": SETTINGS["prompts"]["example_input"]},
         {"role": "assistant", "content": SETTINGS["prompts"]["example_output"],},
