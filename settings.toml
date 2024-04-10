@@ -56,6 +56,61 @@ end
     - Use noise generators like uniform and gaussian.
 """
 
+example_entity_weather_station_input = """
+Given the description:
+"I know the temperature, the humidity and the pressure of my house's location from a weather station to which I communicate with my cloud broker."
+Generate the SmAuto components that match the description.
+"""
+
+example_entity_weather_station_output = """
+Entity weather_station
+    type: sensor
+    freq: 5
+    topic: "enviroment.weather_station"
+    broker: cloud_broker
+    attributes:
+        - temperature: float
+        - humidity: float
+        - pressure: float
+end
+"""
+
+example_entity_bedroom_lamp_input = """
+Given the description:
+"I have a lamp on my bedroom."
+Generate the SmAuto components that match the description.
+"""
+
+example_entity_bedroom_lamp_output = """
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+end
+"""
+
+example_virtual_entity_weather_station_input = """
+Given the description:
+"I know the temperature, the humidity and the pressure of my house's location from a weather station to which I communicate with my cloud_broker.
+I want to have a virtual twin of the weather station."
+Generate the SmAuto components that match the description.
+"""
+
+example_virtual_entity_weather_station_output = """
+Entity weather_station
+    type: sensor
+    freq: 5
+    topic: "smauto.bme"
+    broker: home_mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(10, 20, 5) with noise gaussian(1,1)
+        - humidity: float -> linear(1, 0.2) with noise uniform (0, 1)
+        - pressure: float -> constant(0.5)
+end
+"""
+
 brokers = """
 1. Understand the Broker’s Role:
     - The broker serves as the central communication layer.
@@ -87,6 +142,24 @@ end
     - topicExchange (Optional for AMQP): Specify the exchange parameter for topics.
     - rpcExchange (Future support for AMQP): Indicate the exchange parameter for RPC.
     - db (Optional for Redis): State the database number.
+"""
+
+example_broker_input = """
+Given the description:
+"I use an mqtt broker for my devices upstairs.
+It runs on this machine and listens on the port 1883.
+The authenctication credentials are john.doe as the username and John!1234 as password."
+Generate the SmAuto components that match the description.
+"""
+
+example_broker_output = """
+Broker<MQTT> upstairs_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: "john.doe"
+        password: "John!1234"
+end
 """
 
 automations = """
@@ -122,6 +195,126 @@ end
     - after: List any automations that must finish before this one starts.
     - starts: Specify which automations to start after this one ends.
     - stops: Indicate which automations to stop after this one ends.
+"""
+
+example_automation_start_aircondition_input = """
+You have started generating an SmAuto model.
+A part of the model you have generated so far is the following:
+
+Broker<MQTT> home_broker
+    host: 'localhost'
+    port: 1883
+    auth:
+        username: "homeMQTT"
+        password: "home#secure123"
+end
+
+Entity thermometer
+    type: sensor
+    freq: 5
+    topic: "house.thermometer"
+    broker: home_broker
+    attributes:
+        - temperature: float
+end
+
+Entity humidity
+    type: sensor
+    freq: 5
+    topic: "house.humidity"
+    broker: home_broker
+    attributes:
+        - humidity: int
+end
+
+Entity aircondition
+    type: actuator
+    topic: "house.aircondition"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+        - on: bool
+end
+
+Given the description:
+"When the thermometer reads more than 32 degrees and the humidity is more than 30% set the aircondition to 25 degrees on the cool setting if it is already turned on."
+Generate the missing components to be added to the model.
+You should reference the existing entities.
+"""
+
+example_automation_start_aircondition_output = """
+Automation start_aircondition
+    condition: 
+        (
+            (thermometer.temperature > 32) AND 
+            (humidity.humidity > 30)
+        ) AND (aircondition.on == true)
+    enabled: true
+    continuous: false
+    actions:
+        - aircondition.temperature:  25.0
+        - aircondition.mode:  "cool"
+        - aircondition.on:  true
+end
+"""
+
+example_automation_humidifier_input = """
+You have started generating an SmAuto model.
+A part of the model you have generated so far is the following:
+
+Broker<MQTT> home_broker
+    host: 'localhost'
+    port: 1883
+    auth:
+        username: "homeMQTT"
+        password: "home#secure123"
+end
+
+Entity bedroom_humidity_sensor
+    type: sensor
+    freq: 12
+    topic: "bedroom.humidity_sensor"
+    broker: home_broker
+    attributes:
+        - humidity: float
+end
+
+Entity bedroom_humidifier
+    type: actuator
+    topic: "bedroom.humidifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Given the description:
+"Turn on the humidifier in the bedroom, if the bedroom has more than 60% humidity.
+After its turned on turn it off again when the humidity drops below 30%."
+Generate the missing components to be added to the model. 
+You should reference the existing entities.
+"""
+
+example_automation_humidifier_output = """
+Automation start_humidifier
+    condition:
+        bedroom_humidity_sensor.humidity > 0.6
+    enabled: true
+    actions:
+        - bedroom_humidifier.power: true
+    starts:
+        - stop_humidifier
+end
+
+Automation stop_humidifier
+    condition:
+        bedroom_humidity_sensor.humidity < 0.3
+    enabled: false
+    actions:
+        - bedroom_humidifier.power: false
+    starts:
+        - start_humidifier
+end
 """
 
 conditions = """
