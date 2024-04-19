@@ -1,3 +1,8 @@
+"""Python module to read a user utterance from the command line and use 
+it to generate SmAuto models. Prompts are contructed for the user 
+utterance and provided to a Large Language Model for the generation. 
+The generated model gets validated by calling the SmAuto validator."""
+
 import argparse
 import os
 import tomllib
@@ -9,7 +14,9 @@ import requests
 __all__ = ["get_chat_completion"]
 
 # Authenticate
-client = OpenAI(base_url="http://localhost:1234/v1", api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(
+    base_url="http://localhost:1234/v1", api_key=os.getenv("OPENAI_API_KEY")
+)
 
 # Load settings file
 settings_path = Path("settings.toml")
@@ -25,13 +32,19 @@ def parse_args() -> argparse.Namespace:
 
 
 def main(args: argparse.Namespace) -> None:
+    """Read the user input and use it to generate SmAuto model."""
     file_content = args.file_path.read_text("utf-8")
     # print(get_chat_completion(file_content))
-    generated_model = get_chat_completion(file_content);
+    generated_model = get_chat_completion(file_content)
     print(generated_model)
-    print(requests.post("http://localhost:8080/validate", 
-                        headers={'X-API-Key': os.getenv("SMAUTO_API_KEY")}, 
-                        json={'name': "generated model", 'model': generated_model}).json())
+    print(
+        requests.post(
+            "http://localhost:8080/validate",
+            headers={"X-API-Key": os.getenv("SMAUTO_API_KEY")},
+            json={"name": "generated model", "model": generated_model},
+            timeout=60,
+        ).json()
+    )
 
 
 def get_chat_completion(content: str) -> str:
@@ -39,7 +52,7 @@ def get_chat_completion(content: str) -> str:
     response = client.chat.completions.create(
         model=SETTINGS["general"]["model"],
         messages=_assemble_chat_messages(content),
-        temperature=SETTINGS["general"]["temperature"]
+        temperature=SETTINGS["general"]["temperature"],
     )
     return response.choices[0].message.content
 
@@ -49,27 +62,66 @@ def _assemble_chat_messages(content: str) -> list[dict]:
     messages = [
         {"role": "system", "content": SETTINGS["prompts"]["dsl_description"]},
         {"role": "system", "content": SETTINGS["prompts"]["entities"]},
-        {"role": "user", "content": SETTINGS["prompts"]["example_entity_weather_station_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_entity_weather_station_output"]},
-        {"role": "user", "content": SETTINGS["prompts"]["example_entity_bedroom_lamp_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_entity_bedroom_lamp_output"]},
-        {"role": "user", "content": SETTINGS["prompts"]["example_entity_weather_station_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_virtual_entity_weather_station_output"]},
+        {
+            "role": "user",
+            "content": SETTINGS["prompts"]["example_entity_weather_station_input"],
+        },
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"]["example_entity_weather_station_output"],
+        },
+        {
+            "role": "user",
+            "content": SETTINGS["prompts"]["example_entity_bedroom_lamp_input"],
+        },
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"]["example_entity_bedroom_lamp_output"],
+        },
+        {
+            "role": "user",
+            "content": SETTINGS["prompts"]["example_entity_weather_station_input"],
+        },
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"][
+                "example_virtual_entity_weather_station_output"
+            ],
+        },
         {"role": "system", "content": SETTINGS["prompts"]["brokers"]},
         {"role": "user", "content": SETTINGS["prompts"]["example_broker_input"]},
         {"role": "assistant", "content": SETTINGS["prompts"]["example_broker_output"]},
         {"role": "system", "content": SETTINGS["prompts"]["conditions"]},
         {"role": "system", "content": SETTINGS["prompts"]["actions"]},
         {"role": "system", "content": SETTINGS["prompts"]["automations"]},
-        {"role": "user", "content": SETTINGS["prompts"]["example_automation_start_aircondition_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_automation_start_aircondition_output"]},
-        {"role": "user", "content": SETTINGS["prompts"]["example_automation_humidifier_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_automation_humidifier_output"]},
+        {
+            "role": "user",
+            "content": SETTINGS["prompts"][
+                "example_automation_start_aircondition_input"
+            ],
+        },
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"][
+                "example_automation_start_aircondition_output"
+            ],
+        },
+        {
+            "role": "user",
+            "content": SETTINGS["prompts"]["example_automation_humidifier_input"],
+        },
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"]["example_automation_humidifier_output"],
+        },
         {"role": "system", "content": SETTINGS["prompts"]["rtmonitor"]},
         {"role": "system", "content": SETTINGS["prompts"]["constraints"]},
         {"role": "system", "content": SETTINGS["prompts"]["role_prompt"]},
         {"role": "user", "content": SETTINGS["prompts"]["example_input"]},
-        {"role": "assistant", "content": SETTINGS["prompts"]["example_output"],},
+        {
+            "role": "assistant",
+            "content": SETTINGS["prompts"]["example_output"],
+        },
         {"role": "user", "content": f">>>>>\n{content}\n<<<<<"},
         {"role": "user", "content": SETTINGS["prompts"]["instruction_prompt"]},
     ]
