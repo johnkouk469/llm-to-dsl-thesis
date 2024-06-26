@@ -1,0 +1,630 @@
+```plaintext
+# Define Metadata
+Metadata
+    name: SmartHomeAutomation
+    version: "1.0.0"
+    description: "Comprehensive home automation model for a three-bedroom, two-bathroom house."
+    author: "AI Assistant"
+    email: "ai_assistant@example.com"
+end
+
+# Define Broker
+Broker<MQTT> home_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: ""
+        password: ""
+end
+
+# Define Entities for Living Room
+Entity smart_tv
+    type: actuator
+    topic: "livingroom.smart_tv"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - channel: int
+end
+
+Entity smart_light_bulbs_living_room
+    type: actuator
+    topic: "livingroom.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_thermostat_living_room
+    type: actuator
+    topic: "livingroom.smart_thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+end
+
+Entity smart_speaker_living_room
+    type: actuator
+    topic: "livingroom.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+end
+
+Entity smart_window_blinds_living_room
+    type: actuator
+    topic: "livingroom.smart_window_blinds"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_smoke_detector_living_room
+    type: sensor
+    topic: "livingroom.smart_smoke_detector"
+    broker: home_broker
+    attributes:
+        - smoke_level: float
+end
+
+Entity smart_plug_living_room
+    type: actuator
+    topic: "livingroom.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_air_purifier_living_room
+    type: actuator
+    topic: "livingroom.smart_air_purifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_motion_sensor_living_room
+    type: sensor
+    topic: "livingroom.smart_motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion_detected: bool
+end
+
+# Define Entities for Kitchen
+Entity smart_refrigerator
+    type: sensor
+    topic: "kitchen.smart_refrigerator"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - door_open: bool
+end
+
+Entity smart_oven
+    type: actuator
+    topic: "kitchen.smart_oven"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - temperature: float
+end
+
+Entity smart_dishwasher
+    type: actuator
+    topic: "kitchen.smart_dishwasher"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_coffee_maker
+    type: actuator
+    topic: "kitchen.smart_coffee_maker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brew_strength: str
+end
+
+Entity smart_leak_sensor_kitchen
+    type: sensor
+    topic: "kitchen.smart_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_garbage_disposal
+    type: actuator
+    topic: "kitchen.smart_garbage_disposal"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_light_switch_kitchen
+    type: actuator
+    topic: "kitchen.smart_light_switch"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_temperature_sensor_kitchen
+    type: sensor
+    topic: "kitchen.smart_temperature_sensor"
+    broker: home_broker
+    attributes:
+        - temperature: float
+end
+
+# Define Entities for Bedroom 1
+Entity smart_bed
+    type: sensor
+    topic: "bedroom1.smart_bed"
+    broker: home_broker
+    attributes:
+        - sleep_quality: float
+end
+
+Entity smart_light_bulbs_bedroom1
+    type: actuator
+    topic: "bedroom1.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_alarm_clock
+    type: actuator
+    topic: "bedroom1.smart_alarm_clock"
+    broker: home_broker
+    attributes:
+        - set_time: str
+        - enabled: bool
+end
+
+Entity smart_ceiling_fan
+    type: actuator
+    topic: "bedroom1.smart_ceiling_fan"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+Entity smart_air_quality_monitor
+    type: sensor
+    topic: "bedroom1.smart_air_quality_monitor"
+    broker: home_broker
+    attributes:
+        - air_quality_index: float
+end
+
+# Define Entities for Bedroom 2
+Entity smart_light_bulbs_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_plug_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_window_blinds_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_window_blinds"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_humidifier_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_humidifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - level: int
+end
+
+Entity smart_door_lock_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_door_lock"
+    broker: home_broker
+    attributes:
+        - locked: bool
+end
+
+# Define Entities for Bedroom 3
+Entity smart_light_bulbs_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_speaker_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+end
+
+Entity smart_thermostat_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+end
+
+# Define Entities for Bathroom 1
+Entity smart_showerhead
+    type: actuator
+    topic: "bathroom1.smart_showerhead"
+    broker: home_broker
+    attributes:
+        - water_temperature: float
+        - flow_rate: float
+end
+
+Entity smart_light_bulbs_bathroom1
+    type: actuator
+    topic: "bathroom1.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_mirror
+    type: actuator
+    topic: "bathroom1.smart_mirror"
+    broker: home_broker
+    attributes:
+        - defogger: bool
+        - light: bool
+end
+
+Entity smart_scale
+    type: sensor
+    topic: "bathroom1.smart_scale"
+    broker: home_broker
+    attributes:
+        - weight: float
+        - body_fat_percentage: float
+end
+
+Entity smart_leak_sensor_bathroom1
+    type: sensor
+    topic: "bathroom1.smart_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+# Define Entities for Bathroom 2
+Entity smart_light_bulbs_bathroom2
+    type: actuator
+    topic: "bathroom2.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_exhaust_fan
+    type: actuator
+    topic: "bathroom2.smart_exhaust_fan"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_leak_sensor_bathroom2
+    type: sensor
+    topic: "bathroom2.smart_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_electric_toothbrush
+    type: actuator
+    topic: "bathroom2.smart_electric_toothbrush"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_towel_warmer
+    type: actuator
+    topic: "bathroom2.smart_towel_warmer"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+# Define Entities for Hallway
+Entity smart_light_bulbs_hallway
+    type: actuator
+    topic: "hallway.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_motion_sensor_hallway
+    type: sensor
+    topic: "hallway.smart_motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion_detected: bool
+end
+
+Entity smart_thermostat_hallway
+    type: actuator
+    topic: "hallway.smart_thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+end
+
+Entity smart_smoke_detector_hallway
+    type: sensor
+    topic: "hallway.smart_smoke_detector"
+    broker: home_broker
+    attributes:
+        - smoke_level: float
+end
+
+Entity smart_doorbell_camera
+    type: sensor
+    topic: "hallway.smart_doorbell_camera"
+    broker: home_broker
+    attributes:
+        - video_stream: str
+        - motion_detected: bool
+end
+
+# Define Entities for Garage
+Entity smart_garage_door_opener
+    type: actuator
+    topic: "garage.smart_garage_door_opener"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - door_open: bool
+end
+
+Entity smart_security_camera_garage
+    type: sensor
+    topic: "garage.smart_security_camera"
+    broker: home_broker
+    attributes:
+        - video_stream: str
+        - motion_detected: bool
+end
+
+Entity smart_light_bulbs_garage
+    type: actuator
+    topic: "garage.smart_light_bulbs"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_car_charger
+    type: actuator
+    topic: "garage.smart_car_charger"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - charging_status: str
+end
+
+Entity smart_motion_sensor_garage
+    type: sensor
+    topic: "garage.smart_motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion_detected: bool
+end
+
+# Define Entities for Outdoor
+Entity smart_irrigation_system
+    type: actuator
+    topic: "outdoor.smart_irrigation_system"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - zone: int
+end
+
+Entity smart_outdoor_lights
+    type: actuator
+    topic: "outdoor.smart_outdoor_lights"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+end
+
+Entity smart_security_camera_outdoor
+    type: sensor
+    topic: "outdoor.smart_security_camera"
+    broker: home_broker
+    attributes:
+        - video_stream: str
+        - motion_detected: bool
+end
+
+Entity smart_weather_station
+    type: sensor
+    topic: "outdoor.smart_weather_station"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+        - wind_speed: float
+end
+
+Entity smart_door_lock_outdoor
+    type: actuator
+    topic: "outdoor.smart_door_lock"
+    broker: home_broker
+    attributes:
+        - locked: bool
+end
+
+# Define Automations
+Automation turn_on_living_room_lights
+    condition:
+        smart_motion_sensor_living_room.motion_detected is true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_living_room.brightness: 100
+        - smart_light_bulbs_living_room.color: "warm_white"
+end
+
+Automation turn_off_living_room_lights
+    condition:
+        smart_motion_sensor_living_room.motion_detected is false
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_living_room.brightness: 0
+end
+
+Automation turn_on_smart_tv
+    condition:
+        smart_motion_sensor_living_room.motion_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_tv.power: true
+end
+
+Automation adjust_thermostat
+    condition:
+        smart_temperature_sensor_kitchen.temperature > 25
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat_living_room.temperature: 22.0
+        - smart_thermostat_living_room.mode: "cool"
+end
+
+Automation kitchen_leak_alert
+    condition:
+        smart_leak_sensor_kitchen.leak_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker_living_room.power: true
+        - smart_speaker_living_room.volume: 10
+end
+
+Automation garage_door_open
+    condition:
+        smart_motion_sensor_garage.motion_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_garage_door_opener.door_open: true
+end
+
+Automation irrigation_system_control
+    condition:
+        smart_weather_station.humidity < 30
+    enabled: true
+    continuous: true
+    actions:
+        - smart_irrigation_system.power: true
+        - smart_irrigation_system.zone: 1
+end
+
+Automation outdoor_lights_on
+    condition:
+        smart_motion_sensor_garage.motion_detected is true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_outdoor_lights.brightness: 100
+        - smart_outdoor_lights.color: "white"
+end
+
+Automation bedroom1_sleep_mode
+    condition:
+        smart_bed.sleep_quality > 80
+    enabled: true
+    continuous: false
+    actions:
+        - smart_ceiling_fan.power: true
+        - smart_ceiling_fan.speed: 2
+        - smart_light_bulbs_bedroom1.brightness: 10
+end
+
+Automation bathroom1_leak_alert
+    condition:
+        smart_leak_sensor_bathroom1.leak_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker_living_room.power: true
+        - smart_speaker_living_room.volume: 10
+end
+
+Automation turn_on_bathroom2_exhaust_fan
+    condition:
+        smart_motion_sensor_hallway.motion_detected is true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_exhaust_fan.power: true
+end
+
+Automation bathroom2_leak_alert
+    condition:
+        smart_leak_sensor_bathroom2.leak_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker_living_room.power: true
+        - smart_speaker_living_room.volume: 10
+end
+
+# Define RTMonitor
+RTMonitor
+    broker: home_broker
+    namespace: "smauto.smart_home_auto"
+    eventTopic: "event"
+    logsTopic: "logs"
+end
+```

@@ -1,0 +1,1 @@
+Will open and close the light on the living room that is connected to the MQTT broker on my house listening on the port 3005 with username myAmazingHome and password skeC*xw_U2mF. The light should open when motion has been detected and close if no motion is detected.

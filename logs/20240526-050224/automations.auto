@@ -1,0 +1,142 @@
+```smauto
+Automation motion_activated_living_room_light
+    condition:
+        motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb.power: true
+    starts:
+        - motion_deactivated_living_room_light
+end
+
+Automation motion_deactivated_living_room_light
+    condition:
+        motion_sensor.motion_detected == false
+    enabled: false
+    continuous: false
+    actions:
+        - smart_light_bulb.power: false
+    starts:
+        - motion_activated_living_room_light
+end
+
+Automation living_room_air_quality_check
+    condition:
+        air_quality_monitor.co2 > 1000
+    enabled: true
+    actions:
+        - smart_outlet.power: true
+    starts:
+        - living_room_air_quality_normal
+end
+
+Automation living_room_air_quality_normal
+    condition:
+        air_quality_monitor.co2 < 800
+    enabled: false
+    actions:
+        - smart_outlet.power: false
+    starts:
+        - living_room_air_quality_check
+end
+
+Automation morning_routine_kitchen
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_coffee_maker.power: true
+        - smart_light_switch.power: true
+        - smart_oven.power: true
+end
+
+Automation water_leak_detected_kitchen
+    condition:
+        water_leak_sensor.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_dishwasher.power: false
+        - smart_fridge.power: false
+end
+
+Automation bedtime_routine_master_bedroom
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_strip.power: false
+        - smart_bed.position: 0
+        - smart_alarm_clock.alarm_time: "07:00"
+end
+
+Automation guest_bedroom_heater_control
+    condition:
+        guest_thermostat.current_temp < 18
+    enabled: true
+    continuous: false
+    actions:
+        - smart_heater.power: true
+    starts:
+        - guest_bedroom_heater_off
+end
+
+Automation guest_bedroom_heater_off
+    condition:
+        guest_thermostat.current_temp > 22
+    enabled: false
+    actions:
+        - smart_heater.power: false
+    starts:
+        - guest_bedroom_heater_control
+end
+
+Automation kids_bedroom_night_light
+    condition:
+        system_clock.time >= 19:00 AND system_clock.time <= 07:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_night_light.power: true
+end
+
+Automation kids_bedroom_day_light
+    condition:
+        system_clock.time > 07:00 AND system_clock.time < 19:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_night_light.power: false
+end
+
+Automation master_bathroom_mirror_light
+    condition:
+        system_clock.time >= 06:00 AND system_clock.time <= 08:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_mirror.power: true
+end
+
+Automation master_bathroom_mirror_off
+    condition:
+        system_clock.time > 08:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.power: false
+end
+
+Automation guest_bathroom_morning_routine
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: true
+    actions:
+        - smart_toilet.power: true
+        - smart_towel_warmer.power: true
+end
+```

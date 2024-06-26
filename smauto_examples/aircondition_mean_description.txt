@@ -1,0 +1,4 @@
+Automate the aircondition of my home to turn on when the mean of the house temperature and 4 degrees is higher than 30 degrees.
+With aircondition and the temperature sensor communicate through an MQTT broker in the issel cloud running at locsys.issel.ee.auth.gr and listening on port 1883, the authentication credentials are r4a as the username and r4a123$ as the password.
+Use value generators. 
+The SmAuto runtime paremeters should be monitored.

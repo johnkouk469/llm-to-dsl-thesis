@@ -1,0 +1,286 @@
+```smauto
+Automation living_room_motion_detected
+    condition:
+        living_room.motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_light_bulbs.power: true
+        - living_room.smart_speaker.power: true
+end
+
+Automation living_room_cool_down
+    condition:
+        living_room.smart_thermostat.current_temp > 28
+    enabled: true
+    continuous: true
+    actions:
+        - living_room.smart_thermostat.target_temp: 24
+        - living_room.smart_thermostat.mode: "cool"
+end
+
+Automation kitchen_coffee_maker_morning
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_coffee_maker.power: true
+        - kitchen.smart_coffee_maker.brew_strength: "strong"
+end
+
+Automation kitchen_smoke_detected
+    condition:
+        kitchen.smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_oven.power: false
+        - kitchen.smart_dishwasher.power: false
+end
+
+Automation bedroom1_wake_up_alarm
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom1.smart_alarm_clock.snooze: false
+        - bedroom1.smart_light_bulbs.power: true
+        - bedroom1.smart_air_purifier.power: true
+end
+
+Automation bedroom1_blinds_morning
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom1.smart_blinds.position: 100
+end
+
+Automation bedroom2_cool_down
+    condition:
+        bedroom2.smart_air_conditioner.current_temp > 28
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2.smart_air_conditioner.target_temp: 24
+        - bedroom2.smart_air_conditioner.mode: "cool"
+end
+
+Automation bedroom2_humidifier_on
+    condition:
+        bedroom2.smart_humidifier.humidity_level < 30
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2.smart_humidifier.power: true
+end
+
+Automation bedroom3_security_night
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom3.smart_door_lock.locked: true
+        - bedroom3.smart_window_sensors.window_open: false
+end
+
+Automation bathroom1_mirror_on_morning
+    condition:
+        system_clock.time >= 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_mirror.power: true
+end
+
+Automation bathroom1_shower_warm_up
+    condition:
+        system_clock.time == 06:45
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_shower_system.temp: 38
+        - bathroom1.smart_shower_system.power: true
+end
+
+Automation bathroom2_toilet_flush
+    condition:
+        bathroom2.smart_toilet.flush == true
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_toilet.power: true
+end
+
+Automation bathroom2_air_freshener_on
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_air_freshener.power: true
+        - bathroom2.smart_air_freshener.level: 5
+end
+
+Automation doorbell_motion_detected
+    condition:
+        other_areas.smart_doorbell.button_pressed == true
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_outdoor_camera.motion_detected: true
+end
+
+Automation garage_door_open
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_garage_door_opener.position: 100
+end
+
+Automation sprinkler_system_morning
+    condition:
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_sprinkler_system.zone: 1
+        - other_areas.smart_sprinkler_system.power: true
+end
+
+Automation vacuum_cleaner_start
+    condition:
+        system_clock.time == 10:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_vacuum_cleaner.power: true
+        - other_areas.smart_vacuum_cleaner.mode: "clean"
+end
+
+Automation outdoor_camera_motion
+    condition:
+        other_areas.smart_outdoor_camera.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_outdoor_camera.motion_detected: true
+end
+
+Automation living_room_tv_on
+    condition:
+        system_clock.time >= 19:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_tv.power: true
+        - living_room.smart_tv.channel: 1
+end
+
+Automation living_room_tv_off
+    condition:
+        system_clock.time >= 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_tv.power: false
+end
+
+Automation kitchen_oven_off
+    condition:
+        kitchen.smart_oven.temp > 200
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_oven.power: false
+end
+
+Automation bedroom1_lamp_on
+    condition:
+        system_clock.time >= 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom1.smart_light_bulbs.power: true
+end
+
+Automation bedroom2_ac_off
+    condition:
+        bedroom2.smart_air_conditioner.current_temp < 24
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2.smart_air_conditioner.power: false
+end
+
+Automation bedroom3_fan_on
+    condition:
+        system_clock.time >= 20:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom3.smart_fan.power: true
+        - bedroom3.smart_fan.speed: 3
+end
+
+Automation bathroom1_towel_warmer
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_towel_warmer.power: true
+end
+
+Automation bathroom2_water_heater
+    condition:
+        system_clock.time >= 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_water_heater.power: true
+end
+
+Automation garage_door_close
+    condition:
+        system_clock.time == 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_garage_door_opener.position: 0
+end
+
+Automation sprinkler_system_evening
+    condition:
+        system_clock.time == 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_sprinkler_system.zone: 2
+        - other_areas.smart_sprinkler_system.power: true
+end
+
+Automation vacuum_cleaner_stop
+    condition:
+        system_clock.time == 11:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_vacuum_cleaner.power: false
+end
+
+Automation outdoor_camera_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - other_areas.smart_outdoor_camera.motion_detected: false
+end
+```

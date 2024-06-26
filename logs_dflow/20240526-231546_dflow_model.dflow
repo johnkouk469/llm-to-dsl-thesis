@@ -1,0 +1,135 @@
+entities
+Location
+"living room", "kitchen", "bedroom", "bathroom"
+end
+Device
+"lights", "thermostat", "window", "security system"
+end
+Role
+"homeowner", "guest"
+end
+end
+
+triggers
+Intent greet
+"hello", "hi", "hey", "good morning", "good evening"
+end
+Intent control_lights
+"turn on the lights", "switch off the lights", "dim the lights", "change light color to [color]"
+end
+Intent set_thermostat
+"set the thermostat to [temperature]", "adjust the temperature to [temperature]"
+end
+Intent open_window
+"open the window", "close the window"
+end
+Intent get_weather
+"what's the weather like", "tell me the weather forecast", "weather update for [location]"
+end
+Intent schedule_appointment
+"schedule an appointment", "book a meeting", "set an appointment with [person] on [date]"
+end
+Intent play_music
+"play music", "stop the music", "next song", "play [song]"
+end
+Intent set_reminder
+"set a reminder", "remind me to [task]", "remind me at [time]"
+end
+Intent security_alert
+"any security alerts", "any unusual activities", "security update"
+end
+end
+
+eservices
+EServiceHTTP weather_svc
+verb: GET
+host: 'http://api.weather.com'
+path: '/v3/weather/forecast'
+end
+EServiceHTTP calendar_svc
+verb: POST
+host: 'http://api.calendar.com'
+path: '/v1/appointments'
+end
+EServiceHTTP music_svc
+verb: POST
+host: 'http://api.music.com'
+path: '/v1/playback'
+end
+end
+
+dialogues
+Dialogue greet_user
+trigger: Intent.greet
+response: SpeakAction("Hello there! How can I assist you today?")
+end
+
+Dialogue control_lights
+trigger: Intent.control_lights
+response: ActionGroup(
+    SetFSlot(Device, $1),
+    SpeakAction("Sure, I will " + $1 + " the lights.")
+)
+end
+
+Dialogue set_thermostat
+trigger: Intent.set_thermostat
+response: ActionGroup(
+    SetFSlot(temperature, $1),
+    SpeakAction("Setting the thermostat to " + $1 + " degrees.")
+)
+end
+
+Dialogue open_window
+trigger: Intent.open_window
+response: ActionGroup(
+    SetFSlot(window_action, $1),
+    SpeakAction("I am " + $1 + " the window now.")
+)
+end
+
+Dialogue get_weather
+trigger: Intent.get_weather
+response: ActionGroup(
+    EServiceHTTP.weather_svc,
+    SpeakAction("The weather forecast for " + Location + " is " + weather_svc.response.temp + " degrees.")
+)
+end
+
+Dialogue schedule_appointment
+trigger: Intent.schedule_appointment
+response: Form(
+    SetFSlot(person, $1),
+    SetFSlot(date, $2),
+    EServiceHTTP.calendar_svc,
+    SpeakAction("Appointment with " + person + " on " + date + " has been scheduled.")
+)
+end
+
+Dialogue play_music
+trigger: Intent.play_music
+response: ActionGroup(
+    SetFSlot(song, $1),
+    EServiceHTTP.music_svc,
+    SpeakAction("Playing " + song + " now.")
+)
+end
+
+Dialogue set_reminder
+trigger: Intent.set_reminder
+response: Form(
+    SetFSlot(task, $1),
+    SetFSlot(time, $2),
+    EServiceHTTP.reminder_svc,
+    SpeakAction("Reminder set for " + task + " at " + time + ".")
+)
+end
+
+Dialogue security_alert
+trigger: Intent.security_alert
+response: ActionGroup(
+    EServiceHTTP.security_svc,
+    SpeakAction("There are no security alerts at the moment.")
+)
+end
+end

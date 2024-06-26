@@ -1,0 +1,413 @@
+```smauto
+Automation livingroom_lights_on
+    condition:
+        (system_clock.time >= 18:00) AND (system_clock.time <= 23:00)
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs.power: true
+        - smart_light_bulbs.brightness: 80
+end
+
+Automation livingroom_lights_off
+    condition:
+        (system_clock.time >= 23:00) OR (system_clock.time <= 06:00)
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs.power: false
+end
+
+Automation livingroom_thermostat_control
+    condition:
+        smart_thermostat_livingroom.current_temp > 25.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat_livingroom.target_temp: 22.0
+        - smart_thermostat_livingroom.mode: "cool"
+end
+
+Automation livingroom_ceiling_fan_on
+    condition:
+        smart_thermostat_livingroom.current_temp > 28.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_ceiling_fan.power: true
+        - smart_ceiling_fan.speed: 3
+end
+
+Automation kitchen_coffee_maker_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+        - smart_coffee_maker.mode: "brew"
+end
+
+Automation kitchen_smoke_alert
+    condition:
+        smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - voice_assistant.power: true
+        - voice_assistant.volume: 100
+end
+
+Automation kitchen_leak_alert
+    condition:
+        smart_leak_detector.leak_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - voice_assistant.power: true
+        - voice_assistant.volume: 100
+end
+
+Automation masterbedroom_alarm_clock
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_alarm_clock.power: true
+end
+
+Automation masterbedroom_light_strip_on
+    condition:
+        system_clock.time == 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_strip.power: true
+        - smart_light_strip.brightness: 70
+end
+
+Automation masterbedroom_light_strip_off
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_strip.power: false
+end
+
+Automation masterbedroom_air_conditioner_control
+    condition:
+        smart_air_conditioner.power == true AND smart_thermostat_livingroom.current_temp > 25.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_conditioner.temperature: 22.0
+end
+
+Automation masterbedroom_speaker_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker.power: true
+        - smart_speaker.volume: 50
+end
+
+Automation bedroom1_desk_lamp_on
+    condition:
+        system_clock.time >= 06:30 AND system_clock.time <= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_desk_lamp.power: true
+        - smart_desk_lamp.brightness: 70
+end
+
+Automation bedroom1_fan_on
+    condition:
+        smart_air_conditioner.power == false AND smart_thermostat_livingroom.current_temp > 28.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_fan.power: true
+        - smart_fan.speed: 3
+end
+
+Automation bedroom1_humidifier_on
+    condition:
+        bedroom_humidity_sensor.humidity < 0.4
+    enabled: true
+    continuous: true
+    actions:
+        - smart_humidifier.power: true
+        - smart_humidifier.humidity_level: 0.5
+end
+
+Automation bedroom1_door_lock
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_door_lock.locked: true
+end
+
+Automation bedroom1_curtains_open
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_curtains.position: 100
+end
+
+Automation bedroom1_curtains_close
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_curtains.position: 0
+end
+
+Automation bedroom2_night_light_on
+    condition:
+        system_clock.time >= 18:00 AND system_clock.time <= 06:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_night_light.power: true
+        - smart_night_light.brightness: 30
+end
+
+Automation bedroom2_heater_on
+    condition:
+        smart_thermostat_livingroom.current_temp < 18.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_heater.power: true
+        - smart_heater.temperature: 22.0
+end
+
+Automation bedroom2_wall_switch_on
+    condition:
+        system_clock.time >= 18:00 AND system_clock.time <= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_wall_switch.power: true
+end
+
+Automation bedroom2_security_camera_on
+    condition:
+        system_clock.time >= 22:00 AND system_clock.time <= 06:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_security_camera_bedroom2.recording: true
+end
+
+Automation bedroom2_motion_sensor_alert
+    condition:
+        smart_motion_sensor.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_security_camera_bedroom2.recording: true
+end
+
+Automation masterbathroom_shower_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_shower_system.power: true
+        - smart_shower_system.temperature: 38.0
+end
+
+Automation masterbathroom_mirror_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.power: true
+end
+
+Automation masterbathroom_scale_on
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_scale.power: true
+end
+
+Automation masterbathroom_toilet_flush
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_toilet.flush: true
+end
+
+Automation masterbathroom_water_heater_on
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_water_heater.power: true
+        - smart_water_heater.temperature: 50.0
+end
+
+Automation bathroom2_faucet_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_faucet.power: true
+        - smart_faucet.temperature: 38.0
+end
+
+Automation bathroom2_towel_warmer_on
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_towel_warmer.power: true
+end
+
+Automation bathroom2_ventilation_fan_on
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_ventilation_fan.power: true
+        - smart_ventilation_fan.speed: 3
+end
+
+Automation bathroom2_flood_alert
+    condition:
+        smart_flood_sensor.flood_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - voice_assistant.power: true
+        - voice_assistant.volume: 100
+end
+
+Automation bathroom2_light_switch_on
+    condition:
+        system_clock.time >= 18:00 AND system_clock.time <= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_switch_bathroom2.power: true
+end
+
+Automation hallway_thermostat_control
+    condition:
+        smart_thermostat_hallway.current_temp > 25.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat_hallway.target_temp: 22.0
+        - smart_thermostat_hallway.mode: "cool"
+end
+
+Automation hallway_doorbell_alert
+    condition:
+        smart_doorbell.ring == true
+    enabled: true
+    continuous: true
+    actions:
+        - voice_assistant.power: true
+        - voice_assistant.volume: 100
+end
+
+Automation hallway_security_system_arm
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_security_system_panel.armed: true
+end
+
+Automation hallway_lighting_system_on
+    condition:
+        system_clock.time >= 18:00 AND system_clock.time <= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_lighting_system.power: true
+        - smart_lighting_system.brightness: 70
+end
+
+Automation hallway_smoke_co_alert
+    condition:
+        (smart_smoke_co_detector.smoke_detected == true) OR (smart_smoke_co_detector.co_detected == true)
+    enabled: true
+    continuous: true
+    actions:
+        - voice_assistant.power: true
+        - voice_assistant.volume: 100
+end
+
+Automation garage_door_opener_on
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_garage_door_opener.power: true
+        - smart_garage_door_opener.position: 100
+end
+
+Automation garage_car_charger_on
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_car_charger.power: true
+        - smart_car_charger.charging: true
+end
+
+Automation garage_security_camera_on
+    condition:
+        system_clock.time >= 22:00 AND system_clock.time <= 06:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_security_camera_garage.recording: true
+end
+
+Automation garage_workshop_lights_on
+    condition:
+        system_clock.time >= 18:00 AND system_clock.time <= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_workshop_lights.power: true
+        - smart_workshop_lights.brightness: 100
+end
+
+Automation garage_pest_repeller_on
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_pest_repeller.power: true
+end
+```

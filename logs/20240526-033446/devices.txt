@@ -1,0 +1,59 @@
+Sure! Here is a list of 30 devices for a three-bedroom, two-bathroom house, categorized by room:
+
+### Living Room
+1. **Smart Light Bulb**
+2. **Smart Thermostat**
+3. **Motion Sensor**
+4. **Smart TV**
+5. **Smart Speaker**
+6. **Security Camera**
+
+### Kitchen
+7. **Smart Refrigerator**
+8. **Smart Oven**
+9. **Smart Dishwasher**
+10. **Smart Coffee Maker**
+11. **Water Leak Sensor**
+12. **Temperature and Humidity Sensor**
+
+### Master Bedroom
+13. **Smart Bed**
+14. **Smart Alarm Clock**
+15. **Smart Window Blinds**
+16. **Smart Light Switch**
+17. **Smart Air Purifier**
+18. **Door/Window Sensor**
+
+### Bedroom 2
+19. **Smart Lamp**
+20. **Smart Fan**
+21. **Smart Plug**
+22. **Smart Mirror**
+23. **Smart Smoke Detector**
+24. **Smart Curtain Motor**
+
+### Bedroom 3
+25. **Smart Night Light**
+26. **Smart Humidifier**
+27. **Smart Door Lock**
+28. **Smart Wall Outlet**
+29. **Smart Shelf Light**
+30. **Smart Baby Monitor**
+
+### Bathroom 1
+31. **Smart Showerhead**
+32. **Smart Scale**
+33. **Smart Toothbrush**
+34. **Smart Toilet**
+35. **Smart Water Heater**
+36. **Humidity Sensor**
+
+### Bathroom 2
+37. **Smart Mirror**
+38. **Smart Soap Dispenser**
+39. **Smart Exhaust Fan**
+40. **Smart Leak Detector**
+41. **Smart Bath Mat**
+42. **Smart Water Flow Sensor**
+
+This comprehensive list includes sensors, actuators, and other smart devices to enhance the functionality, convenience, and security of a smart home environment.

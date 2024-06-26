@@ -1,0 +1,65 @@
+Sure, here is a list of 30 devices that can be used in a smart environment for a three-bedroom and two-bathroom house. The devices are categorized by room.
+
+### Living Room
+1. **Smart TV** - Actuator
+2. **Smart Speaker** - Actuator
+3. **Smart Light Bulb** - Actuator
+4. **Motion Sensor** - Sensor
+5. **Smart Thermostat** - Actuator
+6. **Smart Plug** - Actuator
+
+### Kitchen
+7. **Smart Refrigerator** - Actuator
+8. **Smart Oven** - Actuator
+9. **Smart Dishwasher** - Actuator
+10. **Smart Coffee Maker** - Actuator
+11. **Smart Smoke Detector** - Sensor
+12. **Water Leak Sensor** - Sensor
+
+### Bedroom 1
+13. **Smart Bed** - Actuator
+14. **Smart Alarm Clock** - Actuator
+15. **Smart Light Strip** - Actuator
+16. **Temperature Sensor** - Sensor
+17. **Smart Security Camera** - Sensor
+
+### Bedroom 2
+18. **Smart Air Purifier** - Actuator
+19. **Smart Window Blinds** - Actuator
+20. **Smart Humidifier** - Actuator
+21. **Smart Light Switch** - Actuator
+22. **Smart Door Lock** - Actuator
+
+### Bedroom 3
+23. **Smart Fan** - Actuator
+24. **Smart Mattress** - Actuator
+25. **Smart Curtain Controller** - Actuator
+26. **Smart Night Light** - Actuator
+27. **Smart Carbon Monoxide Detector** - Sensor
+
+### Bathroom 1
+28. **Smart Shower System** - Actuator
+29. **Smart Mirror** - Actuator
+30. **Humidity Sensor** - Sensor
+
+### Bathroom 2
+31. **Smart Toilet** - Actuator
+32. **Smart Scale** - Sensor
+33. **Smart Bathroom Heater** - Actuator
+34. **Water Leak Sensor** - Sensor
+
+### Hallway
+35. **Smart Doorbell** - Sensor
+36. **Smart Light Panel** - Actuator
+
+### Garage
+37. **Smart Garage Door Opener** - Actuator
+38. **Smart Car Charger** - Actuator
+39. **Smart Security System** - Sensor
+
+### Garden
+40. **Smart Sprinkler System** - Actuator
+41. **Soil Moisture Sensor** - Sensor
+42. **Smart Outdoor Lights** - Actuator
+
+This list includes a variety of smart devices that can enhance the functionality and security of a smart home environment. Each room and area has a combination of sensors and actuators to create a comprehensive smart home system.

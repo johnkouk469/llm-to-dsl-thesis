@@ -1,0 +1,55 @@
+// Define the Metadata
+Metadata
+    name: AirconditionAutomation
+    version: "0.1.0"
+    description: "Automation model to turn on the aircondition when the mean of the house temperature and 4 degrees is higher than 30 degrees."
+    author: ""
+    email: ""
+end
+
+// Define the RTMonitor
+RTMonitor
+    broker: issel_cloud
+    namespace: "smauto.simple_home_auto"
+    eventTopic: "event"
+    logsTopic: "logs"
+end
+
+// Define the MQTT Broker
+Broker<MQTT> issel_cloud
+    host: "locsys.issel.ee.auth.gr"
+    port: 1883
+    auth:
+        username: "r4a"
+        password: "r4a123$"
+end
+
+// Define the aircondition entity
+Entity aircondition
+    type: actuator
+    topic: "home.aircondition"
+    broker: issel_cloud
+    attributes:
+        - power: bool
+end
+
+// Define the temperature sensor entity
+Entity temperature_sensor
+    type: sensor
+    topic: "home.temperature"
+    broker: issel_cloud
+    attributes:
+        - temperature: float -> linear(20, 1)
+end
+
+// Automation to turn on the aircondition when the mean of the house temperature and 4 degrees is higher than 30 degrees
+Automation turn_on_aircondition
+    condition:
+        mean(temperature_sensor.temperature, 4) >= 30
+    enabled: true
+    continuous: false
+    actions:
+        - aircondition.power: true
+    starts:
+        - turn_on_aircondition
+end

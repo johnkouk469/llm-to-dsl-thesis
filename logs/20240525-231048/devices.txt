@@ -1,0 +1,73 @@
+Sure! Below is a comprehensive list of 30 devices that can be used in a smart environment, categorized by the rooms in a three-bedroom, two-bathroom house.
+
+### Living Room:
+1. **Smart TV**
+2. **Smart Speaker**
+3. **Smart Thermostat**
+4. **Occupancy Sensor**
+5. **Smart Light Bulbs**
+6. **Smart Window Blinds**
+7. **Smart Air Purifier**
+8. **Smart Plug**
+9. **Smart Security Camera**
+
+### Kitchen:
+10. **Smart Refrigerator**
+11. **Smart Oven**
+12. **Smart Coffee Maker**
+13. **Smart Dishwasher**
+14. **Water Leak Sensor**
+15. **Smart Smoke Detector**
+16. **Smart Faucet**
+17. **Smart Kitchen Scale**
+
+### Bedroom 1:
+18. **Smart Bed**
+19. **Smart Lamp**
+20. **Smart Alarm Clock**
+21. **Ambient Light Sensor**
+22. **Smart Air Conditioner**
+23. **Smart Door Lock**
+
+### Bedroom 2:
+24. **Smart Mattress**
+25. **Smart Light Switch**
+26. **Smart Humidifier**
+27. **Smart Curtain Controller**
+28. **Smart Ceiling Fan**
+
+### Bedroom 3:
+29. **Smart Baby Monitor**
+30. **Smart Mobile Charging Station**
+
+### Bathroom 1:
+31. **Smart Mirror**
+32. **Smart Shower Head**
+33. **Smart Towel Warmer**
+34. **Smart Toilet**
+35. **Smart Scale**
+
+### Bathroom 2:
+36. **Smart Water Heater**
+37. **Smart Toothbrush**
+38. **Smart Bathroom Ventilation Fan**
+39. **Smart Soap Dispenser**
+40. **Smart Leak Detector**
+
+### Hallway:
+41. **Smart Motion Sensor**
+42. **Smart Doorbell**
+43. **Smart Light Strips**
+44. **Smart Security Alarm**
+
+### Garage:
+45. **Smart Garage Door Opener**
+46. **Smart Car Charger**
+47. **Smart Flood Sensor**
+48. **Smart Surveillance Camera**
+
+### Outdoor:
+49. **Smart Sprinkler System**
+50. **Smart Outdoor Lights**
+
+These devices can be integrated into a smart home environment to enhance security, convenience, and energy efficiency.

@@ -1,0 +1,287 @@
+```smauto
+Automation turn_on_living_room_lights
+    condition:
+        system_clock.time >= 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb.power: true
+        - smart_light_bulb.brightness: 80
+end
+
+Automation turn_off_living_room_lights
+    condition:
+        system_clock.time >= 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb.power: false
+end
+
+Automation morning_coffee
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+        - smart_coffee_maker.brew_time: "07:15"
+end
+
+Automation night_mode_bedroom2
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_night_light.power: true
+        - smart_night_light.brightness: 30
+        - smart_sound_machine.power: true
+end
+
+Automation wake_up_bedroom3
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_desk_lamp.power: true
+        - smart_desk_lamp.brightness: 70
+        - smart_sound_machine.power: false
+end
+
+Automation start_air_purifier
+    condition:
+        smart_air_purifier.air_quality < 50
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.power: true
+end
+
+Automation stop_air_purifier
+    condition:
+        smart_air_purifier.air_quality >= 50
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.power: false
+    starts:
+        - start_air_purifier
+end
+
+Automation turn_on_ceiling_fan
+    condition:
+        smart_thermostat.current_temp > 25.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_ceiling_fan.power: true
+        - smart_ceiling_fan.speed: 3
+end
+
+Automation turn_off_ceiling_fan
+    condition:
+        smart_thermostat.current_temp <= 25.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_ceiling_fan.power: false
+    starts:
+        - turn_on_ceiling_fan
+end
+
+Automation start_dishwasher
+    condition:
+        system_clock.time == 02:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_dishwasher.power: true
+        - smart_dishwasher.cycle: "normal"
+end
+
+Automation turn_off_tv
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_tv.power: false
+end
+
+Automation lock_doors_at_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_door_lock.locked: true
+end
+
+Automation unlock_doors_morning
+    condition:
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_door_lock.locked: false
+end
+
+Automation start_heater_bedroom3
+    condition:
+        smart_thermostat.current_temp < 18.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_heater.power: true
+        - smart_heater.temperature: 22.0
+end
+
+Automation stop_heater_bedroom3
+    condition:
+        smart_thermostat.current_temp >= 22.0
+    enabled: true
+    continuous: true
+    actions:
+        - smart_heater.power: false
+    starts:
+        - start_heater_bedroom3
+end
+
+Automation alert_smoke_detected
+    condition:
+        smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker.power: true
+        - smart_speaker.track: "Emergency Alert: Smoke Detected!"
+end
+
+Automation alert_co_detected
+    condition:
+        smart_carbon_monoxide_detector.co_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker.power: true
+        - smart_speaker.track: "Emergency Alert: Carbon Monoxide Detected!"
+end
+
+Automation close_shades_at_night
+    condition:
+        system_clock.time == 20:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_window_shades.position: 0
+end
+
+Automation open_shades_morning
+    condition:
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_window_shades.position: 100
+end
+
+Automation turn_on_humidifier
+    condition:
+        smart_humidifier.humidity_level < 40
+    enabled: true
+    continuous: true
+    actions:
+        - smart_humidifier.power: true
+end
+
+Automation turn_off_humidifier
+    condition:
+        smart_humidifier.humidity_level >= 60
+    enabled: true
+    continuous: true
+    actions:
+        - smart_humidifier.power: false
+    starts:
+        - turn_on_humidifier
+end
+
+Automation security_alert_motion
+    condition:
+        smart_security_camera.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker.power: true
+        - smart_speaker.track: "Security Alert: Motion Detected!"
+end
+
+Automation start_oven_prep
+    condition:
+        system_clock.time == 17:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_oven.power: true
+        - smart_oven.temperature: 180
+        - smart_oven.mode: "preheat"
+end
+
+Automation turn_off_oven
+    condition:
+        system_clock.time == 19:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_oven.power: false
+end
+
+Automation mirror_display_weather
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.power: true
+        - smart_mirror.display_content: "Weather Update"
+end
+
+Automation mirror_display_news
+    condition:
+        system_clock.time == 08:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.display_content: "Morning News"
+end
+
+Automation weigh_in_reminder
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker.power: true
+        - smart_speaker.track: "Reminder: Time to weigh in!"
+end
+
+Automation turn_on_tv_evening
+    condition:
+        system_clock.time == 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_tv.power: true
+end
+
+Automation bedtime_music_bedroom2
+    condition:
+        system_clock.time == 22:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_sound_machine.power: true
+        - smart_sound_machine.sound_type: "calm"
+end
+```

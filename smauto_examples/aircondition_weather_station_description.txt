@@ -1,0 +1,6 @@
+Set the aircondition in my bedroom to 18 degrees on the cool mode when it is already on and the enviroment temperature is above 30 degrees.
+The aircondition as well as a weather station used to know the temperature, the humidity and the pressure of the house's location are connected to an MQTT broker.
+The MQTT broker is the one I have running in my house on the IP 155.207.19.66 and it listens on the port 1883.
+The username for the broker is johndoesmqtt and the password is HMr4%}+z;P"R.
+Make use of value generators.
+The SmAuto runtime paremeters should be monitored.

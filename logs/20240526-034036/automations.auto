@@ -1,0 +1,265 @@
+```smauto
+Automation turn_on_living_room_light
+    condition:
+        motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_living_room.power: true
+end
+
+Automation turn_off_living_room_light
+    condition:
+        motion_sensor.motion_detected == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_living_room.power: false
+end
+
+Automation adjust_living_room_thermostat
+    condition:
+        air_quality_sensor.air_quality_index > 100
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat.mode: "ventilate"
+end
+
+Automation close_living_room_curtains
+    condition:
+        system_clock.time >= 20:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_curtain_motor.position: 0
+end
+
+Automation open_living_room_curtains
+    condition:
+        system_clock.time >= 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_curtain_motor.position: 100
+end
+
+Automation turn_off_smart_tv
+    condition:
+        system_clock.time >= 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_tv.power: false
+end
+
+Automation turn_on_smart_coffee_maker
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+end
+
+Automation turn_off_smart_coffee_maker
+    condition:
+        system_clock.time == 08:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: false
+end
+
+Automation notify_water_leak
+    condition:
+        water_leak_sensor.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_speaker_living_room.track: "Alert: Water Leak Detected!"
+        - smart_speaker_living_room.power: true
+end
+
+Automation fire_alarm
+    condition:
+        smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_living_room.color: "red"
+        - smart_light_bulb_living_room.power: true
+        - smart_speaker_living_room.track: "Alert: Fire Detected!"
+        - smart_speaker_living_room.power: true
+end
+
+Automation bedtime_master_bedroom
+    condition:
+        system_clock.time == 22:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_bed.position: 0
+        - smart_light_switch_master_bedroom.power: false
+        - smart_fan.power: true
+end
+
+Automation wake_up_master_bedroom
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_alarm_clock.alarm_time: "07:00"
+        - smart_light_switch_master_bedroom.power: true
+        - smart_fan.power: false
+end
+
+Automation turn_on_bedroom2_light_strip
+    condition:
+        occupancy_sensor.occupied == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_strip.power: true
+end
+
+Automation turn_off_bedroom2_light_strip
+    condition:
+        occupancy_sensor.occupied == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_strip.power: false
+end
+
+Automation adjust_bedroom2_air_purifier
+    condition:
+        temp_humidity_sensor.humidity > 60
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.mode: "high"
+end
+
+Automation turn_off_bedroom3_desk_lamp
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_desk_lamp.power: false
+end
+
+Automation humidify_bedroom3
+    condition:
+        temp_humidity_sensor.humidity < 30
+    enabled: true
+    continuous: true
+    actions:
+        - smart_humidifier.humidity_level: 50
+        - smart_humidifier.power: true
+end
+
+Automation secure_bedroom3
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_blinds.position: 0
+        - smart_camera.motion_detected: false
+end
+
+Automation mirror_on_bathroom1
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.power: true
+end
+
+Automation mirror_off_bathroom1
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.power: false
+end
+
+Automation shower_time_bathroom1
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_showerhead.water_temp: 38
+        - smart_showerhead.water_flow: 8
+end
+
+Automation scale_check_bathroom1
+    condition:
+        system_clock.time == 07:15
+    enabled: true
+    continuous: false
+    actions:
+        - smart_scale.weight: 0
+end
+
+Automation turn_off_bathroom2_light_bulb
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_bathroom2.power: false
+end
+
+Automation turn_on_bathroom2_light_bulb
+    condition:
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_bathroom2.power: true
+end
+
+Automation exhaust_fan_on
+    condition:
+        humidity_sensor_bathroom1.humidity > 70
+    enabled: true
+    continuous: true
+    actions:
+        - smart_exhaust_fan.power: true
+end
+
+Automation exhaust_fan_off
+    condition:
+        humidity_sensor_bathroom1.humidity < 50
+    enabled: true
+    continuous: true
+    actions:
+        - smart_exhaust_fan.power: false
+end
+
+Automation leak_detected_bathroom2
+    condition:
+        leak_detector.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb_bathroom2.color: "blue"
+        - smart_light_bulb_bathroom2.power: true
+end
+
+Automation toilet_flush_bathroom2
+    condition:
+        system_clock.time == 08:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_toilet.flush: true
+end
+```

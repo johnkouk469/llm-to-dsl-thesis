@@ -1,0 +1,82 @@
+```smauto
+Broker<MQTT> living_room_broker
+    host: "192.168.1.10"
+    port: 1883
+    ssl: false
+    auth:
+        username: "lr_user"
+        password: "lr_pass"
+end
+
+Broker<MQTT> kitchen_broker
+    host: "192.168.1.11"
+    port: 1883
+    ssl: false
+    auth:
+        username: "kit_user"
+        password: "kit_pass"
+end
+
+Broker<MQTT> master_bedroom_broker
+    host: "192.168.1.12"
+    port: 1883
+    ssl: false
+    auth:
+        username: "mb_user"
+        password: "mb_pass"
+end
+
+Broker<MQTT> bedroom2_broker
+    host: "192.168.1.13"
+    port: 1883
+    ssl: false
+    auth:
+        username: "br2_user"
+        password: "br2_pass"
+end
+
+Broker<MQTT> bedroom3_broker
+    host: "192.168.1.14"
+    port: 1883
+    ssl: false
+    auth:
+        username: "br3_user"
+        password: "br3_pass"
+end
+
+Broker<MQTT> bathroom1_broker
+    host: "192.168.1.15"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bath1_user"
+        password: "bath1_pass"
+end
+
+Broker<MQTT> bathroom2_broker
+    host: "192.168.1.16"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bath2_user"
+        password: "bath2_pass"
+end
+
+Broker<MQTT> hallway_broker
+    host: "192.168.1.17"
+    port: 1883
+    ssl: false
+    auth:
+        username: "hall_user"
+        password: "hall_pass"
+end
+
+Broker<MQTT> outdoor_broker
+    host: "192.168.1.18"
+    port: 1883
+    ssl: false
+    auth:
+        username: "out_user"
+        password: "out_pass"
+end
+```

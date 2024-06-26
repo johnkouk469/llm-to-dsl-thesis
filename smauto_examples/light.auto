@@ -1,0 +1,53 @@
+// Define the Metadata
+Metadata
+    name: LivingRoomLightAutomation
+    version: "0.1.0"
+    description: "Will open and close the light on the living room. The light should open when motion has been detected and close if no motion is detected"
+    author: ""
+    email: ""
+end
+
+// Define the MQTT broker
+Broker<MQTT> house_mqtt_broker
+    host: "localhost"
+    port: 3005
+    auth:
+        username: "myAmazingHome"
+        password: "skeC*xw_U2mF"
+end
+
+// Define the living room light entity
+Entity living_room_light
+    type: actuator
+    topic: "living_room.light"
+    broker: house_mqtt_broker
+    attributes:
+        - power: bool
+end
+
+// Define the motion sensor entity
+Entity motion_sensor
+    type: sensor
+    topic: "living_room.motion_sensor"
+    broker: house_mqtt_broker
+    attributes:
+        - motion_detected: bool
+end
+
+// Automation to turn on the light when motion is detected
+Automation turn_on_light
+    condition: 
+        motion_sensor.motion_detected is true
+    enabled: true
+    actions:
+        - living_room_light.power: true
+end
+
+// Automation to turn off the light when no motion is detected
+Automation turn_off_light
+    condition: 
+        motion_sensor.motion_detected is false
+    enabled: true
+    actions:
+        - living_room_light.power: false
+end

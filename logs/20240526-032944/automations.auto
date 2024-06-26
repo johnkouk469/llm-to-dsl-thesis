@@ -1,0 +1,193 @@
+```smauto
+Automation morning_routine
+    condition:
+        system_clock.time == "07:00"
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_lamp.power: true
+        - bedroom_lamp.brightness: 100
+        - kitchen_coffee_maker.power: true
+        - kitchen_coffee_maker.brewing: true
+end
+
+Automation bedtime_routine
+    condition:
+        system_clock.time == "22:00"
+    enabled: true
+    continuous: false
+    actions:
+        - livingroom_lightbulbs.power: false
+        - bedroom_lightstrips.power: true
+        - bedroom_lightstrips.brightness: 30
+        - bedroom_lightstrips.color: "warm"
+        - masterbedroom_airpurifier.power: true
+end
+
+Automation movie_night
+    condition:
+        smart_tv.power == true
+    enabled: true
+    continuous: false
+    actions:
+        - livingroom_lightbulbs.power: false
+        - livingroom_windowblinds.position: "50"
+        - livingroom_speaker.power: true
+        - livingroom_speaker.volume: 10
+end
+
+Automation smart_oven_preheat
+    condition:
+        system_clock.time == "18:00"
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen_oven.power: true
+        - kitchen_oven.temperature: 180
+        - kitchen_oven.mode: "preheat"
+end
+
+Automation fridge_door_open_alert
+    condition:
+        kitchen_refrigerator.door_open == true
+    enabled: true
+    continuous: true
+    actions:
+        - kitchen_speaker.power: true
+        - kitchen_speaker.playing: "Fridge door open"
+end
+
+Automation air_purifier_on
+    condition:
+        masterbedroom_window_sensors.window_open == false
+    enabled: true
+    continuous: true
+    actions:
+        - masterbedroom_airpurifier.power: true
+end
+
+Automation smart_bed_adjust
+    condition:
+        system_clock.time == "23:00"
+    enabled: true
+    continuous: false
+    actions:
+        - masterbedroom_bed.position: 30
+end
+
+Automation desk_lamp_on
+    condition:
+        system_clock.time == "06:00"
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2_desklamp.power: true
+        - bedroom2_desklamp.brightness: 100
+end
+
+Automation fan_control
+    condition:
+        bedroom2_fan.power == true AND bedroom2_humidifier.level > 70
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2_fan.speed: 3
+end
+
+Automation curtain_open_morning
+    condition:
+        system_clock.time == "07:30"
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2_curtaincontroller.position: 100
+end
+
+Automation night_light_on_motion
+    condition:
+        bedroom3_securitycamera.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom3_nightlight.power: true
+        - bedroom3_nightlight.brightness: 50
+end
+
+Automation heater_on_cold
+    condition:
+        bedroom3_heater.temperature < 18
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom3_heater.power: true
+end
+
+Automation wall_switch_off_all
+    condition:
+        bedroom3_wallswitch.power == false
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom3_nightlight.power: false
+        - bedroom3_heater.power: false
+        - bedroom3_fan.power: false
+end
+
+Automation door_lock_at_night
+    condition:
+        system_clock.time == "22:30"
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom3_doorlock.locked: true
+end
+
+Automation smart_mirror_morning
+    condition:
+        system_clock.time == "07:00"
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1_mirror.power: true
+end
+
+Automation toothbrush_reminder
+    condition:
+        system_clock.time == "07:05"
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1_speaker.power: true
+        - bathroom1_speaker.playing: "Time to brush your teeth"
+end
+
+Automation water_leak_alert
+    condition:
+        bathroom1_waterleaksensor.leak_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - bathroom1_speaker.power: true
+        - bathroom1_speaker.playing: "Water leak detected"
+end
+
+Automation shower_preset
+    condition:
+        system_clock.time == "06:30"
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2_showerhead.water_temp: 38.0
+        - bathroom2_showerhead.water_flow: 70
+end
+
+Automation weigh_in_reminder
+    condition:
+        system_clock.time == "07:15"
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2_speaker.power: true
+        - bathroom2_speaker.playing: "Time to check your weight"
+end
+```

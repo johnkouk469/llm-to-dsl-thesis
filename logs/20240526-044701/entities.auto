@@ -1,0 +1,435 @@
+```smauto
+Entity smart_tv
+    type: actuator
+    topic: "living_room.smart_tv"
+    broker: living_room_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - channel: int
+end
+
+Entity smart_speaker
+    type: actuator
+    topic: "living_room.smart_speaker"
+    broker: living_room_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - current_song: str
+end
+
+Entity smart_light_bulbs
+    type: actuator
+    topic: "living_room.smart_light_bulbs"
+    broker: living_room_broker
+    attributes:
+        - power: bool
+        - brightness: int
+        - color: str
+end
+
+Entity smart_thermostat
+    type: hybrid
+    topic: "living_room.smart_thermostat"
+    broker: living_room_broker
+    attributes:
+        - current_temp: float
+        - target_temp: float
+        - mode: str
+end
+
+Entity smart_window_blinds
+    type: actuator
+    topic: "living_room.smart_window_blinds"
+    broker: living_room_broker
+    attributes:
+        - position: int
+end
+
+Entity motion_sensor
+    type: sensor
+    topic: "living_room.motion_sensor"
+    broker: living_room_broker
+    attributes:
+        - motion_detected: bool
+end
+
+Entity smart_air_purifier
+    type: actuator
+    topic: "living_room.smart_air_purifier"
+    broker: living_room_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_plug
+    type: actuator
+    topic: "living_room.smart_plug"
+    broker: living_room_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_refrigerator
+    type: hybrid
+    topic: "kitchen.smart_refrigerator"
+    broker: kitchen_broker
+    attributes:
+        - temperature: float
+        - door_open: bool
+end
+
+Entity smart_oven
+    type: actuator
+    topic: "kitchen.smart_oven"
+    broker: kitchen_broker
+    attributes:
+        - temperature: float
+        - timer: int
+end
+
+Entity smart_coffee_maker
+    type: actuator
+    topic: "kitchen.smart_coffee_maker"
+    broker: kitchen_broker
+    attributes:
+        - power: bool
+        - brew_strength: str
+end
+
+Entity smart_dishwasher
+    type: actuator
+    topic: "kitchen.smart_dishwasher"
+    broker: kitchen_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_smoke_detector
+    type: sensor
+    topic: "kitchen.smart_smoke_detector"
+    broker: kitchen_broker
+    attributes:
+        - smoke_detected: bool
+end
+
+Entity water_leak_sensor
+    type: sensor
+    topic: "kitchen.water_leak_sensor"
+    broker: kitchen_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_faucet
+    type: actuator
+    topic: "kitchen.smart_faucet"
+    broker: kitchen_broker
+    attributes:
+        - power: bool
+        - temperature: float
+end
+
+Entity smart_trash_can
+    type: actuator
+    topic: "kitchen.smart_trash_can"
+    broker: kitchen_broker
+    attributes:
+        - lid_open: bool
+end
+
+Entity smart_bed
+    type: actuator
+    topic: "master_bedroom.smart_bed"
+    broker: master_bedroom_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_alarm_clock
+    type: actuator
+    topic: "master_bedroom.smart_alarm_clock"
+    broker: master_bedroom_broker
+    attributes:
+        - time: time
+        - alarm_set: bool
+end
+
+Entity smart_lighting_system
+    type: actuator
+    topic: "master_bedroom.smart_lighting_system"
+    broker: master_bedroom_broker
+    attributes:
+        - power: bool
+        - brightness: int
+        - color: str
+end
+
+Entity smart_ceiling_fan
+    type: actuator
+    topic: "master_bedroom.smart_ceiling_fan"
+    broker: master_bedroom_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+Entity smart_window_sensors
+    type: sensor
+    topic: "master_bedroom.smart_window_sensors"
+    broker: master_bedroom_broker
+    attributes:
+        - window_open: bool
+end
+
+Entity smart_air_quality_monitor
+    type: sensor
+    topic: "master_bedroom.smart_air_quality_monitor"
+    broker: master_bedroom_broker
+    attributes:
+        - air_quality_index: int
+end
+
+Entity smart_night_light
+    type: actuator
+    topic: "bedroom2.smart_night_light"
+    broker: bedroom2_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_heater
+    type: actuator
+    topic: "bedroom2.smart_heater"
+    broker: bedroom2_broker
+    attributes:
+        - power: bool
+        - target_temp: float
+end
+
+Entity smart_humidifier
+    type: actuator
+    topic: "bedroom2.smart_humidifier"
+    broker: bedroom2_broker
+    attributes:
+        - power: bool
+        - humidity_level: int
+end
+
+Entity smart_curtain_controller
+    type: actuator
+    topic: "bedroom2.smart_curtain_controller"
+    broker: bedroom2_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_door_lock
+    type: actuator
+    topic: "bedroom2.smart_door_lock"
+    broker: bedroom2_broker
+    attributes:
+        - locked: bool
+end
+
+Entity smart_carbon_monoxide_detector
+    type: sensor
+    topic: "bedroom2.smart_carbon_monoxide_detector"
+    broker: bedroom2_broker
+    attributes:
+        - co_detected: bool
+end
+
+Entity smart_desk_lamp
+    type: actuator
+    topic: "bedroom3.smart_desk_lamp"
+    broker: bedroom3_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_security_camera
+    type: sensor
+    topic: "bedroom3.smart_security_camera"
+    broker: bedroom3_broker
+    attributes:
+        - motion_detected: bool
+end
+
+Entity smart_shower_system
+    type: actuator
+    topic: "bathroom1.smart_shower_system"
+    broker: bathroom1_broker
+    attributes:
+        - power: bool
+        - temperature: float
+end
+
+Entity smart_mirror
+    type: actuator
+    topic: "bathroom1.smart_mirror"
+    broker: bathroom1_broker
+    attributes:
+        - power: bool
+        - defogger: bool
+end
+
+Entity smart_scale
+    type: sensor
+    topic: "bathroom1.smart_scale"
+    broker: bathroom1_broker
+    attributes:
+        - weight: float
+end
+
+Entity smart_toilet
+    type: actuator
+    topic: "bathroom1.smart_toilet"
+    broker: bathroom1_broker
+    attributes:
+        - flush: bool
+end
+
+Entity smart_towel_warmer
+    type: actuator
+    topic: "bathroom1.smart_towel_warmer"
+    broker: bathroom1_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_bathroom_vent_fan
+    type: actuator
+    topic: "bathroom1.smart_bathroom_vent_fan"
+    broker: bathroom1_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+Entity smart_toothbrush
+    type: actuator
+    topic: "bathroom2.smart_toothbrush"
+    broker: bathroom2_broker
+    attributes:
+        - power: bool
+        - brushing_mode: str
+end
+
+Entity smart_water_heater
+    type: hybrid
+    topic: "bathroom2.smart_water_heater"
+    broker: bathroom2_broker
+    attributes:
+        - current_temp: float
+        - target_temp: float
+end
+
+Entity smart_leak_detector
+    type: sensor
+    topic: "bathroom2.smart_leak_detector"
+    broker: bathroom2_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_light_switch
+    type: actuator
+    topic: "bathroom2.smart_light_switch"
+    broker: bathroom2_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_dehumidifier
+    type: actuator
+    topic: "bathroom2.smart_dehumidifier"
+    broker: bathroom2_broker
+    attributes:
+        - power: bool
+        - humidity_level: int
+end
+
+Entity smart_soap_dispenser
+    type: actuator
+    topic: "bathroom2.smart_soap_dispenser"
+    broker: bathroom2_broker
+    attributes:
+        - power: bool
+        - soap_level: int
+end
+
+Entity smart_doorbell
+    type: sensor
+    topic: "hallway.smart_doorbell"
+    broker: hallway_broker
+    attributes:
+        - ring: bool
+end
+
+Entity smart_motion_detector
+    type: sensor
+    topic: "hallway.smart_motion_detector"
+    broker: hallway_broker
+    attributes:
+        - motion_detected: bool
+end
+
+Entity smart_thermostat_main
+    type: hybrid
+    topic: "hallway.smart_thermostat_main"
+    broker: hallway_broker
+    attributes:
+        - current_temp: float
+        - target_temp: float
+        - mode: str
+end
+
+Entity smart_security_system
+    type: sensor
+    topic: "hallway.smart_security_system"
+    broker: hallway_broker
+    attributes:
+        - alarm_triggered: bool
+end
+
+Entity smart_garage_door_opener
+    type: actuator
+    topic: "garage.smart_garage_door_opener"
+    broker: garage_broker
+    attributes:
+        - door_open: bool
+end
+
+Entity smart_car_charger
+    type: actuator
+    topic: "garage.smart_car_charger"
+    broker: garage_broker
+    attributes:
+        - power: bool
+        - charging: bool
+end
+
+Entity smart_floodlight
+    type: actuator
+    topic: "garage.smart_floodlight"
+    broker: garage_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_smoke_co_detector
+    type: sensor
+    topic: "garage.smart_smoke_co_detector"
+    broker: garage_broker
+    attributes:
+        - smoke_detected: bool
+        - co_detected: bool
+end
+```

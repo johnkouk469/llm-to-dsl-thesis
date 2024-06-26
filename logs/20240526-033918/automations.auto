@@ -1,0 +1,278 @@
+```
+// Living Room Automations
+Automation turn_on_living_room_light_when_motion_detected
+    condition:
+        motion_sensor.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulb.power: true
+end
+
+Automation turn_off_living_room_light_when_no_motion
+    condition:
+        motion_sensor.motion_detected == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulb.power: false
+end
+
+Automation adjust_living_room_temperature
+    condition:
+        temperature_sensor_bedroom1.current_temp > 25
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat.target_temp: 22.0
+end
+
+Automation turn_on_smart_plug_at_night
+    condition:
+        system_clock.time >= 20:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_plug.power: true
+end
+
+// Kitchen Automations
+Automation alert_if_smoke_detected
+    condition:
+        smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_speaker.power: true
+end
+
+Automation turn_off_coffee_maker_after_use
+    condition:
+        system_clock.time >= 09:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: false
+end
+
+Automation water_leak_alert_kitchen
+    condition:
+        water_leak_sensor_kitchen.leak_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_speaker.power: true
+end
+
+// Bedroom 1 Automations
+Automation wake_up_routine
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_alarm_clock.set_alarm: "07:00"
+        - smart_light_strip.power: true
+        - smart_light_strip.brightness: 100
+end
+
+Automation adjust_bedroom1_temperature
+    condition:
+        temperature_sensor_bedroom1.current_temp < 18
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat.target_temp: 21.0
+end
+
+Automation secure_bedroom1_camera
+    condition:
+        smart_security_camera_bedroom1.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_security_camera_bedroom1.video_stream: "record"
+end
+
+// Bedroom 2 Automations
+Automation purify_air_when_needed
+    condition:
+        temperature_sensor_bedroom1.current_temp > 25
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.power: true
+end
+
+Automation close_window_blinds_at_night
+    condition:
+        system_clock.time >= 21:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_window_blinds.position: 0
+end
+
+Automation turn_off_lights_when_door_locked
+    condition:
+        smart_door_lock.locked == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_switch.power: false
+end
+
+// Bedroom 3 Automations
+Automation turn_on_fan_when_hot
+    condition:
+        temperature_sensor_bedroom1.current_temp > 26
+    enabled: true
+    continuous: true
+    actions:
+        - smart_fan.power: true
+end
+
+Automation set_mattress_firmness
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mattress.firmness: 5
+end
+
+Automation adjust_curtains_in_morning
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_curtain_controller.position: 100
+end
+
+Automation night_light_when_dark
+    condition:
+        system_clock.time >= 20:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_night_light.power: true
+        - smart_night_light.brightness: 50
+end
+
+// Bathroom 1 Automations
+Automation turn_on_shower_in_morning
+    condition:
+        system_clock.time >= 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_shower_system.power: true
+        - smart_shower_system.temperature: 37.0
+end
+
+Automation adjust_mirror_brightness
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.brightness: 75
+end
+
+Automation manage_bathroom1_humidity
+    condition:
+        humidity_sensor_bathroom1.humidity_level > 70
+    enabled: true
+    continuous: true
+    actions:
+        - smart_bathroom_heater.power: true
+        - smart_bathroom_heater.temperature: 25
+end
+
+// Bathroom 2 Automations
+Automation flush_smart_toilet
+    condition:
+        system_clock.time >= 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_toilet.flush_mode: "full"
+end
+
+Automation record_weight_in_morning
+    condition:
+        system_clock.time >= 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_scale.weight: record
+end
+
+Automation turn_off_bathroom_heater_when_leak
+    condition:
+        water_leak_sensor_bathroom2.leak_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_bathroom_heater.power: false
+end
+
+// Hallway Automations
+Automation doorbell_alert
+    condition:
+        smart_doorbell.button_pressed == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_panel.power: true
+end
+
+// Garage Automations
+Automation open_garage_door_in_morning
+    condition:
+        system_clock.time >= 08:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_garage_door_opener.open: true
+end
+
+Automation start_car_charger_at_night
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_car_charger.power: true
+end
+
+Automation activate_garage_security_system
+    condition:
+        system_clock.time >= 00:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_security_system_garage.alarm_status: true
+end
+
+// Garden Automations
+Automation water_garden_in_morning
+    condition:
+        system_clock.time >= 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_sprinkler_system.power: true
+end
+
+Automation adjust_outdoor_lights_at_night
+    condition:
+        system_clock.time >= 20:00
+    enabled: true
+    continuous: true
+    actions:
+        - smart_outdoor_lights.power: true
+        - smart_outdoor_lights.brightness: 80
+end
+```

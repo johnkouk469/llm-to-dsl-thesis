@@ -1,0 +1,193 @@
+```smauto
+Automation living_room_light_on_motion
+    condition: 
+        (motion_sensor_living_room.motion_detected == true) AND 
+        (system_clock.time >= 18:00)
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_living_room.power: true
+    description: "Turn on living room lights when motion is detected and it's evening."
+end
+
+Automation living_room_light_off_no_motion
+    condition: 
+        (motion_sensor_living_room.motion_detected == false) AND 
+        (system_clock.time >= 18:00)
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_living_room.power: false
+    description: "Turn off living room lights when no motion is detected and it's evening."
+end
+
+Automation living_room_blinds_open_morning
+    condition: 
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_window_blinds_living_room.position: 100
+    description: "Open living room blinds at 7:00 AM."
+end
+
+Automation living_room_blinds_close_night
+    condition: 
+        system_clock.time == 19:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_window_blinds_living_room.position: 0
+    description: "Close living room blinds at 7:00 PM."
+end
+
+Automation start_air_purifier
+    condition:
+        air_quality_sensor.pm2_5 > 50
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.power: true
+    description: "Start air purifier when PM2.5 level is high."
+end
+
+Automation stop_air_purifier
+    condition:
+        air_quality_sensor.pm2_5 <= 50
+    enabled: true
+    continuous: true
+    actions:
+        - smart_air_purifier.power: false
+    description: "Stop air purifier when PM2.5 level is normal."
+end
+
+Automation morning_coffee
+    condition: 
+        system_clock.time == 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+    description: "Start coffee maker at 6:30 AM."
+end
+
+Automation kitchen_light_on_motion
+    condition: 
+        motion_sensor_kitchen.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_kitchen.power: true
+    description: "Turn on kitchen lights when motion is detected."
+end
+
+Automation kitchen_light_off_no_motion
+    condition: 
+        motion_sensor_kitchen.motion_detected == false
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_kitchen.power: false
+    description: "Turn off kitchen lights when no motion is detected."
+end
+
+Automation bedroom2_light_on_motion
+    condition: 
+        motion_sensor_bedroom2.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_bedroom2.power: true
+    description: "Turn on bedroom 2 lights when motion is detected."
+end
+
+Automation bedroom2_light_off_no_motion
+    condition: 
+        motion_sensor_bedroom2.motion_detected == false
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_bedroom2.power: false
+    description: "Turn off bedroom 2 lights when no motion is detected."
+end
+
+Automation bedroom3_fan_on_heat
+    condition: 
+        temperature_sensor_bedroom3.temperature >= 28
+    enabled: true
+    continuous: true
+    actions:
+        - smart_fan.power: true
+    description: "Turn on fan in bedroom 3 when it gets too hot."
+end
+
+Automation bedroom3_fan_off_cool
+    condition: 
+        temperature_sensor_bedroom3.temperature < 28
+    enabled: true
+    continuous: true
+    actions:
+        - smart_fan.power: false
+    description: "Turn off fan in bedroom 3 when it cools down."
+end
+
+Automation garage_light_on_motion
+    condition: 
+        motion_sensor_garage.motion_detected == true
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_garage.power: true
+    description: "Turn on garage lights when motion is detected."
+end
+
+Automation garage_light_off_no_motion
+    condition: 
+        motion_sensor_garage.motion_detected == false
+    enabled: true
+    continuous: true
+    actions:
+        - smart_light_bulbs_garage.power: false
+    description: "Turn off garage lights when no motion is detected."
+end
+
+Automation outdoor_lights_on_evening
+    condition: 
+        system_clock.time == 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_outdoor_lights.power: true
+    description: "Turn on outdoor lights at 6:00 PM."
+end
+
+Automation outdoor_lights_off_morning
+    condition: 
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_outdoor_lights.power: false
+    description: "Turn off outdoor lights at 6:00 AM."
+end
+
+Automation start_sprinklers_morning
+    condition: 
+        system_clock.time == 05:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_sprinkler_system.power: true
+    description: "Start sprinklers at 5:00 AM."
+end
+
+Automation stop_sprinklers_morning
+    condition: 
+        system_clock.time == 05:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_sprinkler_system.power: false
+    description: "Stop sprinklers at 5:30 AM."
+end
+```

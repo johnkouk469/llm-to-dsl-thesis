@@ -1,0 +1,129 @@
+// Define the Metadata
+Metadata
+    name: SmartCasa
+    version: "0.1.0"
+    description: "Automations for the alarm and for the aircondition and the humidifier in the bedroom"
+    author: ""
+    email: ""
+end
+
+// Define the RT Monitor
+RTMonitor
+    broker: casa_stream
+    namespace: "smauto.smart_casa"
+    eventTopic: "event"
+    logsTopic: "logs"
+end
+
+// Define the MQTT broker
+Broker<MQTT> casa_stream
+    host: "localhost"
+    port: 1883
+    auth:
+        username: "John"
+        password: "w/%th5:!V7mR"
+end
+
+// Define the bedroom humidifier entity
+Entity bedroom_humidifier
+    type: actuator
+    topic: "bedroom.humidifier"
+    broker: casa_stream
+    attributes:
+        - power: bool
+        - timer: int
+end
+
+// Define the bedroom humidity sensor entity
+Entity bedroom_humidity_sensor
+    type: sensor
+    topic: "bedroom.humidity"
+    broker: casa_stream
+    attributes:
+        - humidity: float -> linear(0, 0.1) with noise gaussian(0, 0.05)
+end
+
+// Define the bedroom temperature sensor entity
+Entity bedroom_temperature_sensor
+    type: sensor
+    freq: 10
+    topic: "bedroom.temperature"
+    broker: casa_stream
+    attributes:
+        - temperature: float -> linear(20, 1) with noise gaussian(0, 0.05)
+end
+
+// Define the kitchen gas sensor
+Entity kitchen_gas_sensor
+    type: sensor
+    freq: 10
+    topic: "kitchen.gas"
+    broker: casa_stream
+    attributes:
+        - gas: float -> linear(0, 0.1) with noise gaussian(0, 0.1)
+end
+
+// Define the bedroom aircondition entity
+Entity bedroom_aircondition
+    type: actuator
+    topic: "bedroom.aircondition"
+    broker: casa_stream
+    attributes:
+        - power: bool
+        - temperature: float
+        - swing: bool
+        - mode: str
+end
+
+// Define the alarm entity
+Entity alarm
+    type: actuator
+    topic: "alarm"
+    broker: casa_stream
+    attributes:
+        - state: int = 0
+end
+
+// Automation to start the humidifier in the bedroom when the humidity is above 60%. Triggers another automation that will turn it off
+Automation start_humidifier
+    condition:
+        bedroom_humidity_sensor.humidity > 0.6
+    continuous: false
+    actions:
+        - bedroom_humidifier.power: true
+        - bedroom_humidifier.timer: -1
+    starts:
+        - stop_humidifier
+end
+
+// Automation to stop the humidifier in the bedroom when the humidity is below 30%. Triggers another automation that will turn it on again
+Automation stop_humidifier
+    condition:
+        bedroom_humidity_sensor.humidity < 0.3
+    enabled: false
+    continuous: false
+    actions:
+        - bedroom_humidifier.power: false
+    starts:
+        - start_humidifier
+end
+
+// Automation to start the aircondition in the bedroom if the temperature in the room is higher than 28 degrees and the humidity is between 30% and 60% 
+Automation start_aircondition
+    condition:
+        (bedroom_temperature_sensor.temperature > 28) AND
+        (bedroom_humidity_sensor.humidity in range [0.3, 0.6])
+    continuous: false
+    actions:
+        - bedroom_aircondition.temperature:  25.0
+        - bedroom_aircondition.mode:  "cool"
+        - bedroom_aircondition.power:  true
+end
+
+// Automation to trigger the alarm if gas levels in the kitchen deviate significantly from their usual values
+Automation trigger_alarm_on_gas
+    condition:
+        std(kitchen_gas_sensor.gas, 10) > 0.1
+    actions:
+        - alarm.state:  1
+end

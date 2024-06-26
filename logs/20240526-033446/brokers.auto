@@ -1,0 +1,64 @@
+```smauto
+Broker<MQTT> living_room_broker
+    host: "broker.livingroom.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "living_room_user"
+        password: "living_room_pass"
+end
+
+Broker<MQTT> kitchen_broker
+    host: "broker.kitchen.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "kitchen_user"
+        password: "kitchen_pass"
+end
+
+Broker<MQTT> master_bedroom_broker
+    host: "broker.masterbedroom.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "master_bedroom_user"
+        password: "master_bedroom_pass"
+end
+
+Broker<MQTT> bedroom2_broker
+    host: "broker.bedroom2.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bedroom2_user"
+        password: "bedroom2_pass"
+end
+
+Broker<MQTT> bedroom3_broker
+    host: "broker.bedroom3.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bedroom3_user"
+        password: "bedroom3_pass"
+end
+
+Broker<MQTT> bathroom1_broker
+    host: "broker.bathroom1.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bathroom1_user"
+        password: "bathroom1_pass"
+end
+
+Broker<MQTT> bathroom2_broker
+    host: "broker.bathroom2.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bathroom2_user"
+        password: "bathroom2_pass"
+end
+```

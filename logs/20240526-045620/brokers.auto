@@ -1,0 +1,69 @@
+```plaintext
+Broker<MQTT> living_room_broker
+    host: "mqtt.livingroom.server"
+    port: 1883
+    ssl: false
+    auth:
+        username: "livingroom_user"
+        password: "livingroom_pass"
+end
+
+Broker<AMQP> kitchen_broker
+    host: "amqp.kitchen.server"
+    port: 5672
+    vhost: "/"
+    topicExchange: "kitchen.topic"
+    ssl: true
+    auth:
+        username: "kitchen_user"
+        password: "kitchen_pass"
+end
+
+Broker<Redis> bedroom1_broker
+    host: "redis.bedroom1.server"
+    port: 6379
+    db: 0
+    ssl: false
+    auth:
+        username: "bedroom1_user"
+        password: "bedroom1_pass"
+end
+
+Broker<AMQP> bedroom2_broker
+    host: "amqp.bedroom2.server"
+    port: 5672
+    vhost: "/"
+    topicExchange: "bedroom2.topic"
+    ssl: true
+    auth:
+        username: "bedroom2_user"
+        password: "bedroom2_pass"
+end
+
+Broker<Redis> bedroom3_broker
+    host: "redis.bedroom3.server"
+    port: 6379
+    db: 1
+    ssl: true
+    auth:
+        certPath: "/path/to/bedroom3/cert"
+end
+
+Broker<MQTT> bathroom1_broker
+    host: "mqtt.bathroom1.server"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bathroom1_user"
+        password: "bathroom1_pass"
+end
+
+Broker<MQTT> bathroom2_broker
+    host: "mqtt.bathroom2.server"
+    port: 1883
+    ssl: false
+    auth:
+        username: "bathroom2_user"
+        password: "bathroom2_pass"
+end
+```

@@ -1,0 +1,607 @@
+Metadata
+    name: SmartHomeAutomation
+    version: "1.0.0"
+    description: "Automates a variety of smart devices in a three-bedroom, two-bathroom house."
+    author: "John Doe"
+    email: "johndoe@example.com"
+end
+
+RTMonitor
+    broker: home_broker
+    namespace: "home_automation"
+    eventTopic: "events"
+    logsTopic: "logs"
+end
+
+Broker<MQTT> home_broker
+    host: "192.168.1.100"
+    port: 1883
+    ssl: false
+    auth:
+        username: "home_user"
+        password: "secure_password"
+end
+
+Entity smart_tv
+    type: actuator
+    topic: "livingroom.tv"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+end
+
+Entity smart_thermostat
+    type: hybrid
+    topic: "livingroom.thermostat"
+    broker: home_broker
+    attributes:
+        - current_temp: float
+        - target_temp: float
+        - mode: str
+end
+
+Entity smart_light_bulbs
+    type: actuator
+    topic: "livingroom.light_bulbs"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_speaker
+    type: actuator
+    topic: "livingroom.speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+end
+
+Entity smart_window_blinds
+    type: actuator
+    topic: "livingroom.window_blinds"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_refrigerator
+    type: hybrid
+    topic: "kitchen.refrigerator"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - door_open: bool
+end
+
+Entity smart_oven
+    type: actuator
+    topic: "kitchen.oven"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - temperature: int
+end
+
+Entity smart_dishwasher
+    type: actuator
+    topic: "kitchen.dishwasher"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity smart_coffee_maker
+    type: actuator
+    topic: "kitchen.coffee_maker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brew_strength: str
+end
+
+Entity smart_smoke_detector
+    type: sensor
+    topic: "kitchen.smoke_detector"
+    broker: home_broker
+    attributes:
+        - smoke_detected: bool
+end
+
+Entity smart_bed
+    type: hybrid
+    topic: "masterbedroom.bed"
+    broker: home_broker
+    attributes:
+        - occupancy: bool
+        - firmness: int
+end
+
+Entity smart_alarm_clock
+    type: actuator
+    topic: "masterbedroom.alarm_clock"
+    broker: home_broker
+    attributes:
+        - time: str
+        - alarm_set: bool
+end
+
+Entity smart_lamp
+    type: actuator
+    topic: "masterbedroom.lamp"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_air_purifier
+    type: hybrid
+    topic: "masterbedroom.air_purifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - air_quality: float
+end
+
+Entity smart_window_sensor
+    type: sensor
+    topic: "masterbedroom.window_sensor"
+    broker: home_broker
+    attributes:
+        - window_open: bool
+end
+
+Entity smart_fan
+    type: actuator
+    topic: "bedroom2.fan"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+Entity smart_humidifier
+    type: hybrid
+    topic: "bedroom2.humidifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - humidity_level: float
+end
+
+Entity smart_night_light
+    type: actuator
+    topic: "bedroom2.night_light"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_temperature_sensor
+    type: sensor
+    topic: "bedroom2.temperature_sensor"
+    broker: home_broker
+    attributes:
+        - temperature: float
+end
+
+Entity smart_curtain_motor
+    type: actuator
+    topic: "bedroom2.curtain_motor"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_desk_lamp
+    type: actuator
+    topic: "bedroom3.desk_lamp"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_plug
+    type: actuator
+    topic: "bedroom3.plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_door_lock
+    type: hybrid
+    topic: "bedroom3.door_lock"
+    broker: home_broker
+    attributes:
+        - locked: bool
+        - battery_level: float
+end
+
+Entity smart_motion_sensor
+    type: sensor
+    topic: "bedroom3.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion_detected: bool
+end
+
+Entity smart_ceiling_light
+    type: actuator
+    topic: "bedroom3.ceiling_light"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity smart_shower_system
+    type: hybrid
+    topic: "bathroom1.shower_system"
+    broker: home_broker
+    attributes:
+        - water_temp: float
+        - water_flow: float
+end
+
+Entity smart_mirror
+    type: actuator
+    topic: "bathroom1.mirror"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - light_brightness: int
+end
+
+Entity smart_water_leak_sensor
+    type: sensor
+    topic: "bathroom1.water_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_exhaust_fan
+    type: actuator
+    topic: "bathroom1.exhaust_fan"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_towel_warmer
+    type: actuator
+    topic: "bathroom1.towel_warmer"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+#
+Entity smart_toilet
+    type: hybrid
+    topic: "bathroom2.toilet"
+    broker: home_broker
+    attributes:
+        - flush: bool
+        - seat_temp: float
+end
+
+Entity smart_scale
+    type: sensor
+    topic: "bathroom2.scale"
+    broker: home_broker
+    attributes:
+        - weight: float
+end
+
+Entity smart_light_switch
+    type: actuator
+    topic: "bathroom2.light_switch"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity smart_water_usage_monitor
+    type: sensor
+    topic: "bathroom2.water_usage_monitor"
+    broker: home_broker
+    attributes:
+        - water_used: float
+end
+
+Entity smart_toothbrush
+    type: hybrid
+    topic: "bathroom2.toothbrush"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - battery_level: float
+end
+
+
+Automation turn_on_livingroom_lights
+    condition:
+        motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs.power: true
+    description: "Turn on living room lights when motion is detected."
+end
+
+Automation turn_off_livingroom_lights
+    condition:
+        motion_sensor.motion_detected == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs.power: false
+    description: "Turn off living room lights when no motion is detected."
+end
+
+Automation adjust_thermostat
+    condition:
+        system_clock.time >= "06:00" AND system_clock.time <= "22:00"
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat.target_temp: 22.0
+        - smart_thermostat.mode: "auto"
+    description: "Adjust thermostat during the day."
+end
+
+Automation night_mode_thermostat
+    condition:
+        system_clock.time > "22:00" OR system_clock.time < "06:00"
+    enabled: true
+    continuous: true
+    actions:
+        - smart_thermostat.target_temp: 18.0
+        - smart_thermostat.mode: "eco"
+    description: "Adjust thermostat for night mode."
+end
+
+Automation start_coffee_maker
+    condition:
+        system_clock.time == "07:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+        - smart_coffee_maker.brew_strength: "medium"
+    description: "Start coffee maker at 7 AM."
+end
+
+Automation lock_bedroom3_door
+    condition:
+        system_clock.time == "23:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_door_lock.locked: true
+    description: "Lock Bedroom 3 door at 11 PM."
+end
+
+Automation turn_on_bedroom2_fan
+    condition:
+        smart_temperature_sensor.temperature >= 25.0
+    enabled: true
+    continuous: false
+    actions:
+        - smart_fan.power: true
+        - smart_fan.speed: 3
+    description: "Turn on Bedroom 2 fan when temperature is high."
+end
+
+Automation turn_off_bedroom2_fan
+    condition:
+        smart_temperature_sensor.temperature < 25.0
+    enabled: true
+    continuous: false
+    actions:
+        - smart_fan.power: false
+    description: "Turn off Bedroom 2 fan when temperature is low."
+end
+
+Automation start_shower
+    condition:
+        system_clock.time == "06:30"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_shower_system.water_temp: 38.0
+        - smart_shower_system.water_flow: 10.0
+    description: "Start shower system at 6:30 AM."
+end
+
+Automation turn_on_towel_warmer
+    condition:
+        system_clock.time == "06:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_towel_warmer.power: true
+    description: "Turn on towel warmer at 6 AM."
+end
+
+Automation turn_off_towel_warmer
+    condition:
+        system_clock.time == "07:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_towel_warmer.power: false
+    description: "Turn off towel warmer at 7 AM."
+end
+
+Automation turn_on_bedroom3_lights
+    condition:
+        smart_motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_ceiling_light.power: true
+        - smart_ceiling_light.brightness: 100
+    description: "Turn on Bedroom 3 lights when motion is detected."
+end
+
+Automation turn_off_bedroom3_lights
+    condition:
+        smart_motion_sensor.motion_detected == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_ceiling_light.power: false
+    description: "Turn off Bedroom 3 lights when no motion is detected."
+end
+
+Automation start_air_purifier
+    condition:
+        smart_air_purifier.air_quality < 50.0
+    enabled: true
+    continuous: false
+    actions:
+        - smart_air_purifier.power: true
+    description: "Start air purifier when air quality is poor."
+end
+
+Automation stop_air_purifier
+    condition:
+        smart_air_purifier.air_quality >= 50.0
+    enabled: true
+    continuous: false
+    actions:
+        - smart_air_purifier.power: false
+    description: "Stop air purifier when air quality is good."
+end
+
+Automation start_dishwasher
+    condition:
+        system_clock.time == "21:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_dishwasher.power: true
+        - smart_dishwasher.mode: "normal"
+    description: "Start dishwasher at 9 PM."
+end
+
+Automation start_oven
+    condition:
+        system_clock.time == "18:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_oven.power: true
+        - smart_oven.temperature: 180
+    description: "Start oven at 6 PM."
+end
+
+Automation start_exhaust_fan
+    condition:
+        smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_exhaust_fan.power: true
+    description: "Start exhaust fan when smoke is detected."
+end
+
+Automation stop_exhaust_fan
+    condition:
+        smart_smoke_detector.smoke_detected == false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_exhaust_fan.power: false
+    description: "Stop exhaust fan when no smoke is detected."
+end
+
+Automation turn_on_desk_lamp
+    condition:
+        system_clock.time == "20:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_desk_lamp.power: true
+        - smart_desk_lamp.brightness: 100
+    description: "Turn on desk lamp at 8 PM."
+end
+
+Automation turn_off_desk_lamp
+    condition:
+        system_clock.time == "23:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_desk_lamp.power: false
+    description: "Turn off desk lamp at 11 PM."
+end
+
+Automation turn_on_bedroom1_lamp
+    condition:
+        system_clock.time == "19:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_lamp.power: true
+        - smart_lamp.brightness: 100
+    description: "Turn on Bedroom 1 lamp at 7 PM."
+end
+
+Automation turn_off_bedroom1_lamp
+    condition:
+        system_clock.time == "23:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_lamp.power: false
+    description: "Turn off Bedroom 1 lamp at 11 PM."
+end
+
+Automation start_mirror_lights
+    condition:
+        system_clock.time == "06:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.light_brightness: 100
+    description: "Turn on mirror lights at 6 AM."
+end
+
+Automation stop_mirror_lights
+    condition:
+        system_clock.time == "22:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_mirror.light_brightness: 0
+    description: "Turn off mirror lights at 10 PM."
+end
+
+Automation start_toothbrush
+    condition:
+        system_clock.time == "07:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_toothbrush.power: true
+    description: "Start toothbrush at 7 AM."
+end
+
+Automation stop_toothbrush
+    condition:
+        system_clock.time == "07:05"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_toothbrush.power: false
+    description: "Turn off toothbrush at 7:05 AM."
+end

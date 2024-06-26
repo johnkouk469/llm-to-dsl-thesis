@@ -1,0 +1,57 @@
+Certainly! Below is a list of 30 devices categorized by rooms in a three-bedroom, two-bathroom house. These devices include sensors, actuators, and other smart devices that can be used in a smart environment.
+
+### Living Room
+1. **Smart TV**
+2. **Smart Light Bulb**
+3. **Smart Thermostat**
+4. **Smart Speaker**
+5. **Smart Curtain Motor**
+6. **Motion Sensor**
+7. **Air Quality Sensor**
+
+### Kitchen
+8. **Smart Refrigerator**
+9. **Smart Oven**
+10. **Smart Dishwasher**
+11. **Water Leak Sensor**
+12. **Smoke Detector**
+13. **Temperature Sensor**
+14. **Smart Coffee Maker**
+
+### Master Bedroom
+15. **Smart Bed**
+16. **Smart Alarm Clock**
+17. **Smart Light Switch**
+18. **Smart Plug**
+19. **Smart Fan**
+20. **Door/Window Sensor**
+
+### Bedroom 2
+21. **Smart Light Strip**
+22. **Smart Speaker**
+23. **Smart Air Purifier**
+24. **Smart Radiator Valve**
+25. **Occupancy Sensor**
+
+### Bedroom 3
+26. **Smart Desk Lamp**
+27. **Smart Humidifier**
+28. **Smart Camera**
+29. **Smart Blinds**
+30. **Temperature and Humidity Sensor**
+
+### Bathroom 1
+31. **Smart Mirror**
+32. **Smart Scale**
+33. **Smart Showerhead**
+34. **Water Flow Sensor**
+35. **Humidity Sensor**
+
+### Bathroom 2
+36. **Smart Toilet**
+37. **Smart Light Bulb**
+38. **Leak Detector**
+39. **Smart Exhaust Fan**
+40. **Water Temperature Sensor**
+
+These devices can be integrated into a comprehensive smart home system to automate and manage various aspects of the environment, enhancing comfort, security, and efficiency.

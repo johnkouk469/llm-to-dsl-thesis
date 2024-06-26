@@ -1,0 +1,61 @@
+entities
+    Entity Doctor
+        cardiologist,
+        dentist,
+        doc
+    end
+end
+
+synonyms
+end
+
+gslots
+    slotA: int = 10,
+    slotB: str = "asdas",
+    slotC: str
+end
+
+triggers
+  Intent ask_weather
+    "I want to tell me the weather",
+    "Tell me the weather please"
+  end
+
+  Intent ask_weather_2
+    "I want to tell me the weather for" PE:GPE['Thessaloniki', 'Athens'],
+    "Tell me the weather please for" PE:DATE['tomorrow', 'today'],
+    "Tell me the weather" PE:DATE['tomorrow', 'today'] "for"  PE:GPE['Thessaloniki', 'Athens']
+  end
+end
+
+eservices
+    EServiceHTTP weather_svc
+        verb: GET
+        host: 'r4a.issel.ee.auth.gr'
+        port: 8080
+        path: '/weather'
+    end
+end
+
+dialogues
+  Dialogue weather_dialogue
+        on: ask_weather, ask_weather_2
+        responses:
+          Form form1
+            city_slot: str = HRI("For which city" USER:NAME "?", [PE:GPE])
+            time_slot: str = HRI('For when?', [TE:Doctor])
+            answer: str = weather_svc(
+                query=[city=[form1.city_slot[city]], time=form1.time_slot, user=USER:NAME],
+                header=[city=form1.city_slot[city], time=form1.time_slot],
+            )[weather.forecast]
+          end,
+          ActionGroup answer_back
+            Speak('Dear' USER:NAME 'the weather in' USER:CITY 'is' form1.answer)
+            FireEvent('/test', {a: 1, b: '2'})
+            FireEvent('/test', '/llalll')
+            FireEvent('/test', ['a', 1, 'b','2'])
+            SetFSlot(form1.city_slot, "Thessaloniki")
+            SetGSlot(slotA, 10)
+          end
+  end
+end

@@ -1,0 +1,557 @@
+Metadata
+    name: ComprehensiveHomeAutomation
+    version: "1.0.0"
+    description: "A comprehensive smart home automation model for a three-bedroom, two-bathroom house."
+    author: "Assistant"
+    email: "assistant@example.com"
+end
+
+Broker<MQTT> home_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: ""
+        password: ""
+end
+
+// Living Room Entities
+Entity smart_tv
+    type: actuator
+    topic: "livingroom.smart_tv"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - channel: int
+end
+
+Entity smart_speaker_livingroom
+    type: actuator
+    topic: "livingroom.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - song: str
+end
+
+Entity motion_sensor_livingroom
+    type: sensor
+    freq: 5
+    topic: "livingroom.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion: bool
+end
+
+Entity smart_light_livingroom
+    type: actuator
+    topic: "livingroom.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity thermostat_livingroom
+    type: sensor
+    freq: 5
+    topic: "livingroom.thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity smart_plug_livingroom
+    type: actuator
+    topic: "livingroom.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity air_quality_sensor_livingroom
+    type: sensor
+    freq: 5
+    topic: "livingroom.air_quality_sensor"
+    broker: home_broker
+    attributes:
+        - air_quality_index: int
+end
+
+Entity smart_blinds_livingroom
+    type: actuator
+    topic: "livingroom.smart_blinds"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+// Kitchen Entities
+Entity smart_fridge
+    type: actuator
+    topic: "kitchen.smart_fridge"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - door_open: bool
+end
+
+Entity smart_oven
+    type: actuator
+    topic: "kitchen.smart_oven"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - timer: int
+        - power: bool
+end
+
+Entity smart_coffee_maker
+    type: actuator
+    topic: "kitchen.smart_coffee_maker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brew_strength: str
+end
+
+Entity water_leak_sensor_kitchen
+    type: sensor
+    freq: 5
+    topic: "kitchen.water_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smoke_detector_kitchen
+    type: sensor
+    freq: 5
+    topic: "kitchen.smoke_detector"
+    broker: home_broker
+    attributes:
+        - smoke_detected: bool
+end
+
+Entity smart_faucet
+    type: actuator
+    topic: "kitchen.smart_faucet"
+    broker: home_broker
+    attributes:
+        - flow_rate: float
+        - temperature: float
+end
+
+Entity smart_dishwasher
+    type: actuator
+    topic: "kitchen.smart_dishwasher"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - cycle: str
+end
+
+Entity temperature_sensor_kitchen
+    type: sensor
+    freq: 5
+    topic: "kitchen.temperature_sensor"
+    broker: home_broker
+    attributes:
+        - temperature: float
+end
+
+// Master Bedroom Entities
+Entity smart_bed
+    type: actuator
+    topic: "masterbedroom.smart_bed"
+    broker: home_broker
+    attributes:
+        - position: int
+        - heating: bool
+end
+
+Entity smart_alarm_clock_master
+    type: actuator
+    topic: "masterbedroom.smart_alarm_clock"
+    broker: home_broker
+    attributes:
+        - time: time
+        - alarm_set: bool
+end
+
+Entity smart_light_master
+    type: actuator
+    topic: "masterbedroom.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity smart_speaker_master
+    type: actuator
+    topic: "masterbedroom.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - song: str
+end
+
+Entity air_purifier_master
+    type: actuator
+    topic: "masterbedroom.air_purifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+Entity thermostat_master
+    type: sensor
+    freq: 5
+    topic: "masterbedroom.thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity smart_plug_master
+    type: actuator
+    topic: "masterbedroom.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity motion_sensor_master
+    type: sensor
+    freq: 5
+    topic: "masterbedroom.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion: bool
+end
+
+// Bedroom 2 Entities
+Entity smart_light_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity smart_speaker_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - song: str
+end
+
+Entity thermostat_bedroom2
+    type: sensor
+    freq: 5
+    topic: "bedroom2.thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity smart_plug_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity motion_sensor_bedroom2
+    type: sensor
+    freq: 5
+    topic: "bedroom2.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion: bool
+end
+
+Entity smart_curtain_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_curtain"
+    broker: home_broker
+    attributes:
+        - position: int
+end
+
+Entity smart_alarm_clock_bedroom2
+    type: actuator
+    topic: "bedroom2.smart_alarm_clock"
+    broker: home_broker
+    attributes:
+        - time: time
+        - alarm_set: bool
+end
+
+// Bedroom 3 Entities
+Entity smart_light_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity smart_speaker_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_speaker"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - volume: int
+        - song: str
+end
+
+Entity thermostat_bedroom3
+    type: sensor
+    freq: 5
+    topic: "bedroom3.thermostat"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity smart_plug_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_plug"
+    broker: home_broker
+    attributes:
+        - power: bool
+end
+
+Entity motion_sensor_bedroom3
+    type: sensor
+    freq: 5
+    topic: "bedroom3.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion: bool
+end
+
+Entity smart_alarm_clock_bedroom3
+    type: actuator
+    topic: "bedroom3.smart_alarm_clock"
+    broker: home_broker
+    attributes:
+        - time: time
+        - alarm_set: bool
+end
+
+Entity air_purifier_bedroom3
+    type: actuator
+    topic: "bedroom3.air_purifier"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - speed: int
+end
+
+// Bathroom 1 Entities
+Entity smart_shower_bathroom1
+    type: actuator
+    topic: "bathroom1.smart_shower"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - flow_rate: float
+end
+
+Entity smart_mirror_bathroom1
+    type: actuator
+    topic: "bathroom1.smart_mirror"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity water_leak_sensor_bathroom1
+    type: sensor
+    freq: 5
+    topic: "bathroom1.water_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_light_bathroom1
+    type: actuator
+    topic: "bathroom1.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity smart_scale_bathroom1
+    type: actuator
+    topic: "bathroom1.smart_scale"
+    broker: home_broker
+    attributes:
+        - weight: float
+        - body_fat_percentage: float
+end
+
+// Bathroom 2 Entities
+Entity smart_shower_bathroom2
+    type: actuator
+    topic: "bathroom2.smart_shower"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - flow_rate: float
+end
+
+Entity smart_mirror_bathroom2
+    type: actuator
+    topic: "bathroom2.smart_mirror"
+    broker: home_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity water_leak_sensor_bathroom2
+    type: sensor
+    freq: 5
+    topic: "bathroom2.water_leak_sensor"
+    broker: home_broker
+    attributes:
+        - leak_detected: bool
+end
+
+Entity smart_light_bathroom2
+    type: actuator
+    topic: "bathroom2.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+Entity smart_scale_bathroom2
+    type: actuator
+    topic: "bathroom2.smart_scale"
+    broker: home_broker
+    attributes:
+        - weight: float
+        - body_fat_percentage: float
+end
+
+// Hallway/Entryway Entities
+Entity smart_door_lock
+    type: actuator
+    topic: "hallway.smart_door_lock"
+    broker: home_broker
+    attributes:
+        - locked: bool
+end
+
+Entity smart_doorbell
+    type: sensor
+    freq: 5
+    topic: "hallway.smart_doorbell"
+    broker: home_broker
+    attributes:
+        - doorbell_pressed: bool
+end
+
+Entity motion_sensor_hallway
+    type: sensor
+    freq: 5
+    topic: "hallway.motion_sensor"
+    broker: home_broker
+    attributes:
+        - motion: bool
+end
+
+Entity smart_light_hallway
+    type: actuator
+    topic: "hallway.smart_light"
+    broker: home_broker
+    attributes:
+        - brightness: int
+        - color: str
+        - power: bool
+end
+
+// Automations
+Automation turn_on_livingroom_lights
+    condition:
+        motion_sensor_livingroom.motion is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_livingroom.power: true
+        - smart_light_livingroom.brightness: 80
+end
+
+Automation turn_off_livingroom_lights
+    condition:
+        motion_sensor_livingroom.motion is false
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_livingroom.power: false
+end
+
+Automation set_livingroom_temperature
+    condition:
+        thermostat_livingroom.temperature > 25
+    enabled: true
+    continuous: false
+    actions:
+        - thermostat_livingroom.temperature: 22
+end
+
+Automation alert_water_leak_kitchen
+    condition:
+        water_leak_sensor_kitchen.leak_detected is true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_plug_kitchen.power: false
+        - smart_light_kitchen.color: "red"
+        - smart_speaker_kitchen.song: "Alert: Water Leak Detected"
+end
+
+Automation lock_door_at_night
+    condition:
+        time >= "22:00"
+    enabled: true
+    continuous: false
+    actions:
+        - smart_door_lock.locked: true
+end
+
+RTMonitor
+    broker: home_broker
+    namespace: "smauto.comprehensive_home_auto"
+    eventTopic: "event"
+    logsTopic: "logs"
+end

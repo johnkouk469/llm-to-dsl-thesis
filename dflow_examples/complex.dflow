@@ -1,0 +1,77 @@
+entities
+    Entity Doctor
+        cardiologist,
+        dentist,
+        doc
+    end
+end
+
+triggers
+    Intent find_doctor
+        "I want" TE:Doctor "please",
+        TE:Doctor "please!",
+        "I want to call" TE:Doctor,
+        "I want to call" TE:Doctor,
+        "I want to call" TE:Doctor "test" "test",
+        "I want to call" PE:PERSON "test",
+        "I want to call" PE:PERSON["Test"] "test"
+    end
+
+    Intent time
+        "what time is it",
+        "what's the time",
+        "tell me the time",
+        "is it late already"
+    end
+
+    Intent affirm
+      "yes",
+      "yeahh",
+      "absolutely",
+      "yeap",
+      "y"
+    end
+
+    Intent deny
+      "no",
+      "nohh",
+      "no way",
+      "nope",
+      "n"
+    end
+
+    Event external_1
+        "bot/event/external_1"
+    end
+end
+
+dialogues
+    Dialogue DialA
+        on: external_1
+        responses: ActionGroup answers
+          Speak('Hello')
+        end
+    end
+
+    Dialogue DialB
+        on: find_doctor
+        responses:
+          Form AF1
+            Param1: int = HRI('Give me a number')
+            Param2: bool = HRI('yes/no', [affirm:True, deny:False])
+            Param3: str = HRI('Give a name')
+          end,
+          ActionGroup answers_2
+            Speak('perfect thanks!')
+            FireEvent('external/complete' AF1.Param2, ['bye bye', AF1.Param1])
+          end
+    end
+
+    Dialogue dial3
+      on: time
+      responses:
+        ActionGroup say_time
+          Speak('The time is ' SYSTEM: time)
+        end
+    end
+end

@@ -1,0 +1,57 @@
+Sure! Here is a list of 30 devices categorized by room in a three-bedroom and two-bathroom house. The devices include sensors, actuators, and other smart home devices that can be used in a smart environment.
+
+### Living Room
+1. **Smart Thermostat** - Controls heating and cooling.
+2. **Smart Light Bulb** - Adjustable lighting.
+3. **Smart Speaker** - Voice-controlled assistant.
+4. **Smart TV** - Connected television.
+5. **Motion Sensor** - Detects movement.
+6. **Smart Air Purifier** - Monitors and purifies air.
+7. **Smart Curtain Controller** - Automates curtain movements.
+
+### Kitchen
+1. **Smart Refrigerator** - Monitors food inventory and temperature.
+2. **Smart Oven** - Remote-controlled cooking.
+3. **Smart Dishwasher** - Energy-efficient dishwashing.
+4. **Leak Sensor** - Detects water leaks.
+5. **Smart Coffee Maker** - Programmable coffee brewing.
+6. **Smart Smoke Detector** - Detects smoke and CO2.
+7. **Smart Faucet** - Touchless water control.
+
+### Master Bedroom
+1. **Smart Bed** - Monitors sleep patterns.
+2. **Smart Light Switch** - Remote light control.
+3. **Smart Alarm Clock** - Integrates with other devices.
+4. **Smart Blinds** - Automated window shades.
+5. **Temperature Sensor** - Monitors room temperature.
+6. **Smart Fan** - Remote control of fan speed and oscillation.
+
+### Bedroom 2
+1. **Smart Lamp** - Adjustable lighting.
+2. **Smart Plug** - Controls connected devices.
+3. **Air Quality Sensor** - Monitors air quality.
+4. **Smart Mirror** - Displays weather, time, and news.
+5. **Smart Door Lock** - Keyless entry.
+
+### Bedroom 3
+1. **Smart Baby Monitor** - Audio and video monitoring.
+2. **Smart Humidifier** - Controls humidity levels.
+3. **Smart Night Light** - Adjustable brightness and color.
+4. **Window Sensor** - Monitors window status (open/closed).
+5. **Smart Speaker** - Voice-controlled assistant.
+
+### Bathroom 1
+1. **Smart Shower** - Temperature and flow control.
+2. **Smart Scale** - Tracks weight and health metrics.
+3. **Smart Mirror** - Displays news, weather, and time.
+4. **Humidity Sensor** - Monitors humidity levels.
+5. **Smart Toilet** - Automated flushing and cleaning.
+
+### Bathroom 2
+1. **Leak Sensor** - Detects water leaks.
+2. **Smart Towel Warmer** - Controls towel warming.
+3. **Smart Light Bulb** - Adjustable lighting.
+4. **Motion Sensor** - Detects movement.
+5. **Smart Speaker** - Voice-controlled assistant.
+
+This list provides a variety of devices that can be used to create a smart environment in each room of a three-bedroom, two-bathroom house.

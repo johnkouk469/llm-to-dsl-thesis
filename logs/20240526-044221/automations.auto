@@ -1,0 +1,146 @@
+```plaintext
+Automation living_room_motion_detection
+    condition:
+        living_room_motion_sensor.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_light_bulb.power: true
+        - living_room.smart_tv.power: true
+        - living_room.smart_speaker.power: true
+end
+
+Automation evening_lighting
+    condition:
+        system_clock.time >= 18:00
+    enabled: true
+    continuous: true
+    actions:
+        - living_room.smart_light_bulb.brightness: 70
+        - kitchen.smart_lighting.power: true
+        - kitchen.smart_lighting.brightness: 70
+    starts:
+        - night_mode
+end
+
+Automation night_mode
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - living_room.smart_light_bulb.power: false
+        - kitchen.smart_lighting.power: false
+        - bedroom1.smart_lamp.brightness: 20
+        - bedroom2.smart_night_light.power: true
+end
+
+Automation morning_coffee
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_coffee_maker.power: true
+end
+
+Automation refrigerator_door_open
+    condition:
+        kitchen.smart_refrigerator.door_open == true
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_lighting.power: true
+end
+
+Automation smoke_alert
+    condition:
+        kitchen.smart_smoke_detector.smoke_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_faucet.water_flow: true
+        - kitchen.smart_oven.power: false
+        - kitchen.smart_dishwasher.power: false
+end
+
+Automation master_bedroom_alarm
+    condition:
+        master_bedroom.smart_alarm_clock.alarm_set == true
+    enabled: true
+    continuous: false
+    actions:
+        - master_bedroom.smart_light_switch.power: true
+        - master_bedroom.smart_ceiling_fan.power: true
+        - master_bedroom.smart_air_conditioner.power: true
+end
+
+Automation master_bedroom_humidity_control
+    condition:
+        master_bedroom.smart_humidifier.humidity_level < 40
+    enabled: true
+    continuous: false
+    actions:
+        - master_bedroom.smart_humidifier.power: true
+end
+
+Automation bedroom1_night_mode
+    condition:
+        system_clock.time >= 21:00
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom1.smart_lamp.power: false
+        - bedroom1.smart_curtain.position: 0
+        - bedroom1.smart_heater.power: true
+end
+
+Automation bedroom2_night_security
+    condition:
+        system_clock.time >= 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2.smart_door_lock.locked: true
+        - bedroom2.smart_window_sensor.window_open: false
+end
+
+Automation bathroom1_morning_routine
+    condition:
+        system_clock.time == 07:30
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_mirror.power: true
+        - bathroom1.smart_shower.water_temp: 38.0
+        - bathroom1.smart_towel_warmer.power: true
+end
+
+Automation bathroom1_weight_measure
+    condition:
+        bathroom1.smart_scale.weight != 0
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_mirror.brightness: 100
+end
+
+Automation bathroom2_leak_detection
+    condition:
+        bathroom2.smart_leak_detector.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_vent_fan.power: true
+end
+
+Automation bathroom2_morning_lighting
+    condition:
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_lighting_bathroom2.power: true
+        - bathroom2.smart_lighting_bathroom2.brightness: 50
+end
+```

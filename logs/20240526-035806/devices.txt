@@ -1,0 +1,52 @@
+Sure! Below is a list of 30 devices that can be used in a smart environment, categorized by room in a three-bedroom and two-bathroom house.
+
+### Living Room
+1. **Smart TV**
+2. **Smart Light Bulbs**
+3. **Smart Thermostat**
+4. **Smart Speaker**
+5. **Smart Window Blinds**
+
+### Kitchen
+6. **Smart Refrigerator**
+7. **Smart Oven**
+8. **Smart Coffee Maker**
+9. **Smart Dishwasher**
+10. **Smart Smoke Detector**
+
+### Bedroom 1
+11. **Smart Bed**
+12. **Smart Alarm Clock**
+13. **Smart Light Bulbs**
+14. **Smart Air Purifier**
+15. **Smart Window Blinds**
+
+### Bedroom 2
+16. **Smart Bed**
+17. **Smart Alarm Clock**
+18. **Smart Light Bulbs**
+19. **Smart Air Purifier**
+20. **Smart Window Blinds**
+
+### Bedroom 3
+21. **Smart Bed**
+22. **Smart Alarm Clock**
+23. **Smart Light Bulbs**
+24. **Smart Air Purifier**
+25. **Smart Window Blinds**
+
+### Bathroom 1
+26. **Smart Shower System**
+27. **Smart Mirror**
+28. **Smart Scale**
+29. **Smart Water Leak Sensor**
+30. **Smart Towel Warmer**
+
+### Bathroom 2
+26. **Smart Shower System**
+27. **Smart Mirror**
+28. **Smart Scale**
+29. **Smart Water Leak Sensor**
+30. **Smart Towel Warmer**
+
+This list covers a variety of sensors, actuators, and other smart devices that could be used to automate and enhance the living experience in different rooms of a smart home.

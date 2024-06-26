@@ -1,1 +1,0 @@
-Set the aircondition in my living room to 22 degrees in cool mode, when it is already on and the temperature is higher than 30 degrees.

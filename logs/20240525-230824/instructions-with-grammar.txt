@@ -1,0 +1,303 @@
+### Enhanced Instructions for Creating a SmAuto Model with TextX Grammar Files
+
+TextX is a meta-language and a tool for building Domain-Specific Languages (DSLs) and code generators. SmAuto DSL is built using TextX, and it defines the structure of SmAuto models through several grammar files. These files include definitions for brokers, entities, automations, conditions, and more.
+
+### Components of the SmAuto Model
+
+1. **Broker** - Defines the communication layer for messages.
+2. **Entity** - Represents smart devices like sensors and actuators.
+3. **Automation** - Describes actions triggered by specific conditions.
+4. **Condition** - Specifies criteria for triggering actions.
+5. **Action** - Tasks performed when conditions are met.
+6. **Metadata** - Optional information about the model.
+7. **RTMonitor** - Optional monitoring parameters for runtime.
+
+### TextX Grammar Files
+
+The SmAuto DSL is defined using the following TextX grammar files:
+1. `automation.tx`
+2. `communication.tx`
+3. `condition.tx`
+4. `entity.tx`
+5. `smauto.tx`
+6. `types.tx`
+7. `utils.tx`
+
+### Detailed Explanations and Usage of TextX Grammar Files
+
+#### 1. `smauto.tx`
+
+This is the root grammar file that includes references to other grammar files and provides the overall structure of a SmAuto model.
+
+**Example:**
+```plaintext
+Model:
+    (Metadata | Broker | Entity | Automation | RTMonitor)*
+;
+```
+
+Here, the `Model` rule includes optional and repeated definitions of `Metadata`, `Broker`, `Entity`, `Automation`, and `RTMonitor`.
+
+#### 2. `communication.tx`
+
+Defines the structure for brokers which are essential for device communication.
+
+**Example:**
+```plaintext
+Broker:
+    'Broker' '<' brokerType=ID '>' name=ID '{'
+        'host' ':' host=STRING
+        'port' ':' port=INT
+        ('auth' ':' '{'
+            'username' ':' username=STRING
+            'password' ':' password=STRING
+        '}')?
+        ('vhost' ':' vhost=STRING)?
+        ('topicExchange' ':' topicExchange=STRING)?
+        ('rpcExchange' ':' rpcExchange=STRING)?
+        ('db' ':' db=INT)?
+    '}'
+;
+```
+
+**Usage:**
+```plaintext
+Broker<MQTT> home_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: ""
+        password: ""
+end
+```
+
+#### 3. `entity.tx`
+
+Defines entities which are the smart devices in the environment.
+
+**Example:**
+```plaintext
+Entity:
+    'Entity' name=ID '{'
+        'type' ':' type=ID
+        'topic' ':' topic=STRING
+        'broker' ':' broker=[Broker]
+        ('freq' ':' freq=INT)?
+        'attributes' ':' '{'
+            attributes+=Attribute (',' attributes+=Attribute)*
+        '}'
+    '}'
+;
+
+Attribute:
+    name=ID ':' type=DataType
+;
+
+DataType:
+    'int' | 'float' | 'bool' | 'str' | 'time' | 'list' | 'dict'
+;
+```
+
+**Usage:**
+```plaintext
+Entity weather_station
+    type: sensor
+    freq: 5
+    topic: "porch.weather_station"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+```
+
+#### 4. `automation.tx`
+
+Defines the structure for automations which specify the actions and conditions.
+
+**Example:**
+```plaintext
+Automation:
+    'Automation' name=ID '{'
+        'condition' ':' condition=Condition
+        'enabled' ':' enabled=BOOL
+        'continuous' ':' continuous=BOOL
+        'actions' ':' '{'
+            actions+=Action (',' actions+=Action)*
+        '}'
+    '}'
+;
+```
+
+**Usage:**
+```plaintext
+Automation start_aircondition
+    condition:
+        (weather_station.temperature > 32) AND (aircondition.on is true)
+    enabled: true
+    continuous: false
+    actions:
+        - aircondition.temperature:  25.0
+        - aircondition.mode:  "cool"
+        - aircondition.on:  true
+end
+```
+
+#### 5. `condition.tx`
+
+Defines conditions that trigger actions in automations.
+
+**Example:**
+```plaintext
+Condition:
+    OrCondition
+;
+
+OrCondition:
+    AndCondition ('OR' AndCondition)*
+;
+
+AndCondition:
+    NotCondition ('AND' NotCondition)*
+;
+
+NotCondition:
+    'NOT' NotCondition | Comparison
+;
+
+Comparison:
+    left=Operand op=ComparisonOperator right=Operand
+;
+
+Operand:
+    EntityAttribute | Constant
+;
+
+EntityAttribute:
+    entity=[Entity] '.' attribute=[Attribute]
+;
+
+ComparisonOperator:
+    '>' | '<' | '>=' | '<=' | '==' | '!='
+;
+
+Constant:
+    INT | FLOAT | BOOL | STRING
+;
+```
+
+**Usage:**
+```plaintext
+condition:
+    (weather_station.temperature > 32) AND (aircondition.on is true)
+```
+
+#### 6. `types.tx`
+
+Defines data types used in attributes and conditions.
+
+**Example:**
+```plaintext
+DataType:
+    'int' | 'float' | 'bool' | 'str' | 'time' | 'list' | 'dict'
+;
+```
+
+#### 7. `utils.tx`
+
+Provides utility functions and common definitions used across multiple files.
+
+**Example:**
+```plaintext
+STRING: /".*?"/;
+ID: /[_a-zA-Z][_a-zA-Z0-9]*/;
+INT: /-?\d+/;
+FLOAT: /-?\d+\.\d+/;
+BOOL: 'true' | 'false';
+```
+
+### Example of Using TextX Grammar Files to Create a SmAuto Model
+
+#### Complete Model Example:
+
+```plaintext
+# Define Metadata
+Metadata
+    name: SimpleHomeAutomation
+    version: "0.1.0"
+    description: "Simple home automation model."
+    author: "klpanagi"
+    email: "klpanagi@gmail.com"
+end
+
+# Define Broker
+Broker<MQTT> home_broker
+    host: "localhost"
+    port: 1883
+    auth:
+        username: ""
+        password: ""
+end
+
+# Define Entities
+Entity weather_station
+    type: sensor
+    freq: 5
+    topic: "porch.weather_station"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - humidity: int
+end
+
+Entity aircondition
+    type: actuator
+    topic: "bedroom.aircondition"
+    broker: home_broker
+    attributes:
+        - temperature: float
+        - mode: str
+        - on: bool
+end
+
+# Define Automation
+Automation start_aircondition
+    condition:
+        (weather_station.temperature > 32) AND (aircondition.on is true)
+    enabled: true
+    continuous: false
+    actions:
+        - aircondition.temperature:  25.0
+        - aircondition.mode:  "cool"
+        - aircondition.on:  true
+end
+
+# Define RTMonitor
+RTMonitor
+    broker: home_broker
+    namespace: "smauto.simple_home_auto"
+    eventTopic: "event"
+    logsTopic: "logs"
+end
+```
+
+### Validating and Generating Code
+
+**Validate Model:**
+```bash
+smauto validate model.auto
+```
+
+**Generate Virtual Entities:**
+```bash
+smauto genv model.auto
+```
+
+**Generate Automation Code:**
+```bash
+smauto gen model.auto
+```
+
+### Conclusion
+
+By following these detailed instructions and examples, you can create, validate, and generate advanced and complicated SmAuto models using TextX grammar files. Each grammar file plays a crucial role in defining the structure and behavior of the SmAuto model, ensuring a robust and flexible automation system for smart environments.

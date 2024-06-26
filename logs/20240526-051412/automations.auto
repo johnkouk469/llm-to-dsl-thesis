@@ -1,0 +1,163 @@
+```SmAuto
+Automation living_room_motion_detected
+    condition:
+        motion_sensor_living_room.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_living_room.power: true
+        - smart_speaker.power: true
+    starts:
+        - living_room_motion_not_detected
+end
+
+Automation living_room_motion_not_detected
+    condition:
+        motion_sensor_living_room.motion_detected == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_living_room.power: false
+        - smart_speaker.power: false
+    starts:
+        - living_room_motion_detected
+end
+
+Automation start_smart_coffee_maker
+    condition:
+        system_clock.time >= 06:30
+    enabled: true
+    continuous: false
+    actions:
+        - smart_coffee_maker.power: true
+        - smart_coffee_maker.brew_strength: "strong"
+end
+
+Automation kitchen_water_leak_detected
+    condition:
+        water_leak_sensor_kitchen.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_dishwasher.power: false
+        - smart_oven.power: false
+end
+
+Automation master_bedroom_motion_detected
+    condition:
+        motion_sensor_master_bedroom.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_master_bedroom.power: true
+        - smart_blinds.position: 100
+end
+
+Automation master_bedroom_motion_not_detected
+    condition:
+        motion_sensor_master_bedroom.motion_detected == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_master_bedroom.power: false
+        - smart_blinds.position: 0
+    starts:
+        - master_bedroom_motion_detected
+end
+
+Automation bedroom1_motion_detected
+    condition:
+        motion_sensor_bedroom1.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_bedroom1.power: true
+        - smart_fan_bedroom1.power: true
+end
+
+Automation bedroom1_motion_not_detected
+    condition:
+        motion_sensor_bedroom1.motion_detected == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_bedroom1.power: false
+        - smart_fan_bedroom1.power: false
+    starts:
+        - bedroom1_motion_detected
+end
+
+Automation bedroom2_door_open
+    condition:
+        door_window_sensor.door_open == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_bedroom2.power: true
+end
+
+Automation bedroom2_door_closed
+    condition:
+        door_window_sensor.door_open == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_bedroom2.power: false
+    starts:
+        - bedroom2_door_open
+end
+
+Automation bathroom1_motion_detected
+    condition:
+        motion_sensor_bathroom2.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_bathroom1.power: true
+end
+
+Automation bathroom1_motion_not_detected
+    condition:
+        motion_sensor_bathroom2.motion_detected == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_bathroom1.power: false
+    starts:
+        - bathroom1_motion_detected
+end
+
+Automation bathroom2_motion_detected
+    condition:
+        motion_sensor_bathroom2.motion_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - smart_light_bulbs_bathroom2.power: true
+end
+
+Automation bathroom2_motion_not_detected
+    condition:
+        motion_sensor_bathroom2.motion_detected == false
+    enabled: false
+    actions:
+        - smart_light_bulbs_bathroom2.power: false
+    starts:
+        - bathroom2_motion_detected
+end
+
+Automation master_bedroom_alarm_clock
+    condition:
+        system_clock.time == 07:00
+    enabled: true
+    continuous: false
+    actions:
+        - smart_alarm_clock.alarm_set: true
+        - smart_alarm_clock.alarm_time: "07:00"
+        - smart_light_bulbs_master_bedroom.power: true
+end
+
+Automation bedroom2_humidifier_control
+    condition:
+        ((temperature_humidity_sensor_kitchen.humidity > 60) AND (smart_humidifier.power == false)) OR ((temperature_humidity_sensor_kitchen.humidity < 30) AND (smart_humidifier.power == true))
+    enabled: true
+    continuous: true
+    actions:
+        - smart_humidifier.power: smart_humidifier.power == false
+end
+```

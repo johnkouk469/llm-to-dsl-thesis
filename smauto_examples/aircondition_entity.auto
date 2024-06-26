@@ -1,0 +1,74 @@
+Broker<MQTT> home_mqtt_broker
+    host: "localhost"
+    port: 3005
+    auth:
+        username: "myAmazingHome"
+        password: "skeC*xw_U2mF"
+end
+
+Entity airconditioner
+    type: actuator
+    topic: "home/livingroom/airconditioner"
+    description: "Controls the living room air conditioning unit"
+    freq: 60
+    broker: home_mqtt_broker
+    attributes:
+        - power : bool = false -> replay([true, false, false, true], 4)
+        - temperature : float = 24.5 -> gaussian(24.5, 30, 0.5) with noise uniform(-0.5, 0.5)
+        - mode : str = "cooling"
+        - fan_speed : int = 3 -> linear(1, 1) with noise gaussian(0, 1)
+end
+
+Entity philips_hue_bulb
+    type: actuator
+    topic: "living_room.philips_hue"
+    broker: home_mqtt_broker
+    attributes:
+        - brightness: float -> linear(0, 100) with noise uniform(-5, 5)
+        - color_temperature: int -> linear(2000, 6500) with noise uniform(-50, 50)
+end
+
+Entity lifx_smart_bulb
+    type: actuator
+    topic: "bedroom.lifx"
+    broker: home_mqtt_broker
+    attributes:
+        - brightness: float -> gaussian(50, 100, 10) with noise uniform(-5, 5)
+        - color_temperature: int 
+end
+
+Entity belkin_wemo_smart_light_switch
+    type: actuator
+    topic: "kitchen.belkin_wemo"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool -> constant(true)
+        - brightness: float -> constant(0.7)
+end
+
+Entity ikea_tradfri_smart_bulb
+    type: actuator
+    topic: "dining_room.ikea_tradfri"
+    broker: home_mqtt_broker
+    attributes:
+        - brightness: float -> linear(0, 100) with noise uniform(-5, 5)
+        - color_temperature: int -> linear(2000, 6500) with noise uniform(-50, 50)
+end
+
+Entity ge_smart_bulb
+    type: actuator
+    topic: "living_room.ge_smart_bulb"
+    broker: home_mqtt_broker
+    attributes:
+        - brightness: float -> gaussian(50, 100, 10) with noise uniform(-5, 5)
+        - color_temperature: int -> saw(2000, 6500, 100) with noise gaussian(1, 2, 0.3)
+end
+
+Entity lutron_caseta_smart_lighting_dimmer
+    type: actuator
+    topic: "bedroom.lutron_caseta"
+    broker: home_mqtt_broker
+    attributes:
+        - brightness: float -> linear(0, 100) with noise uniform(-5, 5)
+        - dimmer_level: int -> saw(0, 100, 5) with noise gaussian(1, 2, 0.3)
+end

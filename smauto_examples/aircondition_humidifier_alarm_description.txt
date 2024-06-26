@@ -1,0 +1,9 @@
+My smart home devices communicate with each other using my CasaStream MQTT broker.
+CasaStream is running on this machine and is listening on port 1883, login as John by using the password w/%th5:!V7mR.
+In my bedroom I have sensors for the himidity and the the temperature of the room, an aircondition and a humidifier.
+In my kitchen a gas sensor.
+I want the humidifier to power on when the humidity is above 60% and then turn off when it drops the humidity below 30%.
+I want the aircondition to turn on when the temperature in the room is higher than 28 degrees and the humidity is between 30% and 60%. I want it set to 25 degrees on the cool mode.
+Trigger the alarm if gas levels in the kitchen deviate significantly from their usual values.
+Make use of value generators.
+The SmAuto runtime paremeters should be monitored.

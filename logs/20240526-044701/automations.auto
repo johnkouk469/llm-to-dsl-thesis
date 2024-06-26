@@ -1,0 +1,267 @@
+```smauto
+Automation turn_on_living_room_lights
+    condition:
+        (living_room.motion_sensor.motion_detected == true) AND
+        (system_clock.time >= 18:00) AND (system_clock.time <= 06:00)
+    enabled: true
+    continuous: true
+    actions:
+        - living_room.smart_light_bulbs.power: true
+end
+
+Automation turn_off_living_room_lights
+    condition:
+        (living_room.motion_sensor.motion_detected == false) AND
+        (system_clock.time >= 06:01) AND (system_clock.time <= 17:59)
+    enabled: true
+    continuous: true
+    actions:
+        - living_room.smart_light_bulbs.power: false
+end
+
+Automation adjust_thermostat_living_room
+    condition:
+        living_room.smart_thermostat.current_temp < 20
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_thermostat.target_temp: 22
+end
+
+Automation open_window_blinds_morning
+    condition:
+        system_clock.time == 06:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_window_blinds.position: 100
+end
+
+Automation close_window_blinds_night
+    condition:
+        system_clock.time == 20:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_window_blinds.position: 0
+end
+
+Automation turn_on_air_purifier
+    condition:
+        living_room.smart_air_purifier.air_quality_index > 100
+    enabled: true
+    continuous: false
+    actions:
+        - living_room.smart_air_purifier.power: true
+end
+
+Automation turn_on_coffee_maker
+    condition:
+        kitchen.smart_oven.timer == 0
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_coffee_maker.power: true
+end
+
+Automation start_dishwasher_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_dishwasher.power: true
+end
+
+Automation alert_water_leak
+    condition:
+        kitchen.water_leak_sensor.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - kitchen.smart_faucet.power: false
+        - kitchen.smart_trash_can.lid_open: false
+end
+
+Automation turn_on_bedroom_lights
+    condition:
+        master_bedroom.smart_alarm_clock.alarm_set == true
+    enabled: true
+    continuous: false
+    actions:
+        - master_bedroom.smart_lighting_system.power: true
+end
+
+Automation adjust_bedroom_thermostat
+    condition:
+        master_bedroom.smart_air_quality_monitor.air_quality_index > 150
+    enabled: true
+    continuous: false
+    actions:
+        - master_bedroom.smart_ceiling_fan.power: true
+end
+
+Automation turn_on_night_light
+    condition:
+        (bedroom2.smart_door_lock.locked == true) AND (system_clock.time >= 20:00)
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom2.smart_night_light.power: true
+end
+
+Automation turn_off_night_light
+    condition:
+        bedroom2.smart_door_lock.locked == false
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2.smart_night_light.power: false
+end
+
+Automation start_humidifier
+    condition:
+        bedroom2.smart_humidifier.humidity_level < 30
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2.smart_humidifier.power: true
+end
+
+Automation close_curtains_at_night
+    condition:
+        system_clock.time == 21:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2.smart_curtain_controller.position: 0
+end
+
+Automation lock_door_at_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2.smart_door_lock.locked: true
+end
+
+Automation alert_co_detected
+    condition:
+        bedroom2.smart_carbon_monoxide_detector.co_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom2.smart_heater.power: false
+end
+
+Automation turn_on_desk_lamp
+    condition:
+        system_clock.time >= 18:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom3.smart_desk_lamp.power: true
+end
+
+Automation turn_off_desk_lamp
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom3.smart_desk_lamp.power: false
+end
+
+Automation turn_on_shower_system
+    condition:
+        bathroom1.smart_toilet.flush == true
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_shower_system.power: true
+end
+
+Automation turn_on_mirror
+    condition:
+        bathroom1.smart_scale.weight > 0
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom1.smart_mirror.power: true
+end
+
+Automation turn_on_toothbrush
+    condition:
+        bathroom2.smart_light_switch.power == true
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_toothbrush.power: true
+end
+
+Automation turn_on_dehumidifier
+    condition:
+        bathroom2.smart_leak_detector.leak_detected == true
+    enabled: true
+    continuous: false
+    actions:
+        - bathroom2.smart_dehumidifier.power: true
+end
+
+Automation turn_on_hallway_lights
+    condition:
+        (hallway.smart_motion_detector.motion_detected == true) AND
+        (system_clock.time >= 18:00) AND (system_clock.time <= 06:00)
+    enabled: true
+    continuous: true
+    actions:
+        - hallway.smart_light_switch.power: true
+end
+
+Automation adjust_main_thermostat
+    condition:
+        hallway.smart_thermostat_main.current_temp < 18
+    enabled: true
+    continuous: false
+    actions:
+        - hallway.smart_thermostat_main.target_temp: 22
+end
+
+Automation lock_garage_door
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - garage.smart_garage_door_opener.door_open: false
+end
+
+Automation start_car_charger
+    condition:
+        system_clock.time == 23:00
+    enabled: true
+    continuous: false
+    actions:
+        - garage.smart_car_charger.charging: true
+end
+
+Automation turn_on_floodlight
+    condition:
+        garage.smart_security_system.alarm_triggered == true
+    enabled: true
+    continuous: false
+    actions:
+        - garage.smart_floodlight.power: true
+end
+
+Automation alert_smoke_co_detected
+    condition:
+        (garage.smart_smoke_co_detector.smoke_detected == true) OR
+        (garage.smart_smoke_co_detector.co_detected == true)
+    enabled: true
+    continuous: false
+    actions:
+        - garage.smart_garage_door_opener.door_open: true
+end
+```
