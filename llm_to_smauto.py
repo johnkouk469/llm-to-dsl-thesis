@@ -766,6 +766,13 @@ In order to write an SmAuto model, you need to define the brokers, entities and 
 I always follow the provided instructions and guidelines 
 to ensure the model is valid and can be parsed by the provided textX grammar."""
 
+history.append(("system", SYSTEM_ROLE))
+history.append(("system", DEFINE_BROKERS))
+history.append(("system", DEFINE_ENTITIES))
+history.append(("system", DEFINE_AUTOMATIONS))
+history.append(("system", SYSTEM_CLOCK_GUIDELINES))
+history.append(("system", DEFINE_METADATA_RTMONITOR))
+history.append(("system", WRITE_SMAUTO_MODEL))
 
 DEVICE_GENERATOR_PROMPT = """
 Generate a list of {num_of_devices} devices that can be used in a smart environment.
@@ -775,7 +782,6 @@ Come up with the devices for each room of a three bedroom and two bathroom house
 
 generate_devices_prompt_template = ChatPromptTemplate.from_messages(
     [
-        MessagesPlaceholder("history"),
         ("system", SYSTEM_ROLE),
         ("user", DEVICE_GENERATOR_PROMPT),
     ]
@@ -784,137 +790,12 @@ generate_devices_prompt_template = ChatPromptTemplate.from_messages(
 
 devices_chain = generate_devices_prompt_template | model | StrOutputParser()
 
-devices = devices_chain.invoke({"num_of_devices": 30, "history": history})
-
-history.append(devices)
+devices = devices_chain.invoke({"num_of_devices": 30})
 
 with open(os.path.join(results_path, "devices.txt"), "w", encoding="utf-8") as file:
     file.write(devices)
     file.close()
 
-WRITE_MODEL_PROMPT = """
-Write a {dsl_name} model using the provided instructions. 
-The devices of the smart envirmoment are {devices}. 
-Decide how they communicate and what automation tasks they perform. 
-Use the provided instructions to guide you in writing the {dsl_name} model. 
-Output only the model code."""
-
-
-## Write smauto brokers
-DEFINE_BROKERS_PROMPT = """
-Write the needed brokers for the smart environment conatining the devices: {devices}.
-The brokers should be defined according to the provided guidelines.
-Output only the broker code."""
-
-# write_brokers_prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", SYSTEM_ROLE),
-#         ("system", DEFINE_BROKERS),
-#         ("user", DEFINE_BROKERS_PROMPT),
-#     ]
-# )
-
-# write_brokers_chain = write_brokers_prompt_template | model | StrOutputParser()
-
-# brokers = write_brokers_chain.invoke({"devices": devices})
-
-# with open(os.path.join(results_path, "brokers.auto"), "w", encoding="utf-8") as file:
-#     file.write(brokers)
-#     file.close()
-
-## Write smauto entities
-DEFINE_ENTITIES_PROMPT = """
-Write the needed entities for the smart environment containing the devices: {devices}.
-You have already defined the brokers that these devices will communicate through.
-The entities should be defined according to the provided guidelines.
-Output only the entity code."""
-
-# write_entities_prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", SYSTEM_ROLE),
-#         ("system", DEFINE_BROKERS),
-#         ("user", DEFINE_BROKERS_PROMPT),
-#         ("assistant", brokers),
-#         ("system", DEFINE_ENTITIES),
-#         ("user", DEFINE_ENTITIES_PROMPT),
-#     ]
-# )
-
-# write_entities_chain = write_entities_prompt_template | model | StrOutputParser()
-
-# entities = write_entities_chain.invoke({"devices": devices})
-
-# with open(os.path.join(results_path, "entities.auto"), "w", encoding="utf-8") as file:
-#     file.write(entities)
-#     file.close()
-
-## Write smauto automations
-DEFINE_AUTOMATIONS_PROMPT = """
-Write the needed automations for the smart environment containing the devices: {devices}.
-You have already defined the entities and the brokers.
-Think of the automation tasks that the devices should perform.
-The automations should be defined according to the provided guidelines.
-Output only the automation code."""
-
-# write_automations_prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", SYSTEM_ROLE),
-#         ("system", DEFINE_ENTITIES),
-#         ("user", DEFINE_ENTITIES_PROMPT),
-#         ("assistant", entities),
-#         ("system", DEFINE_AUTOMATIONS),
-#         ("system", SYSTEM_CLOCK_GUIDELINES),
-#         ("user", DEFINE_AUTOMATIONS_PROMPT),
-#     ]
-# )
-
-# write_automations_chain = write_automations_prompt_template | model | StrOutputParser()
-
-# automations = write_automations_chain.invoke({"devices": devices})
-
-# with open(
-#     os.path.join(results_path, "automations.auto"), "w", encoding="utf-8"
-# ) as file:
-#     file.write(automations)
-#     file.close()
-
-## Construct the SmAuto model
-CONSTRTUCT_SMAUTO_MODEL_PROMPT = """
-Using the brokers, entities, and automations you have defined, write the complete SmAuto model. Define the Metadata and RTMonitor components as well.
-Follow the guidelines provided for each component to ensure the model is correctly structured.
-
-Output only the SmAuto model code.
-Put the code inbetween the ```smauto and ``` tags."""
-
-
-# write_model_prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", SYSTEM_ROLE),
-#         ("system", DEFINE_BROKERS),
-#         ("user", DEFINE_BROKERS_PROMPT),
-#         ("assistant", brokers),
-#         ("system", DEFINE_ENTITIES),
-#         ("user", DEFINE_ENTITIES_PROMPT),
-#         ("assistant", entities),
-#         ("system", DEFINE_AUTOMATIONS),
-#         ("system", SYSTEM_CLOCK_GUIDELINES),
-#         ("user", DEFINE_AUTOMATIONS_PROMPT),
-#         ("assistant", automations),
-#         ("system", DEFINE_METADATA_RTMONITOR),
-#         ("system", WRITE_SMAUTO_MODEL),
-#         ("user", CONSTRTUCT_SMAUTO_MODEL_PROMPT),
-#     ]
-# )
-
-# smauto_model_chain = write_model_prompt_template | model | StrOutputParser()
-
-# smauto_model = smauto_model_chain.invoke({"devices": devices})
-
-# with open(
-#     os.path.join(results_path, "smauto_model.auto"), "w", encoding="utf-8"
-# ) as file:
-#     file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
-#     file.close()
 
 ## Construct the SmAuto model
 CONSTRTUCT_FULL_SMAUTO_MODEL_PROMPT = """
@@ -933,16 +814,7 @@ Put the code inbetween the ```smauto and ``` tags."""
 
 write_full_model_prompt_template = ChatPromptTemplate.from_messages(
     [
-        ("system", SYSTEM_ROLE),
-        ("system", DEFINE_BROKERS),
-        ("user", DEFINE_BROKERS_PROMPT),
-        ("system", DEFINE_ENTITIES),
-        ("user", DEFINE_ENTITIES_PROMPT),
-        ("system", DEFINE_AUTOMATIONS),
-        ("system", SYSTEM_CLOCK_GUIDELINES),
-        ("user", DEFINE_AUTOMATIONS_PROMPT),
-        ("system", DEFINE_METADATA_RTMONITOR),
-        ("system", WRITE_SMAUTO_MODEL),
+        MessagesPlaceholder("history"),
         ("user", CONSTRTUCT_FULL_SMAUTO_MODEL_PROMPT),
     ]
 )
@@ -950,7 +822,7 @@ write_full_model_prompt_template = ChatPromptTemplate.from_messages(
 full_smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
 
 full_smauto_model = full_smauto_model_chain.invoke(
-    {"devices": devices, "smart_enviroment": devices}
+    {"history": history, "smart_enviroment": devices}
 )
 
 with open(
@@ -1012,15 +884,11 @@ Put the code inbetween the ```smauto and ``` tags.
 
 # invalid_model_chain = invalid_model_prompt_template | model | StrOutputParser()
 
-# validation = smauto_api.validate(
-#     smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
-# )
 validation = smauto_api.validate(
     full_smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
 )
 print(validation.text)
-INVALID_MODEL_GENERATIONS = 0
-# while (validation.status_code != 200) or (INVALID_MODEL_GENERATIONS < 5):
+# INVALID_MODEL_GENERATIONS = 0
 # while True:
 #     validation = smauto_api.validate(
 #         smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
