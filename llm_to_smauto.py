@@ -4,7 +4,7 @@ import os
 import time
 
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
@@ -25,6 +25,7 @@ CODE_SUFFIX = "\n```"
 
 model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
+history = []
 
 DEVICE_GENERATOR_PROMPT = """
 Generate a list of {num_of_devices} devices that can be used in a smart environment.
@@ -50,7 +51,7 @@ with open(os.path.join(results_path, "devices.txt"), "w", encoding="utf-8") as f
 
 
 ## Construct the SmAuto model
-CONSTRTUCT_FULL_SMAUTO_MODEL_PROMPT = """
+CONSTRTUCT_SMAUTO_MODEL_PROMPT = """
 Write brokers, entities, and automations, write the complete SmAuto model for the following smart enviroment:
 {smart_enviroment}
 Define the Metadata and RTMonitor components as well.
@@ -67,35 +68,25 @@ Put the code inbetween the ```smauto and ``` tags."""
 write_full_model_prompt_template = ChatPromptTemplate.from_messages(
     [
         MessagesPlaceholder("system_prompt"),
-        ("user", CONSTRTUCT_FULL_SMAUTO_MODEL_PROMPT),
+        ("user", CONSTRTUCT_SMAUTO_MODEL_PROMPT),
     ]
 )
 
-full_smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
+smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
 
-full_smauto_model = full_smauto_model_chain.invoke(
+smauto_model = smauto_model_chain.invoke(
     {"system_prompt": smauto_system_prompt.get_system_prompt(), "smart_enviroment": devices}
 )
 
+history.append(("user", HumanMessagePromptTemplate.from_template(CONSTRTUCT_SMAUTO_MODEL_PROMPT).format(smart_enviroment=devices).pretty_repr()))
+history.append(("assistant", smauto_model))
+
 with open(
-    os.path.join(results_path, "full_smauto_model.auto"), "w", encoding="utf-8"
+    os.path.join(results_path, "smauto_model.auto"), "w", encoding="utf-8"
 ) as file:
-    file.write(full_smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
+    file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
     file.close()
 
-
-PLAN_TO_IMPROVE_MODEL = """
-Read the SmAuto model you have written and think of ways to improve it.
-Come up with ideas on how to make the model more efficient, scalable, and robust.
-Think about additional features, optimizations, or changes that could enhance the functionality of the model.
-Output only the plan to improve the model."""
-
-plan_to_improve_model_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", smauto_system_prompt.SYSTEM_ROLE),
-        ("user", PLAN_TO_IMPROVE_MODEL),
-    ]
-)
 
 ## Validate the SmAuto model
 
@@ -113,59 +104,44 @@ Output only the model code.
 Put the code inbetween the ```smauto and ``` tags.
 """
 
-# invalid_model_prompt_template = ChatPromptTemplate.from_messages(
-#     [
-#         ("system", SYSTEM_ROLE),
-#         ("system", DEFINE_BROKERS),
-#         ("user", DEFINE_BROKERS_PROMPT),
-#         ("assistant", brokers),
-#         ("system", DEFINE_ENTITIES),
-#         ("user", DEFINE_ENTITIES_PROMPT),
-#         ("assistant", entities),
-#         ("system", DEFINE_AUTOMATIONS),
-#         ("system", SYSTEM_CLOCK_GUIDELINES),
-#         ("user", DEFINE_AUTOMATIONS_PROMPT),
-#         ("assistant", automations),
-#         ("system", DEFINE_METADATA_RTMONITOR),
-#         ("system", WRITE_SMAUTO_MODEL),
-#         ("user", CONSTRTUCT_SMAUTO_MODEL_PROMPT),
-#         ("assistant", smauto_model),
-#         ("user", INVALID_MODEL_PROMPT),
-#     ]
-# )
-
-# invalid_model_chain = invalid_model_prompt_template | model | StrOutputParser()
-
-validation = smauto_api.validate(
-    full_smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
+invalid_model_prompt_template = ChatPromptTemplate.from_messages(
+    [
+        MessagesPlaceholder("system_prompt"),
+        MessagesPlaceholder("history"),
+        ("user", INVALID_MODEL_PROMPT),
+    ]
 )
-print(validation.text)
-# INVALID_MODEL_GENERATIONS = 0
-# while True:
-#     validation = smauto_api.validate(
-#         smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
-#     )
-#     if validation.status_code == 200:
-#         print("The generated SmAuto model is syntactically valid.")
-#         break
-#     print("The SmAuto's validator response for the model is:", validation.text)
-#     smauto_model = invalid_model_chain.invoke(
-#         {
-#             "devices": devices,
-#             "validation_message": validation.text,
-#         }
-#     )
-#     print(smauto_model)
-#     with open(
-#         os.path.join(
-#             results_path,
-#             "smauto_" + str(INVALID_MODEL_GENERATIONS) + "_model.auto",
-#         ),
-#         "w",
-#         encoding="utf-8",
-#     ) as file:
-#         file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
-#         file.close()
-#     INVALID_MODEL_GENERATIONS += 1
-#     if INVALID_MODEL_GENERATIONS == 5:
-#         break
+
+invalid_model_chain = invalid_model_prompt_template | model | StrOutputParser()
+
+INVALID_MODEL_GENERATIONS = 1
+while True:
+    validation = smauto_api.validate(
+        smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
+    )
+    if validation.status_code == 200:
+        print("The generated SmAuto model is syntactically valid.")
+        break
+    print("The SmAuto's validator response for the generated model is:", validation.text)
+    smauto_model = invalid_model_chain.invoke(
+        {
+            "system_prompt": smauto_system_prompt.get_system_prompt(),
+            "history": history,
+            "validation_message": validation.text,
+        }
+    )
+    history.append(("user", HumanMessagePromptTemplate.from_template(INVALID_MODEL_PROMPT).format(validation_message=validation.text)))
+    history.append(("assistant", smauto_model))
+    with open(
+        os.path.join(
+            results_path,
+            "regenerated_smauto_model_" + str(INVALID_MODEL_GENERATIONS) + ".auto",
+        ),
+        "w",
+        encoding="utf-8",
+    ) as file:
+        file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
+        file.close()
+    INVALID_MODEL_GENERATIONS += 1
+    if INVALID_MODEL_GENERATIONS == 5:
+        break
