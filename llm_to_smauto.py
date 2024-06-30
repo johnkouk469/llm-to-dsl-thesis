@@ -145,3 +145,10 @@ while True:
     INVALID_MODEL_GENERATIONS += 1
     if INVALID_MODEL_GENERATIONS == 5:
         break
+    validation_regen = smauto_api.validate(
+        smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
+    )
+    if validation_regen.status_code != 200:
+        if validation.json().get("detail").split(".auto")[1] == validation_regen.json().get("detail").split(".auto")[1]:
+            print("After the regeneration of the model, the same error was found. Therefore the assistant is unable to fix the error.")
+            break
