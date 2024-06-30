@@ -74,7 +74,7 @@ write_full_model_prompt_template = ChatPromptTemplate.from_messages(
 full_smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
 
 full_smauto_model = full_smauto_model_chain.invoke(
-    {"system_prompt": smauto_system_prompt.get_system_prompt, "smart_enviroment": devices}
+    {"system_prompt": smauto_system_prompt.get_system_prompt(), "smart_enviroment": devices}
 )
 
 with open(
@@ -92,7 +92,7 @@ Output only the plan to improve the model."""
 
 plan_to_improve_model_prompt_template = ChatPromptTemplate.from_messages(
     [
-        ("system", SYSTEM_ROLE),
+        ("system", smauto_system_prompt.SYSTEM_ROLE),
         ("user", PLAN_TO_IMPROVE_MODEL),
     ]
 )
