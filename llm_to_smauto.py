@@ -22,6 +22,7 @@ results_path = os.path.join(LOGS_FOLDER, RESULTS_FOLDER)
 
 CODE_PREFIX = "```smauto\n"
 CODE_SUFFIX = "\n```"
+SMAUTO_FILE_NAME_EXTENSION = ".auto"
 
 model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
@@ -82,7 +83,7 @@ history.append(("user", HumanMessagePromptTemplate.from_template(CONSTRTUCT_SMAU
 history.append(("assistant", smauto_model))
 
 with open(
-    os.path.join(results_path, "smauto_model.auto"), "w", encoding="utf-8"
+    os.path.join(results_path, "smauto_model" + SMAUTO_FILE_NAME_EXTENSION), "w", encoding="utf-8"
 ) as file:
     file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
     file.close()
@@ -127,7 +128,7 @@ while True:
         {
             "system_prompt": smauto_system_prompt.get_system_prompt(),
             "history": history,
-            "validation_message": validation.text,
+            "validation_message": validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1],
         }
     )
     history.append(("user", HumanMessagePromptTemplate.from_template(INVALID_MODEL_PROMPT).format(validation_message=validation.text)))
@@ -135,7 +136,7 @@ while True:
     with open(
         os.path.join(
             results_path,
-            "regenerated_smauto_model_" + str(INVALID_MODEL_GENERATIONS) + ".auto",
+            "regenerated_smauto_model_" + str(INVALID_MODEL_GENERATIONS) + SMAUTO_FILE_NAME_EXTENSION,
         ),
         "w",
         encoding="utf-8",
@@ -149,6 +150,6 @@ while True:
         smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
     )
     if validation_regen.status_code != 200:
-        if validation.json().get("detail").split(".auto")[1] == validation_regen.json().get("detail").split(".auto")[1]:
+        if validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1] == validation_regen.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1]:
             print("After the regeneration of the model, the same error was found. Therefore the assistant is unable to fix the error.")
             break
