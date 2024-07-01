@@ -94,13 +94,22 @@ with open(
 INVALID_MODEL_PROMPT = """The model you have written is invalid.
 You should rewrite the model based on the guidelines and the error message.
 The error message contains the first error that was found in the model as it was parsed by the textX grammar.
-An * indicates the position of the error in the model.
-Make sure that all the needed parentheses are included when combining conditions into a more complex ones using logical operators.
-Make sure that whenever you reference time it should using the system_clock.time variable and the time should be in the HH:MM format (24-hour clock).
+You will be provided with error message. 
+Each error is described with a specific format indicating the location and nature of the error.
+Your task is to identify and correct these errors. 
+The format of the error message is as follows:
+:<line>:<column>: <error_description>
+Where:
+<line> is the line number where the error occurs.
+<column> is the column number where the error starts.
+<error_description> is a detailed message describing the error.
+An * in the error description indicates the position of the error in the model.
 The error message is:
 {validation_message}
 Please make all the nessesary adjustments to the model based on the guidelines and the error message.
 Rewrite all the brokers, entities, and automations as nessesary to fix the error and improve the models functionality.
+Make sure that all the needed parentheses are included when combining conditions into a more complex ones using logical operators.
+Make sure that whenever you reference time it should using the system_clock.time variable and the time should be in the HH:MM format (24-hour clock).
 Output only the model code.
 Put the code inbetween the ```smauto and ``` tags.
 """
