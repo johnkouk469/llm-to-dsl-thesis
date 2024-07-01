@@ -131,7 +131,7 @@ while True:
             "validation_message": validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1],
         }
     )
-    history.append(("user", HumanMessagePromptTemplate.from_template(INVALID_MODEL_PROMPT).format(validation_message=validation.text)))
+    history.append(("user", HumanMessagePromptTemplate.from_template(INVALID_MODEL_PROMPT).format(validation_message=validation.text).pretty_repr()))
     history.append(("assistant", smauto_model))
     with open(
         os.path.join(
