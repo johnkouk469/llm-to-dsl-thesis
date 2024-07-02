@@ -29,40 +29,20 @@ model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
 history = []
 
-# Instruct the LLM to generate a list of devices
+# User input
+print("Enter the description of the SmAuto model you would like to create:")
+user_utterance = input()
 
-DEVICE_GENERATOR_PROMPT = """
-Generate a list of {num_of_devices} devices that can be used in a smart environment.
-The devices can be sensors, actuators, or any other device that can be used in a smart environment. 
-Come up with the devices for each room of a three bedroom and two bathroom house seperately."""
-
-
-generate_devices_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", smauto_system_prompt.SYSTEM_ROLE),
-        ("user", DEVICE_GENERATOR_PROMPT),
-    ]
-)
-
-
-devices_chain = generate_devices_prompt_template | model | StrOutputParser()
-
-print("Instructing the LLM to generate a list of devices.")
-
-devices = devices_chain.invoke({"num_of_devices": 30})
-
-# Save the list of devices to a file
-with open(os.path.join(results_path, "devices.txt"), "w", encoding="utf-8") as file:
-    file.write(devices)
+# Save the user utterance to a file
+with open(os.path.join(results_path, "user_utterance.txt"), "w", encoding="utf-8") as file:
+    file.write(user_utterance)
     file.close()
 
-print("The list of devices got generated and saved on the devices.txt file.")
-
-# Instruct the LLM to generate a SmAuto model based on the list of devices
+# Instruct the LLM to generate a SmAuto model based on the user utterance
 
 CONSTRTUCT_SMAUTO_MODEL_PROMPT = """
-Write brokers, entities, and automations, write the complete SmAuto model for the following smart enviroment:
-{smart_enviroment}
+Write brokers, entities, and automations, write the complete SmAuto model on the following description:
+{user_utterance}
 Define the Metadata and RTMonitor components as well.
 Follow the guidelines provided for each component to ensure the model is correctly structured.
 
@@ -86,11 +66,11 @@ smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser(
 print("Instructing the LLM to generate an SmAuto model based on the list of devices.")
 
 smauto_model = smauto_model_chain.invoke(
-    {"system_prompt": smauto_system_prompt.get_system_prompt(), "smart_enviroment": devices}
+    {"system_prompt": smauto_system_prompt.get_system_prompt(), "user_utterance": user_utterance}
 )
 
 # Add the user prompt to generate the model and the LLM's response to the conversation history
-history.append(("user", HumanMessagePromptTemplate.from_template(CONSTRTUCT_SMAUTO_MODEL_PROMPT).format(smart_enviroment=devices).pretty_repr()))
+history.append(("user", HumanMessagePromptTemplate.from_template(CONSTRTUCT_SMAUTO_MODEL_PROMPT).format(user_utterance=user_utterance).pretty_repr()))
 history.append(("assistant", smauto_model))
 
 # Save the generated model to a file
