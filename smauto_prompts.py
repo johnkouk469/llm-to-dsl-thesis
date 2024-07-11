@@ -1,3 +1,5 @@
+"""Module that contains all the prompts to be given to the LLM for the generation of SmAuto models."""
+
 import os
 
 # Load the files used to construct the prompts from the DSL repository
@@ -738,6 +740,43 @@ Each component has its own syntax and set of properties.
 
 These guidelines provide a comprehensive overview of writing SmAuto models. Ensure that you adhere to the syntax and structure specified for each component to create effective and efficient smart home automation scripts.
 """
+
+CONSTRTUCT_SMAUTO_MODEL = """
+    Write brokers, entities, and automations, write the complete SmAuto model on the following description:
+    {user_utterance}
+    Define the Metadata and RTMonitor components as well.
+    Follow the guidelines provided for each component to ensure the model is correctly structured.
+
+    Do not use # to comment in the model. Use // for inline comments and /* */ for block comments.
+    Use the appropriate operators for the conditions and actions in the automations for each type of attribute.
+    As a reminder: **Boolean Operators**: `is`, `is not`
+
+
+    Output only the SmAuto model code.
+    Put the code inbetween the ```smauto and ``` tags."""
+
+INVALID_MODEL = """The model you have written is invalid.
+    You should rewrite the model based on the guidelines and the error message.
+    The error message contains the first error that was found in the model as it was parsed by the textX grammar.
+    You will be provided with error message. 
+    Each error is described with a specific format indicating the location and nature of the error.
+    Your task is to identify and correct these errors. 
+    The format of the error message is as follows:
+    :<line>:<column>: <error_description>
+    Where:
+    <line> is the line number where the error occurs.
+    <column> is the column number where the error starts.
+    <error_description> is a detailed message describing the error.
+    An * in the error description indicates the position of the error in the model.
+    The error message is:
+    {validation_message}
+    Please make all the nessesary adjustments to the model based on the guidelines and the error message.
+    Rewrite all the brokers, entities, and automations as nessesary to fix the error and improve the models functionality.
+    Make sure that all the needed parentheses are included when combining conditions into a more complex ones using logical operators.
+    Make sure that whenever you reference time it should using the system_clock.time variable and the time should be in the HH:MM format (24-hour clock).
+    Output only the model code.
+    Put the code inbetween the ```smauto and ``` tags.
+    """
 
 def get_system_prompt():
     system_prompt = [
