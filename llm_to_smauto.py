@@ -28,19 +28,22 @@ SMAUTO_FILE_NAME_EXTENSION = ".auto"
 
 model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
-history = []
+def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
 
-def generate_smauto_model(user_utterance: str) -> str:
     # Save the user utterance to a file
     with open(os.path.join(results_path, "user_utterance.txt"), "w", encoding="utf-8") as file:
         file.write(user_utterance)
         file.close()
+        
+    if (history is None):
+        history = []
 
     # Instruct the LLM to generate a SmAuto model based on the user utterance
 
     write_full_model_prompt_template = ChatPromptTemplate.from_messages(
         [
             MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history"),
             ("user", smauto_prompts.CONSTRTUCT_SMAUTO_MODEL),
         ]
     )
@@ -50,7 +53,11 @@ def generate_smauto_model(user_utterance: str) -> str:
     print("Instructing the LLM to generate an SmAuto model based on the list of devices.")
 
     smauto_model = smauto_model_chain.invoke(
-        {"system_prompt": smauto_prompts.get_system_prompt(), "user_utterance": user_utterance}
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history": history, 
+            "user_utterance": user_utterance,
+        }
     )
 
     # Add the user prompt to generate the model and the LLM's response to the conversation history
@@ -74,13 +81,16 @@ def generate_smauto_model(user_utterance: str) -> str:
     if validation.status_code == 200:
         print("The generated SmAuto model is syntactically valid.")
     else:
-        smauto_model = regenerate_invalid_model(smauto_model, validation)
+        smauto_model, history = regenerate_invalid_model(smauto_model, validation, history)
     
-    return smauto_model
+    return smauto_model, history
     
 
-def regenerate_invalid_model(smauto_model: str, validation: Response) -> str:
+def regenerate_invalid_model(smauto_model: str, validation: Response, history: list = None) -> tuple:
 
+    if (history is None):
+        history = []
+    
     invalid_model_prompt_template = ChatPromptTemplate.from_messages(
         [
             MessagesPlaceholder("system_prompt"),
@@ -149,7 +159,7 @@ def regenerate_invalid_model(smauto_model: str, validation: Response) -> str:
                 print("After the regeneration of the model, the same error was found. Therefore the assistant is unable to fix the error.")
                 break
         validation = validation_regen
-    return smauto_model
+    return smauto_model, history
 
 if __name__ == "__main__":
     # User input
