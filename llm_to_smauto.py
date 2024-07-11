@@ -2,6 +2,7 @@
 
 import os
 import time
+import logging
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, SystemMessagePromptTemplate, HumanMessagePromptTemplate
@@ -13,6 +14,8 @@ import smauto_api
 import smauto_prompts
 
 load_dotenv()
+logger = logging.getLogger(__name__)
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 # Create folders to log the results
 timestamp = time.strftime("%Y%m%d-%H%M%S")
@@ -50,7 +53,7 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
 
     smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
 
-    print("Instructing the LLM to generate an SmAuto model based on the list of devices.")
+    logger.info("Instructing the LLM to generate an SmAuto model based on the user input.")
 
     smauto_model = smauto_model_chain.invoke(
         {
@@ -71,7 +74,7 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
         file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
         file.close()
         
-    print("An SmAuto model has been generated based on the list of devices and has been saved on the smauto_model.auto file.")
+    logger.info("An SmAuto model has been generated based on the user input and has been saved on the smauto_model.auto file.")
     
     validation = smauto_api.validate(
             smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
@@ -79,7 +82,7 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
 
     # Validate the model and regenarate it if it is invalid
     if validation.status_code == 200:
-        print("The generated SmAuto model is syntactically valid.")
+        logger.info("The generated SmAuto model is syntactically valid.")
     else:
         smauto_model, history = regenerate_invalid_model(smauto_model, validation, history)
     
@@ -105,11 +108,11 @@ def regenerate_invalid_model(smauto_model: str, validation: Response, history: l
     
     while True:
         if INVALID_MODEL_GENERATIONS == 1:
-            print("The generated SmAuto model is not syntactically valid.")
+            logger.info("The generated SmAuto model is not syntactically valid.")
         else:
-            print("The regenarated model still has errors.")
-        print("The SmAuto's validator response for the model is:", validation.text)
-        print("Instructing the LLM to regenerate the model with the error fixed.")
+            logger.info("The regenarated model still has errors.")
+        logger.info("The SmAuto's validator response for the model is: %s", validation.text)
+        logger.info("Instructing the LLM to regenerate the model with the error fixed.")
         
         smauto_model = invalid_model_chain.invoke(
             {
@@ -134,14 +137,14 @@ def regenerate_invalid_model(smauto_model: str, validation: Response, history: l
         ) as file:
             file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
             file.close()
-        print("The SmAuto model has been regenerated and saved at regenerated_smauto_model_" + str(INVALID_MODEL_GENERATIONS) + SMAUTO_FILE_NAME_EXTENSION + " file.")
+        logger.info("The SmAuto model has been regenerated and saved at regenerated_smauto_model_" + str(INVALID_MODEL_GENERATIONS) + SMAUTO_FILE_NAME_EXTENSION + " file.")
         
         INVALID_MODEL_GENERATIONS += 1
         
         # Exit the loop if the max number of iterations is reached
         if INVALID_MODEL_GENERATIONS == 5:
-            print("After " + str(INVALID_MODEL_GENERATIONS) + "attemps to regenerate the SmAuto model with the errors fixed the model remains invalid.")
-            print("Terminating the regeneration process.")
+            logger.info("After " + str(INVALID_MODEL_GENERATIONS) + "attemps to regenerate the SmAuto model with the errors fixed the model remains invalid.")
+            logger.info("Terminating the regeneration process.")
             break
         
         # Validate the regenerated model
@@ -151,12 +154,12 @@ def regenerate_invalid_model(smauto_model: str, validation: Response, history: l
         
         # Exit the loop if the regenerated model is syntactically valid of if the same error appeared two consecutive times
         if validation_regen.status_code == 200:
-            print("All errors have been corrected successfully.")
-            print("The regenerated model is syntactically valid.")
+            logger.info("All errors have been corrected successfully.")
+            logger.info("The regenerated model is syntactically valid.")
             break
         else:
             if validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1] == validation_regen.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1]:
-                print("After the regeneration of the model, the same error was found. Therefore the assistant is unable to fix the error.")
+                logger.info("After the regeneration of the model, the same error was found. Therefore the assistant is unable to fix the error.")
                 break
         validation = validation_regen
     return smauto_model, history
