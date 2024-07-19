@@ -186,7 +186,7 @@ def regenerate_invalid_model(
             file.close()
         logger.info(
             "The SmAuto model has been regenerated and saved at \
-                regenerated_smauto_model_%d%s file.",
+regenerated_smauto_model_%d%s file.",
             invalid_model_generations,
             SMAUTO_FILE_NAME_EXTENSION,
         )
@@ -197,7 +197,7 @@ def regenerate_invalid_model(
         if invalid_model_generations == 5:
             logger.info(
                 "After %d attemps to regenerate the SmAuto model with the \
-                    errors fixed the model remains invalid.",
+errors fixed the model remains invalid.",
                 invalid_model_generations,
             )
             logger.info("Terminating the regeneration process.")
@@ -222,7 +222,7 @@ def regenerate_invalid_model(
         ):
             logger.info(
                 "After the regeneration of the model, the same error was found. \
-                    Therefore the assistant is unable to fix the error."
+Therefore the assistant is unable to fix the error."
             )
             break
         validation = validation_regen
