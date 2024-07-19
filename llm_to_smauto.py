@@ -107,16 +107,12 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
     if validation.status_code == 200:
         logger.info("The generated SmAuto model is syntactically valid.")
     else:
-        smauto_model, history = regenerate_invalid_model(
-            smauto_model, validation, history
-        )
+        smauto_model, history = regenerate_invalid_model(validation, history)
 
     return smauto_model, history
 
 
-def regenerate_invalid_model(
-    smauto_model: str, validation: Response, history: list = None
-) -> tuple:
+def regenerate_invalid_model(validation: Response, history: list = None) -> tuple:
     """Function that instructs the LLM to regenerate an invalid SmAuto model.
     The model keeps being regenerated until all validation errors have been fixed,
     or when the max number of regenerations has been reached
