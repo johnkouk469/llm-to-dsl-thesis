@@ -13,6 +13,7 @@ from langchain_core.prompts import (
 from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 from requests import Response
+import yaml
 
 import smauto_api
 import smauto_prompts
@@ -254,8 +255,63 @@ Therefore the assistant is unable to fix the error."
     return smauto_model, history
 
 
+def process_yaml_file(file_path):
+    """
+    Processes a YAML file at the given file path.
+
+    Args:
+        file_path (str): The path to the YAML file.
+
+    Returns:
+        None
+
+    Raises:
+        FileNotFoundError: If the specified file does not exist.
+        yaml.YAMLError: If there is an error processing the YAML file.
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            config = yaml.safe_load(file)
+            logger.info("Processing YAML file: %s", config)
+    except FileNotFoundError:
+        logger.error("File not found: %s", file_path)
+    except yaml.YAMLError as exc:
+        logger.error("Error processing YAML file: %s", exc)
+
+
+def main():
+    """
+    Main function to interact with the user via the terminal console.
+
+    Prompts the user to choose between inputting an utterance or providing a YAML file.
+    Based on the user's choice, the appropriate function is called to process the input.
+    The user can also choose to exit the program.
+
+    Returns:
+        None
+    """
+
+    while True:
+        # Get user input
+        print("Choose an option to interact with the SmAuto assistant:")
+        print("1. Input an utterance")
+        print("2. Provide a YAML file")
+        print("3. Exit")
+        choice = input("Enter the number of your choice: ")
+
+        # Process based on user's choice
+        if choice == "1":
+            utterance = input("Enter your utterance: ")
+            generate_smauto_model(utterance)
+        elif choice == "2":
+            file_path = input("Enter the path to the YAML file: ")
+            process_yaml_file(file_path)
+        elif choice == "3":
+            print("Exiting the program.")
+            break
+        else:
+            print("Invalid choice, please try again.")
+
+
 if __name__ == "__main__":
-    # User input
-    print("Enter the description of the SmAuto model you would like to create:")
-    user_input = input()
-    generate_smauto_model(user_input)
+    main()
