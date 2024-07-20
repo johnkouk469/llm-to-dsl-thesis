@@ -3,7 +3,7 @@
 import os
 import time
 import logging
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Any
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import (
@@ -228,28 +228,29 @@ def strip_code_tags(model: str) -> str:
     return model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
 
 
-def process_yaml_file(file_path):
+def read_yaml_file(yaml_file_path: str) -> Any:
     """
-    Processes a YAML file at the given file path.
+    Reads and parses the content of a YAML file at the given file path.
 
     Args:
-        file_path (str): The path to the YAML file.
+        yaml_file_path (str): The path to the YAML file.
 
     Returns:
-        None
+        Any: The parsed content of the YAML file.
 
     Raises:
         FileNotFoundError: If the specified file does not exist.
         yaml.YAMLError: If there is an error processing the YAML file.
     """
     try:
-        with open(file_path, "r", encoding="utf-8") as file:
+        with open(yaml_file_path, "r", encoding="utf-8") as file:
             config = yaml.safe_load(file)
-            logger.info("Processing YAML file: %s", config)
+            logger.info("Read and parsed the YAML file: %s", config)
+            return config
     except FileNotFoundError:
-        logger.error("File not found: %s", file_path)
+        logger.error("File not found: %s", yaml_file_path)
     except yaml.YAMLError as exc:
-        logger.error("Error processing YAML file: %s", exc)
+        logger.error("Error reading and parsing YAML file: %s", exc)
 
 
 def main():
@@ -278,7 +279,7 @@ def main():
             generate_smauto_model(utterance)
         elif choice == "2":
             file_path = input("Enter the path to the YAML file: ")
-            process_yaml_file(file_path)
+            read_yaml_file(file_path)
         elif choice == "3":
             print("Exiting the program.")
             break
