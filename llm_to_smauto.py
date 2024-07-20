@@ -3,6 +3,7 @@
 import os
 import time
 import logging
+from typing import List, Tuple, Optional
 
 from langchain_openai import ChatOpenAI
 from langchain_core.prompts import (
@@ -19,6 +20,8 @@ import smauto_api
 import smauto_prompts
 
 load_dotenv()
+
+# Logger setup
 logger = logging.getLogger(__name__)
 logging.basicConfig(format="%(asctime)s %(message)s", level=logging.INFO)
 
@@ -28,62 +31,121 @@ LOGS_FOLDER = "logs"
 os.makedirs(LOGS_FOLDER, exist_ok=True)
 RESULTS_FOLDER = timestamp
 os.makedirs(os.path.join(LOGS_FOLDER, RESULTS_FOLDER), exist_ok=True)
-results_path = os.path.join(LOGS_FOLDER, RESULTS_FOLDER)
 
+# Constants
+MAX_REGENERATIONS = 5
 CODE_PREFIX = "```smauto\n"
 CODE_SUFFIX = "\n```"
 SMAUTO_FILE_NAME_EXTENSION = ".auto"
+RESULTS_PATH = os.path.join(LOGS_FOLDER, RESULTS_FOLDER)
 
-model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
+llm = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
 
-def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
+def generate_smauto_model(
+    user_utterance: str, history: Optional[List[Tuple[str, str]]] = None
+) -> Tuple[str, List[Tuple[str, str]]]:
     """
     Generates an SmAuto model based on the user's utterance.
 
-    This function takes the user's input, saves it to a file, and uses a
-    language model to generate an initial SmAuto model. If the generated
-    model is invalid, it attempts to regenerate it until it is valid or a
-    maximum number of attempts is reached. The function maintains a history
-    of interactions for context.
-
     Parameters:
     user_utterance (str): The input provided by the user to generate the model.
-    history (list, optional): A list to maintain the history of the conversation.
-                              Defaults to None.
+    history (Optional[List[Tuple[str, str]]]): A list to maintain the history of
+    the conversation. Defaults to None.
 
     Returns:
-    tuple: A tuple containing the generated SmAuto model (str) and the updated
-           conversation history (list).
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
+    model (str) and the updated conversation history (list).
     """
+    try:
+        save_user_utterance(user_utterance)
+        if history is None:
+            history = []
 
-    # Save the user utterance to a file
+        smauto_model = invoke_model_generation(user_utterance, history)
+        history.append(("user", format_user_message(user_utterance)))
+        history.append(("assistant", smauto_model))
+
+        save_model(smauto_model, "smauto_model" + SMAUTO_FILE_NAME_EXTENSION)
+
+        if not validate_model(smauto_model):
+            smauto_model, history = regenerate_invalid_model(smauto_model, history)
+
+        return smauto_model, history
+    except Exception as e:
+        logger.error("Error generating SmAuto model: %s", e)
+        raise
+
+
+def regenerate_invalid_model(
+    smauto_model: str, history: List[Tuple[str, str]]
+) -> Tuple[str, List[Tuple[str, str]]]:
+    """
+    Regenerates an invalid SmAuto model.
+
+    Parameters:
+    smauto_model (str): The invalid SmAuto model.
+    history (List[Tuple[str, str]]): A list to maintain the history of the conversation.
+
+    Returns:
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the regenerated SmAuto model (str)
+    and the updated conversation history (list).
+    """
+    try:
+        for attempt in range(MAX_REGENERATIONS):
+            validation_response = smauto_api.validate(strip_code_tags(smauto_model))
+            if validation_response.status_code == 200:
+                logger.info("The regenerated model is syntactically valid.")
+                return smauto_model, history
+
+            logger.info(
+                "The regenerated model still has errors: %s", validation_response.text
+            )
+            smauto_model = invoke_model_regeneration(validation_response, history)
+            history.append(
+                ("user", format_invalid_model_message(validation_response.text))
+            )
+            history.append(("assistant", smauto_model))
+
+            save_model(
+                smauto_model,
+                f"regenerated_smauto_model_{attempt + 1}{SMAUTO_FILE_NAME_EXTENSION}",
+            )
+
+            if not is_repeated_error(validation_response, smauto_model):
+                break
+
+        logger.info(
+            "Max regeneration attempts reached or unable to fix error. Terminating process."
+        )
+        return smauto_model, history
+    except Exception as e:
+        logger.error("Error regenerating SmAuto model: %s", e)
+        raise
+
+
+def save_user_utterance(user_utterance: str) -> None:
+    """Saves the user utterance to a file."""
     with open(
-        os.path.join(results_path, "user_utterance.txt"), "w", encoding="utf-8"
+        os.path.join(RESULTS_PATH, "user_utterance.txt"), "w", encoding="utf-8"
     ) as file:
         file.write(user_utterance)
-        file.close()
 
-    if history is None:
-        history = []
 
-    # Instruct the LLM to generate a SmAuto model based on the user utterance
-
-    write_full_model_prompt_template = ChatPromptTemplate.from_messages(
+def invoke_model_generation(user_utterance: str, history: List[Tuple[str, str]]) -> str:
+    """Invokes the language model to generate the SmAuto model."""
+    prompt_template = ChatPromptTemplate.from_messages(
         [
             MessagesPlaceholder("system_prompt"),
             MessagesPlaceholder("history"),
             ("user", smauto_prompts.CONSTRTUCT_SMAUTO_MODEL),
         ]
     )
-
-    smauto_model_chain = write_full_model_prompt_template | model | StrOutputParser()
-
+    model_chain = prompt_template | llm | StrOutputParser()
     logger.info(
         "Instructing the LLM to generate an SmAuto model based on the user input."
     )
-
-    smauto_model = smauto_model_chain.invoke(
+    return model_chain.invoke(
         {
             "system_prompt": smauto_prompts.get_system_prompt(),
             "history": history,
@@ -91,168 +153,79 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
         }
     )
 
-    logger.info("An SmAuto model has been generated based on the user input.")
 
-    # Add the user prompt to generate the model and the LLM's response to the conversation history
-    history.append(
-        (
-            "user",
-            HumanMessagePromptTemplate.from_template(
-                smauto_prompts.CONSTRTUCT_SMAUTO_MODEL
-            )
-            .format(user_utterance=user_utterance)
-            .pretty_repr(),
-        )
-    )
-    history.append(("assistant", smauto_model))
-
-    # Save the generated model to a file
-    with open(
-        os.path.join(results_path, "smauto_model" + SMAUTO_FILE_NAME_EXTENSION),
-        "w",
-        encoding="utf-8",
-    ) as file:
-        file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
-        file.close()
-
-    logger.info("The model has been saved on the smauto_model.auto file.")
-
-    validation = smauto_api.validate(
-        smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
+def format_user_message(user_utterance: str) -> str:
+    """Formats the user message for the conversation history."""
+    return (
+        HumanMessagePromptTemplate.from_template(smauto_prompts.CONSTRTUCT_SMAUTO_MODEL)
+        .format(user_utterance=user_utterance)
+        .pretty_repr()
     )
 
-    # Validate the model and regenarate it if it is invalid
+
+def save_model(model: str, filename: str) -> None:
+    """Saves the generated or regenerated model to a file."""
+    with open(os.path.join(RESULTS_PATH, filename), "w", encoding="utf-8") as file:
+        file.write(strip_code_tags(model))
+
+
+def validate_model(model: str) -> bool:
+    """Validates the generated or regenerated SmAuto model."""
+    validation = smauto_api.validate(strip_code_tags(model))
     if validation.status_code == 200:
         logger.info("The generated SmAuto model is syntactically valid.")
-    else:
-        smauto_model, history = regenerate_invalid_model(validation, history)
+        return True
+    logger.info("The generated SmAuto model is not syntactically valid.")
+    return False
 
-    return smauto_model, history
 
-
-def regenerate_invalid_model(validation: Response, history: list = None) -> tuple:
-    """
-    Regenerates an invalid SmAuto model.
-
-    This function uses a language model to regenerate an invalid SmAuto model
-    based on validation error messages. It continues the regeneration process
-    until the model is valid, the maximum number of regeneration attempts is
-    reached, or it is determined that the same validation error cannot be fixed.
-
-    Parameters:
-    validation (Response): The response from the validation API indicating
-                           validation errors.
-    history (list, optional): A list to maintain the history of the conversation.
-                              Defaults to None.
-
-    Returns:
-    tuple: A tuple containing the regenerated SmAuto model (str) and the updated
-           conversation history (list).
-    """
-
-    if history is None:
-        history = []
-
-    invalid_model_prompt_template = ChatPromptTemplate.from_messages(
+def invoke_model_regeneration(
+    validation: Response, history: List[Tuple[str, str]]
+) -> str:
+    """Invokes the language model to regenerate the invalid SmAuto model."""
+    prompt_template = ChatPromptTemplate.from_messages(
         [
             MessagesPlaceholder("system_prompt"),
             MessagesPlaceholder("history"),
             ("user", smauto_prompts.INVALID_MODEL),
         ]
     )
+    model_chain = prompt_template | llm | StrOutputParser()
+    validation_message = extract_validation_message(validation)
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history": history,
+            "validation_message": validation_message,
+        }
+    )
 
-    invalid_model_chain = invalid_model_prompt_template | model | StrOutputParser()
 
-    invalid_model_generations = 1
+def format_invalid_model_message(validation_text: str) -> str:
+    """Formats the validation message for the conversation history."""
+    return (
+        HumanMessagePromptTemplate.from_template(smauto_prompts.INVALID_MODEL)
+        .format(validation_message=validation_text)
+        .pretty_repr()
+    )
 
-    while True:
-        if invalid_model_generations == 1:
-            logger.info("The generated SmAuto model is not syntactically valid.")
-        else:
-            logger.info("The regenarated model still has errors.")
-        logger.info(
-            "The SmAuto's validator response for the model is: %s", validation.text
-        )
-        logger.info("Instructing the LLM to regenerate the model with the error fixed.")
 
-        smauto_model = invalid_model_chain.invoke(
-            {
-                "system_prompt": smauto_prompts.get_system_prompt(),
-                "history": history,
-                "validation_message": validation.json()
-                .get("detail")
-                .split(SMAUTO_FILE_NAME_EXTENSION)[1],
-            }
-        )
+def is_repeated_error(validation: Response, model: str) -> bool:
+    """Checks if the same validation error appeared two consecutive times."""
+    validation_message = extract_validation_message(validation)
+    validation_regen = smauto_api.validate(strip_code_tags(model))
+    new_validation_message = extract_validation_message(validation_regen)
+    return validation_message == new_validation_message
 
-        # Add the user prompt to regenerate the model and the LLM's response
-        # to the conversation history
-        history.append(
-            (
-                "user",
-                HumanMessagePromptTemplate.from_template(smauto_prompts.INVALID_MODEL)
-                .format(validation_message=validation.text)
-                .pretty_repr(),
-            )
-        )
-        history.append(("assistant", smauto_model))
 
-        # Save the regenerated model to a file
-        with open(
-            os.path.join(
-                results_path,
-                "regenerated_smauto_model_"
-                + str(invalid_model_generations)
-                + SMAUTO_FILE_NAME_EXTENSION,
-            ),
-            "w",
-            encoding="utf-8",
-        ) as file:
-            file.write(smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
-            file.close()
-        logger.info(
-            "The SmAuto model has been regenerated and saved at \
-regenerated_smauto_model_%d%s file.",
-            invalid_model_generations,
-            SMAUTO_FILE_NAME_EXTENSION,
-        )
+def extract_validation_message(validation: Response) -> str:
+    """Extracts the validation message from the API response."""
+    return validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1]
 
-        invalid_model_generations += 1
 
-        # Exit the loop if the max number of iterations is reached
-        if invalid_model_generations == 5:
-            logger.info(
-                "After %d attemps to regenerate the SmAuto model with the \
-errors fixed the model remains invalid.",
-                invalid_model_generations,
-            )
-            logger.info("Terminating the regeneration process.")
-            break
-
-        # Validate the regenerated model
-        validation_regen = smauto_api.validate(
-            smauto_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
-        )
-
-        # Exit the loop if the regenerated model is syntactically valid
-        # or if the same error appeared two consecutive times
-        if validation_regen.status_code == 200:
-            logger.info("All errors have been corrected successfully.")
-            logger.info("The regenerated model is syntactically valid.")
-            break
-        if (
-            validation.json().get("detail").split(SMAUTO_FILE_NAME_EXTENSION)[1]
-            == validation_regen.json()
-            .get("detail")
-            .split(SMAUTO_FILE_NAME_EXTENSION)[1]
-        ):
-            logger.info(
-                "After the regeneration of the model, the same error was found. \
-Therefore the assistant is unable to fix the error."
-            )
-            break
-        validation = validation_regen
-    return smauto_model, history
+def strip_code_tags(model: str) -> str:
+    """Removes the code prefix and suffix tags from the model."""
+    return model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
 
 
 def process_yaml_file(file_path):
