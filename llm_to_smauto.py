@@ -249,8 +249,10 @@ def read_yaml_file(yaml_file_path: str) -> Any:
             return config
     except FileNotFoundError:
         logger.error("File not found: %s", yaml_file_path)
+        return None
     except yaml.YAMLError as exc:
         logger.error("Error reading and parsing YAML file: %s", exc)
+        return None
 
 
 def main():
