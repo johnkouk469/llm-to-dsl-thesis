@@ -77,6 +77,41 @@ def generate_smauto_model(
         raise
 
 
+def generate_smauto_model_from_yaml(
+    yaml_file_path: str, history: Optional[List[Tuple[str, str]]] = None
+) -> Tuple[str, List[Tuple[str, str]]]:
+    """
+    Generates an SmAuto model based on the contents of a YAML file.
+
+    Parameters:
+    yaml_file_path (str): The path to the YAML file containing the input data.
+    history (Optional[List[Tuple[str, str]]]): A list to maintain the history
+    of the conversation. Defaults to None.
+
+    Returns:
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
+    model (str) and the updated conversation history (list).
+    """
+    try:
+        yaml_content = read_yaml_file(yaml_file_path)
+        if history is None:
+            history = []
+
+        smauto_model = invoke_model_generation_from_yaml(yaml_content, history)
+        history.append(("user", format_yaml_message(yaml_content)))
+        history.append(("assistant", smauto_model))
+
+        save_model(smauto_model, "smauto_model" + SMAUTO_FILE_NAME_EXTENSION)
+
+        if not validate_model(smauto_model):
+            smauto_model, history = regenerate_invalid_model(smauto_model, history)
+
+        return smauto_model, history
+    except Exception as e:
+        logger.error("Error generating SmAuto model from YAML: %s", e)
+        raise
+
+
 def regenerate_invalid_model(
     smauto_model: str, history: List[Tuple[str, str]]
 ) -> Tuple[str, List[Tuple[str, str]]]:
@@ -154,11 +189,46 @@ def invoke_model_generation(user_utterance: str, history: List[Tuple[str, str]])
     )
 
 
+def invoke_model_generation_from_yaml(
+    yaml_content: Any, history: List[Tuple[str, str]]
+) -> str:
+    """Invokes the language model to generate the SmAuto model based on YAML content."""
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history"),
+            ("user", smauto_prompts.CONSTRTUCT_SMAUTO_MODEL_FROM_YAML),
+        ]
+    )
+    model_chain = prompt_template | llm | StrOutputParser()
+    logger.info(
+        "Instructing the LLM to generate an SmAuto model based on the YAML content."
+    )
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history": history,
+            "yaml_content": yaml_content,
+        }
+    )
+
+
 def format_user_message(user_utterance: str) -> str:
     """Formats the user message for the conversation history."""
     return (
         HumanMessagePromptTemplate.from_template(smauto_prompts.CONSTRTUCT_SMAUTO_MODEL)
         .format(user_utterance=user_utterance)
+        .pretty_repr()
+    )
+
+
+def format_yaml_message(yaml_content: Any) -> str:
+    """Formats the YAML content for the conversation history."""
+    return (
+        HumanMessagePromptTemplate.from_template(
+            smauto_prompts.CONSTRTUCT_SMAUTO_MODEL_FROM_YAML
+        )
+        .format(yaml_content=yaml_content)
         .pretty_repr()
     )
 
@@ -281,7 +351,7 @@ def main():
             generate_smauto_model(utterance)
         elif choice == "2":
             file_path = input("Enter the path to the YAML file: ")
-            read_yaml_file(file_path)
+            generate_smauto_model_from_yaml(file_path)
         elif choice == "3":
             print("Exiting the program.")
             break

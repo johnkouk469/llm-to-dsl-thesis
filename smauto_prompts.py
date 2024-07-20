@@ -755,6 +755,20 @@ CONSTRTUCT_SMAUTO_MODEL = """
     Output only the SmAuto model code.
     Put the code inbetween the ```smauto and ``` tags."""
 
+CONSTRTUCT_SMAUTO_MODEL_FROM_YAML = """
+    Write brokers, entities, and automations, write the complete SmAuto model on the following description:
+    {yaml_content}
+    Define the Metadata and RTMonitor components as well.
+    Follow the guidelines provided for each component to ensure the model is correctly structured.
+
+    Do not use # to comment in the model. Use // for inline comments and /* */ for block comments.
+    Use the appropriate operators for the conditions and actions in the automations for each type of attribute.
+    As a reminder: **Boolean Operators**: `is`, `is not`
+
+
+    Output only the SmAuto model code.
+    Put the code inbetween the ```smauto and ``` tags."""
+
 INVALID_MODEL = """The model you have written is invalid.
     You should rewrite the model based on the guidelines and the error message.
     The error message contains the first error that was found in the model as it was parsed by the textX grammar.
@@ -778,6 +792,7 @@ INVALID_MODEL = """The model you have written is invalid.
     Put the code inbetween the ```smauto and ``` tags.
     """
 
+
 def get_system_prompt():
     system_prompt = [
         ("system", SYSTEM_ROLE),
@@ -786,6 +801,6 @@ def get_system_prompt():
         ("system", DEFINE_AUTOMATIONS),
         ("system", SYSTEM_CLOCK_GUIDELINES),
         ("system", DEFINE_METADATA_RTMONITOR),
-        ("system", WRITE_SMAUTO_MODEL)
+        ("system", WRITE_SMAUTO_MODEL),
     ]
     return system_prompt
