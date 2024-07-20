@@ -37,7 +37,24 @@ model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
 
 def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
-    """Function that generates a SmAuto model based on an utterance given by the user"""
+    """
+    Generates an SmAuto model based on the user's utterance.
+
+    This function takes the user's input, saves it to a file, and uses a
+    language model to generate an initial SmAuto model. If the generated
+    model is invalid, it attempts to regenerate it until it is valid or a
+    maximum number of attempts is reached. The function maintains a history
+    of interactions for context.
+
+    Parameters:
+    user_utterance (str): The input provided by the user to generate the model.
+    history (list, optional): A list to maintain the history of the conversation.
+                              Defaults to None.
+
+    Returns:
+    tuple: A tuple containing the generated SmAuto model (str) and the updated
+           conversation history (list).
+    """
 
     # Save the user utterance to a file
     with open(
@@ -113,11 +130,23 @@ def generate_smauto_model(user_utterance: str, history: list = None) -> tuple:
 
 
 def regenerate_invalid_model(validation: Response, history: list = None) -> tuple:
-    """Function that instructs the LLM to regenerate an invalid SmAuto model.
-    The model keeps being regenerated until all validation errors have been fixed,
-    or when the max number of regenerations has been reached
-    or if the LLM is unable to fix the validation error
-    which is spotted when the same validation error is produced two concecutive times.
+    """
+    Regenerates an invalid SmAuto model.
+
+    This function uses a language model to regenerate an invalid SmAuto model
+    based on validation error messages. It continues the regeneration process
+    until the model is valid, the maximum number of regeneration attempts is
+    reached, or it is determined that the same validation error cannot be fixed.
+
+    Parameters:
+    validation (Response): The response from the validation API indicating
+                           validation errors.
+    history (list, optional): A list to maintain the history of the conversation.
+                              Defaults to None.
+
+    Returns:
+    tuple: A tuple containing the regenerated SmAuto model (str) and the updated
+           conversation history (list).
     """
 
     if history is None:
