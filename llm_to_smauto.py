@@ -325,6 +325,26 @@ def read_yaml_file(yaml_file_path: str) -> Any:
         return None
 
 
+def conversation():
+    """Initiates an interactive conversation with the SmAuto assistant."""
+
+    conversation_history = []
+
+    while True:
+        utterance = input("Write your message to the SmAuto assistant or Exit to quit:")
+        if utterance == "Exit":
+            print("Exiting the conversation.")
+            break
+
+        logger.info("User: %s", utterance)
+
+        smauto_model, conversation_history = generate_smauto_model(
+            utterance, conversation_history
+        )
+
+        logger.info("SmAuto Assistant: %s", smauto_model)
+
+
 def main():
     """
     Main function to interact with the user via the terminal console.
@@ -340,15 +360,14 @@ def main():
     while True:
         # Get user input
         print("Choose an option to interact with the SmAuto assistant:")
-        print("1. Input an utterance")
+        print("1. Have a conversation")
         print("2. Provide a YAML file")
         print("3. Exit")
         choice = input("Enter the number of your choice: ")
 
         # Process based on user's choice
         if choice == "1":
-            utterance = input("Enter your utterance: ")
-            generate_smauto_model(utterance)
+            conversation()
         elif choice == "2":
             file_path = input("Enter the path to the YAML file: ")
             generate_smauto_model_from_yaml(file_path)
