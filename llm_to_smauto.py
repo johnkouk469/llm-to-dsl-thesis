@@ -320,7 +320,7 @@ by using all the information gathered."
     return model_chain.invoke(
         {
             "system_prompt": smauto_prompts.get_system_prompt(),
-            "history_with_analysis": history,
+            "history": history,
         }
     )
 
