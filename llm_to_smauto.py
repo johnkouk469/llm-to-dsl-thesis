@@ -112,6 +112,41 @@ def generate_smauto_model_from_yaml(
         raise
 
 
+def generate_smauto_model_after_qna(
+    history: List[Tuple[str, str]],
+    qna_history: List[Tuple[str, str]],
+) -> Tuple[str, List[Tuple[str, str]]]:
+    """
+    Generates an SmAuto model based on the user's utterance.
+
+    Parameters:
+    user_utterance (str): The input provided by the user to generate the model.
+    history (Optional[List[Tuple[str, str]]]): A list to maintain the history of
+    the conversation. Defaults to None.
+
+    Returns:
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
+    model (str) and the updated conversation history (list).
+    """
+    try:
+
+        history.extend(qna_history)
+
+        smauto_model = invoke_model_generation_after_qna(history)
+
+        history.append(("assistant", smauto_model))
+
+        save_model(smauto_model, "smauto_model" + SMAUTO_FILE_NAME_EXTENSION)
+
+        if not validate_model(smauto_model):
+            smauto_model, history = regenerate_invalid_model(smauto_model, history)
+
+        return smauto_model, history
+    except Exception as e:
+        logger.error("Error generating SmAuto model: %s", e)
+        raise
+
+
 def regenerate_invalid_model(
     smauto_model: str, history: List[Tuple[str, str]]
 ) -> Tuple[str, List[Tuple[str, str]]]:
@@ -264,6 +299,28 @@ def invoke_model_generation_from_yaml(
             "system_prompt": smauto_prompts.get_system_prompt(),
             "history": history,
             "yaml_content": yaml_content,
+        }
+    )
+
+
+def invoke_model_generation_after_qna(history: List[Tuple[str, str]]) -> str:
+    """Invokes the language model to generate the SmAuto model after the Q&A process."""
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history"),
+            ("system", smauto_prompts.CONSTRUCT_SMAUTO_MODEL_AFTER_QA),
+        ]
+    )
+    model_chain = prompt_template | llm | StrOutputParser()
+    logger.info(
+        "Instructing the LLM to generate an SmAuto model after the Q&A process \
+by using all the information gathered."
+    )
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history_with_analysis": history,
         }
     )
 
