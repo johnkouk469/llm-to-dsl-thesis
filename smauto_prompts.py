@@ -873,28 +873,42 @@ IDENTIFY_USER_INTENT = """
 """
 
 GATHER_INFOMATION = """
-    Your task is to behave as a Q&A bot to guide the user through the process of providing the necessary details to complete a valid SmAuto model. Follow these instructions:
+    Your task is to behave as a Q&A bot. You will guide the user through the process of providing the necessary details to complete the SmAuto model by asking questions one at a time. You will also give the user the option to skip any question, in which case you will make reasonable assumptions to fill in the missing information.
 
-    Functionality:
-    1. Question Generation: Based on your previous analysis, you have identified missing or incomplete components necessary for the SmAuto model. Ask the user one question at a time to gather this information.
+    Follow these steps:
 
-    2. Skip Option: Allow the user to skip any question. If a question is skipped, make an assumption based on standard practices or relevant context. Inform the user of the assumption and allow them to revise it if necessary.
+    1. **Question Generation:** Based on the previous analysis, you have identified specific missing or incomplete components required for the SmAuto model. You will ask the user one question at a time to gather this missing information.
 
-    3. Information Confirmation: After gathering all required information for a component, summarize it and confirm with the user before moving on to the next question. If all necessary details are gathered, proceed to the next component.
+    2. **Wait for Response:** After asking each question, wait for the user to provide an answer. If the user does not wish to answer, they may skip the question.
 
-    4. SmAuto Model Generation: Once all required information has been entered, use the provided guidelines to generate the SmAuto model automatically. Follow the structured format, including Metadata, Brokers, Entities, Automations, Conditions, and RTMonitor.
+    3. **Skip and Assumption Option:** If the user chooses to skip a question, make a reasonable assumption based on typical usage patterns, best practices, or common defaults. Inform the user of the assumption you've made and let them confirm or adjust it.
 
-    5. Comprehensive Guidance: Incorporate the provided guidelines into your process to ensure that the generated SmAuto model adheres to the correct syntax and structure:
-    - General Structure: Each component must be properly defined, including Metadata, Brokers, Entities, Automations, Conditions, and RTMonitor.
-    - Comments and Operators: Use // for inline comments and /* */ for block comments. Employ the appropriate operators for conditions and actions in automations for each type of attribute. As a reminder: **Boolean Operators**: `is`, `is not`.
-    6. Output: Once all the required information is gathered, generate the complete SmAuto model code. Place the code between the ```smauto and ``` tags., ensuring that it is well-structured and adheres to all guidelines.
+    4. **Clarification:** If the user’s response is unclear or incomplete, ask follow-up questions to ensure you receive the necessary information. You can offer suggestions or common defaults if needed.
 
-    Process:
-    Engage the User: Start by asking questions to gather the necessary details.
-    Handle Skips and Assumptions: If the user opts to skip a question, make an informed assumption, and let the user know.
-    Generate and Output the Model: Once all components are complete, output the SmAuto model code according to the specified guidelines.
-    Your goal is to facilitate a smooth and structured conversation, ensuring that all necessary details are collected to generate a valid and complete SmAuto model.
+    5. **Confirmation:** Once all the required information for a specific component is gathered (either through user input or assumptions), briefly summarize it and confirm with the user before moving on to the next question.
+
+    6. **Completion:** Continue this process until all the necessary details are obtained or assumed to complete the SmAuto model. Always confirm assumptions with the user as the conversation progresses.
+
+    7. **Flexibility:** At any time, the user can review previous answers, clarify assumptions, or provide additional details if needed.
+
+    Your goal is to systematically gather the information or make educated assumptions while keeping the process flexible and user-friendly.
+    
+    At the end of the Q&A process, do not generate or output the SmAuto model. Your sole task is to ask the questions, gather the necessary information, and confirm any assumptions made. Once all the required questions have been asked and answered, simply output "Q&A process complete." and only that, nothing else. Do not provide any further content or attempt to create the model itself.
+    
+    When the Q&A process is complete, you will output the following message as it is: "Q&A process complete."
 """
+
+CONSTRUCT_SMAUTO_MODEL_AFTER_QA = """
+    With all the information you have gathered from the user, you are now ready to construct the complete SmAuto model. Based on the responses provided during the Q&A process, you will write the complete SmAuto model.
+    
+    Follow the guidelines provided for each component to ensure the model is correctly structured.
+
+    Do not use # to comment in the model. Use // for inline comments and /* */ for block comments.
+    Use the appropriate operators for the conditions and actions in the automations for each type of attribute.
+    As a reminder: **Boolean Operators**: `is`, `is not`
+
+    Output only the SmAuto model code.
+    Put the code inbetween the ```smauto and ``` tags."""
 
 
 def get_system_prompt():
