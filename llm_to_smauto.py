@@ -117,12 +117,12 @@ def generate_smauto_model_after_qna(
     qna_history: List[Tuple[str, str]],
 ) -> Tuple[str, List[Tuple[str, str]]]:
     """
-    Generates an SmAuto model based on the user's utterance.
+    Generates an SmAuto model based on the information gathered during the Q&A process.
 
     Parameters:
-    user_utterance (str): The input provided by the user to generate the model.
-    history (Optional[List[Tuple[str, str]]]): A list to maintain the history of
-    the conversation. Defaults to None.
+    history (List[Tuple[str, str]]): A list that maintains the history of the interactions
+      up to the point where the Q&A process started.
+    qna_history (List[Tuple[str, str]]): A list that maintains the history of the Q&A process.
 
     Returns:
     Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
