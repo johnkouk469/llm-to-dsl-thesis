@@ -792,6 +792,110 @@ INVALID_MODEL = """The model you have written is invalid.
     Put the code inbetween the ```smauto and ``` tags.
     """
 
+IDENTIFY_USER_INTENT = """
+    Your task is to analyze the user's input to determine the functionality they want the model to perform. The goal is to assess whether the provided information contains all the necessary details to create a complete SmAuto model. The model should include specific components: Metadata, Brokers, Entities, Automations, and RTMonitor.
+
+    Begin by reviewing the user’s input to see if it specifies these components:
+
+    Metadata: Includes the model's name, version, description, author, and email.
+    Brokers: Defines the communication layers (MQTT, AMQP, or Redis brokers) with details such as type, host, port, SSL, authentication, and more.
+    Entities: Represents smart devices (sensors and actuators) with attributes like type, topic, broker, and frequency.
+    Automations: Outlines automated logic, including conditions, actions, dependencies, and descriptions.
+    RTMonitor: Defines runtime monitoring parameters including broker, namespace, event topic, and logs topic.
+    If any component is missing or incomplete, identify the gaps and engage the user in a conversation to extract the necessary details. Your goal is to ensure all the required components are fully defined to complete the SmAuto model.
+
+    Process:
+
+    Analyze the user’s input for completeness.
+    Identify any missing or incomplete components.
+    Generate specific questions to gather the missing information from the user.
+    Proceed with the analysis and engage the user as needed to fill in the gaps.
+
+    1. Metadata:
+
+    Name:
+    Version:
+    Description:
+    Author:
+    Email:
+    
+    2. Brokers:
+
+    Type (MQTT, AMQP, Redis):
+    Host:
+    Port:
+    SSL (true/false):
+    Authentication (username/password, cert, key):
+    Vhost (AMQP only):
+    TopicExchange (AMQP only):
+    RPCExchange (AMQP only):
+    DB (Redis only):
+    
+    3. Entities:
+
+    Unique Name:
+    Type (sensor, actuator, hybrid):
+    Topic:
+    Broker:
+    Attributes (name and type, default values, value generators, noise generators):
+    Description (optional):
+    Frequency (for sensors):
+    
+    4. Automations:
+
+    Condition:
+    Enabled (true/false):
+    Continuous (true/false):
+    CheckOnce (true/false):
+    Actions:
+    After (dependencies):
+    Starts (subsequent automations):
+    Stops (terminating automations):
+    Description (optional):
+    Frequency (optional):
+    
+    5. RTMonitor:
+
+    Broker:
+    Namespace:
+    Event Topic:
+    Logs Topic:
+    
+
+    Condition:
+    Based on this analysis, here are the missing or incomplete components:
+
+    [Insert analysis results here]
+
+    To complete the SmAuto model, please provide the following missing information:
+
+    [Insert questions to gather missing information]
+"""
+
+GATHER_INFOMATION = """
+    Your task is to behave as a Q&A bot to guide the user through the process of providing the necessary details to complete a valid SmAuto model. Follow these instructions:
+
+    Functionality:
+    1. Question Generation: Based on your previous analysis, you have identified missing or incomplete components necessary for the SmAuto model. Ask the user one question at a time to gather this information.
+
+    2. Skip Option: Allow the user to skip any question. If a question is skipped, make an assumption based on standard practices or relevant context. Inform the user of the assumption and allow them to revise it if necessary.
+
+    3. Information Confirmation: After gathering all required information for a component, summarize it and confirm with the user before moving on to the next question. If all necessary details are gathered, proceed to the next component.
+
+    4. SmAuto Model Generation: Once all required information has been entered, use the provided guidelines to generate the SmAuto model automatically. Follow the structured format, including Metadata, Brokers, Entities, Automations, Conditions, and RTMonitor.
+
+    5. Comprehensive Guidance: Incorporate the provided guidelines into your process to ensure that the generated SmAuto model adheres to the correct syntax and structure:
+    - General Structure: Each component must be properly defined, including Metadata, Brokers, Entities, Automations, Conditions, and RTMonitor.
+    - Comments and Operators: Use // for inline comments and /* */ for block comments. Employ the appropriate operators for conditions and actions in automations for each type of attribute. As a reminder: **Boolean Operators**: `is`, `is not`.
+    6. Output: Once all the required information is gathered, generate the complete SmAuto model code. Place the code between the ```smauto and ``` tags., ensuring that it is well-structured and adheres to all guidelines.
+
+    Process:
+    Engage the User: Start by asking questions to gather the necessary details.
+    Handle Skips and Assumptions: If the user opts to skip a question, make an informed assumption, and let the user know.
+    Generate and Output the Model: Once all components are complete, output the SmAuto model code according to the specified guidelines.
+    Your goal is to facilitate a smooth and structured conversation, ensuring that all necessary details are collected to generate a valid and complete SmAuto model.
+"""
+
 
 def get_system_prompt():
     system_prompt = [

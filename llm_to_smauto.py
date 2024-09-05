@@ -159,6 +159,61 @@ def regenerate_invalid_model(
         raise
 
 
+def analyze_user_utterance(
+    user_utterance: str, history: Optional[List[Tuple[str, str]]] = None
+) -> Tuple[str, List[Tuple[str, str]]]:
+    """
+    Generates an SmAuto model based on the user's utterance.
+
+    Parameters:
+    user_utterance (str): The input provided by the user to generate the model.
+    history (Optional[List[Tuple[str, str]]]): A list to maintain the history of
+    the conversation. Defaults to None.
+
+    Returns:
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
+    model (str) and the updated conversation history (list).
+    """
+    try:
+        save_user_utterance(user_utterance)
+        if history is None:
+            history = []
+
+        analyzed_utterance = invoke_user_utterance_analysis(user_utterance, history)
+
+        history.append(("system", smauto_prompts.IDENTIFY_USER_INTENT))
+        history.append(("user", user_utterance))
+        history.append(("assistant", analyzed_utterance))
+
+        return analyzed_utterance, history
+    except Exception as e:
+        logger.error("Error analyzing the user's utterance: %s", e)
+        raise
+
+
+def qna_initialization(history: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+    """Initializes the Q&A process to gather information from the user."""
+
+    assistant_response = invoke_qna_initialization(history)
+
+    return [("assistant", assistant_response)]
+
+
+def qna_follow_up(
+    user_response: str,
+    history: List[Tuple[str, str]],
+    qna_history: List[Tuple[str, str]],
+) -> List[Tuple[str, str]]:
+    """Asks follow-up questions based on the user's response to gather additional information."""
+
+    assistant_response = invoke_qna_follow_up(user_response, history, qna_history)
+
+    qna_history.append(("user", user_response))
+    qna_history.append(("assistant", assistant_response))
+
+    return qna_history
+
+
 def save_user_utterance(user_utterance: str) -> None:
     """Saves the user utterance to a file."""
     with open(
@@ -209,6 +264,84 @@ def invoke_model_generation_from_yaml(
             "system_prompt": smauto_prompts.get_system_prompt(),
             "history": history,
             "yaml_content": yaml_content,
+        }
+    )
+
+
+def invoke_user_utterance_analysis(
+    user_utterance: str, history: List[Tuple[str, str]]
+) -> str:
+    """Invokes the language model to analyze the user's utterance, identify missing information,
+    and ask follow-up questions to gather all necessary details to write the SmAuto model.
+    """
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history"),
+            ("system", smauto_prompts.IDENTIFY_USER_INTENT),
+            ("user", user_utterance),
+        ]
+    )
+    model_chain = prompt_template | llm | StrOutputParser()
+    logger.info(
+        "Instructing the LLM to to analyze the user's utterance, identify missing information, \
+and ask follow-up questions to gather all necessary details to write the SmAuto model."
+    )
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history": history,
+        }
+    )
+
+
+def invoke_qna_initialization(history: List[Tuple[str, str]]) -> str:
+    """Invokes the language model to initialize the Q&A process."""
+    if history == []:
+        logger.error(
+            "The user utterance should be analyzed before initializing the Q&A process."
+        )
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history"),
+            ("system", smauto_prompts.GATHER_INFOMATION),
+        ]
+    )
+    model_chain = prompt_template | llm | StrOutputParser()
+    logger.info("Instructing the LLM to initializing the Q&A process.")
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history": history,
+        }
+    )
+
+
+def invoke_qna_follow_up(
+    user_response: str,
+    history: List[Tuple[str, str]],
+    qna_history: List[Tuple[str, str]],
+) -> str:
+    """Invokes the language model to ask follow-up questions based on the user's response."""
+    prompt_template = ChatPromptTemplate.from_messages(
+        [
+            MessagesPlaceholder("system_prompt"),
+            MessagesPlaceholder("history_with_analysis"),
+            ("system", smauto_prompts.GATHER_INFOMATION),
+            MessagesPlaceholder("qna_history"),
+            ("user", user_response),
+        ]
+    )
+    model_chain = prompt_template | llm | StrOutputParser()
+    logger.info(
+        "Providing the LLM with the user's response to ask follow-up questions."
+    )
+    return model_chain.invoke(
+        {
+            "system_prompt": smauto_prompts.get_system_prompt(),
+            "history_with_analysis": history,
+            "qna_history": qna_history,
         }
     )
 
@@ -345,6 +478,43 @@ def conversation():
         logger.info("SmAuto Assistant: %s", smauto_model)
 
 
+def conversation_with_feedback():
+    """Initiates an interactive conversation with the SmAuto assistant
+    where the assistant will be analyzing the user's request identify missing information,
+    and ask follow-up questions to gather all necessary details to write the SmAuto model
+    before writing it."""
+
+    conversation_history = []
+
+    utterance = input("Write your message to the SmAuto assistant:")
+
+    logger.info("User: %s", utterance)
+
+    analyzed_utterance, conversation_history = analyze_user_utterance(
+        utterance, conversation_history
+    )
+
+    logger.info("SmAuto Assistant: %s", analyzed_utterance)
+
+    qna_history = qna_initialization(conversation_history)
+
+    logger.info("SmAuto Assistant: %s", qna_history[-1][1])
+
+    while True:
+        utterance = input("Write your message to the SmAuto assistant or Exit to quit:")
+        if utterance == "Exit":
+            print("Exiting the conversation.")
+            break
+
+        logger.info("User: %s", utterance)
+
+        qna_history = qna_follow_up(utterance, conversation_history, qna_history)
+
+        assistant_response = qna_history[-1][1]
+
+        logger.info("SmAuto Assistant: %s", assistant_response)
+
+
 def main():
     """
     Main function to interact with the user via the terminal console.
@@ -362,7 +532,8 @@ def main():
         print("Choose an option to interact with the SmAuto assistant:")
         print("1. Have a conversation")
         print("2. Provide a YAML file")
-        print("3. Exit")
+        print("3. Have converation with feedback")
+        print("4. Exit")
         choice = input("Enter the number of your choice: ")
 
         # Process based on user's choice
@@ -372,6 +543,8 @@ def main():
             file_path = input("Enter the path to the YAML file: ")
             generate_smauto_model_from_yaml(file_path)
         elif choice == "3":
+            conversation_with_feedback()
+        elif choice == "4":
             print("Exiting the program.")
             break
         else:
