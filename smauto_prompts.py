@@ -1,4 +1,6 @@
-"""Module that contains all the prompts to be given to the LLM for the generation of SmAuto models."""
+"""
+Module that contains all the prompts to be given to the LLM for the generation of SmAuto models.
+"""
 
 import os
 
@@ -741,7 +743,7 @@ Each component has its own syntax and set of properties.
 These guidelines provide a comprehensive overview of writing SmAuto models. Ensure that you adhere to the syntax and structure specified for each component to create effective and efficient smart home automation scripts.
 """
 
-CONSTRTUCT_SMAUTO_MODEL = """
+CONSTRUCT_SMAUTO_MODEL = """
     Write brokers, entities, and automations, write the complete SmAuto model on the following description:
     {user_utterance}
     Define the Metadata and RTMonitor components as well.
@@ -755,7 +757,7 @@ CONSTRTUCT_SMAUTO_MODEL = """
     Output only the SmAuto model code.
     Put the code inbetween the ```smauto and ``` tags."""
 
-CONSTRTUCT_SMAUTO_MODEL_FROM_YAML = """
+CONSTRUCT_SMAUTO_MODEL_FROM_YAML = """
     Write brokers, entities, and automations, write the complete SmAuto model on the following description:
     {yaml_content}
     Define the Metadata and RTMonitor components as well.
@@ -912,6 +914,7 @@ CONSTRUCT_SMAUTO_MODEL_AFTER_QA = """
 
 
 def get_system_prompt():
+    """Returns the system prompt containing the guidelines for writing SmAuto models."""
     system_prompt = [
         ("system", SYSTEM_ROLE),
         ("system", DEFINE_BROKERS),

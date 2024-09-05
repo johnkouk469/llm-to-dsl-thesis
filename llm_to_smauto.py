@@ -228,7 +228,7 @@ def invoke_model_generation(user_utterance: str, history: List[Tuple[str, str]])
         [
             MessagesPlaceholder("system_prompt"),
             MessagesPlaceholder("history"),
-            ("user", smauto_prompts.CONSTRTUCT_SMAUTO_MODEL),
+            ("user", smauto_prompts.CONSTRUCT_SMAUTO_MODEL),
         ]
     )
     model_chain = prompt_template | llm | StrOutputParser()
@@ -252,7 +252,7 @@ def invoke_model_generation_from_yaml(
         [
             MessagesPlaceholder("system_prompt"),
             MessagesPlaceholder("history"),
-            ("user", smauto_prompts.CONSTRTUCT_SMAUTO_MODEL_FROM_YAML),
+            ("user", smauto_prompts.CONSTRUCT_SMAUTO_MODEL_FROM_YAML),
         ]
     )
     model_chain = prompt_template | llm | StrOutputParser()
@@ -349,7 +349,7 @@ def invoke_qna_follow_up(
 def format_user_message(user_utterance: str) -> str:
     """Formats the user message for the conversation history."""
     return (
-        HumanMessagePromptTemplate.from_template(smauto_prompts.CONSTRTUCT_SMAUTO_MODEL)
+        HumanMessagePromptTemplate.from_template(smauto_prompts.CONSTRUCT_SMAUTO_MODEL)
         .format(user_utterance=user_utterance)
         .pretty_repr()
     )
@@ -359,7 +359,7 @@ def format_yaml_message(yaml_content: Any) -> str:
     """Formats the YAML content for the conversation history."""
     return (
         HumanMessagePromptTemplate.from_template(
-            smauto_prompts.CONSTRTUCT_SMAUTO_MODEL_FROM_YAML
+            smauto_prompts.CONSTRUCT_SMAUTO_MODEL_FROM_YAML
         )
         .format(yaml_content=yaml_content)
         .pretty_repr()
