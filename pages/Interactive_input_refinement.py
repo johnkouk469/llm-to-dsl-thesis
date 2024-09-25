@@ -75,7 +75,7 @@ def handle_user_input(user_input):
                 st.session_state.conversation_history
             )
             st.session_state.display_history.append(
-                ("SmAuto Assistant", st.session_state.qna_history[-1][1])
+                ("Assistant", st.session_state.qna_history[-1][1])
             )
         else:
             # Continue the refinement with follow-up questions
@@ -84,12 +84,25 @@ def handle_user_input(user_input):
                 st.session_state.conversation_history,
                 st.session_state.qna_history,
             )
-            st.session_state.display_history.append(
-                ("SmAuto Assistant", st.session_state.qna_history[-1][1])
-            )
+            if st.session_state.qna_history[-1][1] == "Q&A process complete.":
+                # Generate the final model after Q&A completion
+                with st.spinner(
+                    "Generating the SmAuto model using all the information you have provided..."
+                ):
+                    smauto_model, st.session_state.conversation_history = (
+                        llm_to_smauto.generate_smauto_model_after_qna(
+                            st.session_state.conversation_history,
+                            st.session_state.qna_history,
+                        )
+                    )
+                st.session_state.display_history.append(("Model", smauto_model))
+            else:
+                st.session_state.display_history.append(
+                    ("Assistant", st.session_state.qna_history[-1][1])
+                )
     except Exception as e:
         st.session_state.display_history.append(
-            ("SmAuto Assistant", f"An error occurred: {str(e)}")
+            ("Assistant", f"An error occurred: {str(e)}")
         )
 
 
@@ -109,6 +122,17 @@ def display_chat_history():
         if sender == "User":
             with st.chat_message("user"):
                 st.write(message)
+        elif sender == "Model":
+            with st.chat_message("assistant"):
+                if llm_to_smauto.validate_model(message):
+                    st.success("A valid SmAuto model has been generated.")
+                else:
+                    st.warning(
+                        "The generated model contains errors. \
+Please check for missing or incorrect syntax."
+                    )
+                with st.expander("Generated model"):
+                    st.markdown(message)
         else:
             with st.chat_message("assistant"):
                 st.write(message)
