@@ -583,6 +583,7 @@ Name:
 Provide a unique and descriptive name for your model.
 The name should reflect the purpose or functionality of the model.
 Make sure to NOT include the model name inside " "
+There should be no spaces in the model name.
 Example:
 
 name: SimpleHomeAutomation
