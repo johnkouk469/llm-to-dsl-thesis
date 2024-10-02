@@ -2,10 +2,14 @@
 
 import os
 import time
-import json
+from typing import List, Tuple, Optional
 
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import (
+    ChatPromptTemplate,
+    MessagesPlaceholder,
+    HumanMessagePromptTemplate,
+)
 from langchain_core.output_parsers import StrOutputParser
 
 from dotenv import load_dotenv
@@ -24,70 +28,99 @@ CODE_SUFFIX = "\n```"
 
 model = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
 
-# Load the files used to construct the prompts from the dflow paper
-with open("./dflow_paper.txt", "r", encoding="utf-8") as file:
-    dflow_paper = file.readlines()
+
+def generate_dflow_model(
+    user_utterance: str, history: Optional[List[Tuple[str, str]]] = None
+) -> List[Tuple[str, str]]:
+    """Generate a dFlow model for the given user utterance."""
+    try:
+        if history is None:
+            history = []
+
+        write_dflow_model_prompt_template = ChatPromptTemplate.from_messages(
+            [
+                ("system", dflow_prompts.DFLOW_DESCRIPTION),
+                ("system", dflow_prompts.DFLOW_MODELING_GUIDELINES),
+                ("system", dflow_prompts.SYSTEM_ROLE),
+                dflow_prompts.get_few_shot_examples(),
+                MessagesPlaceholder("history"),
+                ("user", dflow_prompts.CONSTRTUCT_DFLOW_MODEL_PROMPT),
+            ]
+        )
+
+        dflow_model_chain = (
+            write_dflow_model_prompt_template | model | StrOutputParser()
+        )
+
+        dflow_model = dflow_model_chain.invoke(
+            {
+                "history": history,
+                "input": str("Help me create a virtual assistant."),
+                "user_utterance": user_utterance,
+            }
+        )
+
+        history.append(("user", format_user_message(user_utterance)))
+        history.append(("system", dflow_model))
+
+        with open(
+            os.path.join(LOGS_FOLDER, timestamp + "_dflow_model.dflow"),
+            "w",
+            encoding="utf-8",
+        ) as file:
+            file.write(dflow_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
+            file.close()
+
+        validate_model(dflow_model)
+
+        return history
+    except Exception as e:
+        print(e)
+        raise
 
 
-generate_va_concept_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", dflow_prompts.SYSTEM_ROLE),
-        ("system", dflow_prompts.DFLOW_USECASES),
-        ("system", dflow_paper),
-        ("user", dflow_prompts.VA_CONCEPT_GENERATOR_PROMPT),
-    ]
-)
+def validate_model(dflow_model: str) -> bool:
+    """Validate the dFlow model."""
+    validation = dflow_api.validate(
+        dflow_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
+    )
+    print(validation.text)
+    if validation.status_code == 200:
+        print("The dFlow model is syntactically valid.")
+        return True
+    print("The dFlow model is not syntactically valid.")
+    return False
 
 
-va_concept_chain = generate_va_concept_prompt_template | model | StrOutputParser()
-
-va_concept = va_concept_chain.invoke({"input": "Help me create a virtual assistant."})
-
-with open(
-    os.path.join(LOGS_FOLDER, timestamp + "_va_concept.txt"), "w", encoding="utf-8"
-) as file:
-    file.write(va_concept)
-    file.close()
-
-
+def format_user_message(user_utterance: str) -> str:
+    """Formats the user message for the conversation history."""
+    return (
+        HumanMessagePromptTemplate.from_template(
+            dflow_prompts.CONSTRTUCT_DFLOW_MODEL_PROMPT
+        )
+        .format(user_utterance=user_utterance)
+        .pretty_repr()
+    )
 
 
-write_dflow_model_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ("system", dflow_prompts.SYSTEM_ROLE),
-        ("system", dflow_paper),
-        ("system", dflow_prompts.DFLOW_USECASES),
-        ("system", dflow_prompts.DFLOW_MODELING_GUIDELINES),
-        ("system", dflow_prompts.WRITE_DFLOW_MODEL),
-        dflow_prompts.get_few_shot_examples(),
-        ("user", dflow_prompts.CONSTRTUCT_DFLOW_MODEL_PROMPT),
-    ]
-)
+def conversation():
+    """Initiates an interactive conversation with the dFlow assistant."""
 
-dflow_model_chain = write_dflow_model_prompt_template | model | StrOutputParser()
+    conversation_history = []
 
-with open(
-    os.path.join(dflow_api.DFLOW_EXAMPLES_PATH, "template.dflow"),
-    "r",
-    encoding="utf-8",
-) as file:
-    template_dflow = file.readlines()
+    while True:
+        utterance = input("Write your message to the dFlow assistant or Exit to quit:")
+        if utterance == "Exit":
+            print("Exiting the conversation.")
+            break
 
-dflow_model = dflow_model_chain.invoke(
-    {
-        "input": str("Help me create a virtual assistant."),
-        "va_concept": va_concept,
-        "template_dflow": template_dflow,
-    }
-)
+        conversation_history = generate_dflow_model(utterance, conversation_history)
 
-with open(
-    os.path.join(LOGS_FOLDER, timestamp + "_dflow_model.dflow"), "w", encoding="utf-8"
-) as file:
-    file.write(dflow_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX))
-    file.close()
 
-validation = dflow_api.validate(
-    dflow_model.removeprefix(CODE_PREFIX).removesuffix(CODE_SUFFIX)
-)
-print(validation.text)
+def main():
+    """Main function."""
+    conversation()
+
+
+if __name__ == "__main__":
+    main()

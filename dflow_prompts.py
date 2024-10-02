@@ -13,170 +13,607 @@ from langchain_chroma import Chroma
 
 import dflow_api
 
-# Load the files used to construct the prompts from the dflow paper
-with open("./dflow_paper.txt", "r", encoding="utf-8") as file:
-    dflow_paper = file.readlines()
-
 DFLOW_MODELING_GUIDELINES = """
-dFlow Modeling Guidelines
+# dFlow Modeling Guidelines
 
-These guidelines provide a detailed overview of the dFlow modeling language, covering the primary components and their syntax. The guidelines ensure you can create accurate and efficient dFlow models, which are then transformed into ready-to-deploy Rasa models.
+These guidelines provide a detailed overview of the dFlow modeling language, covering the primary components and their syntax. The guidelines ensure you can create accurate and efficient dFlow models.
+Pay attention to every little detail. You will be asked to follow these guidelines to write a dFlow model.
 
-Overview of dFlow Components
+## Overview of dFlow Concepts
 
-A dFlow model incorporates several key components: Entities, Synonyms, Triggers, EServices, Global Slots, and Dialogues. These components define the NLU (Natural Language Understanding) and NLG (Natural Language Generation) aspects of a Virtual Assistant (VA).
+A task-oriented Virtual Assistant incorporates the following two components: the Natural Language Understanding (NLU) component, which is responsible for processing user utterances and interpreting the user’s goals or intents, and the Natural Language Generation (NLG) part, which is responsible for creating the most appropriate responses and actions. The root meta-model of dFlow consists of six concepts: Entity, Synonym, Trigger, EService, Global Slot, and Dialogues. Entity, Synonym and Trigger capture the NLU part of the assistant, EService and Global Slot define reusable features in general scope, and Dialogues describe the dialogue flows and the assistant responses, encompassing the entire NLG component. A dFlow model incorporates these concepts at the root scope and can be utilized to define the interactive part and include bot responses to predefined conditions (e.g., an internal intent is triggered).
 
-1. Entities
-Entities are structured pieces of information extracted from user messages. They can represent real-world objects like persons, locations, organizations, products, etc. Entities are divided into two types:
+### **Entities**
+Entities are structured pieces of information inside a user message that can be extracted and used by the assistant. They can be real-world objects or meanings, such as a person, a location, an organization, or a product. DFlow can employ pre-trained Named Entity Recognition (NER) models that can efficiently extract those types of entities without further training. Frequently, Virtual Assistants need to detect use-case-specific information not supported by pre-trained NER models, such as types of food or fruits. In this case, Trainable Entities can be specified and trained during deployment given a set of entity examples.
+
+The textX grammar for defining entities is as follows:
+
+```
+Entity: TrainableEntity | PretrainedEntity;
+
+TrainableEntity:
+    'Entity' name=ID
+        words+=Words[',']
+    'end'
+;
+
+PretrainedEntity:
+    'PERSON'        |
+    'NORP'          |
+    'FAC'           |
+    'ORG'           |
+    'GPE'           |
+    'LOC'           |
+    'PRODUCT'       |
+    'EVENT'         |
+    'WORK_OF_ART'   |
+    'LAW'           |
+    'LANGUAGE'      |
+    'DATE'          |
+    'TIME'          |
+    'PERCENT'       |
+    'MONEY'         |
+    'QUANTITY'      |
+    'ORDINAL'       |
+    'CARDINAL'
+;
+
+Words:
+    /[-\w ]*\b/
+;
+```
 
 a. Pre-trained Entities
-These are standard entities that come with pre-trained models (e.g., SpaCy). They are defined using specific keywords:
-
-```dflow
-entities
-    Entity PretrainedEntity
-        PERSON,
-        NORP,
-        LOC
-    end
-end
-```
+These are standard entities that come with pre-trained models. They are defined using specific keywords:
+PERSON: "People, including fictional",
+NORP: "Nationalities or religious or political groups",
+FAC: "Buildings, airports, highways, bridges, etc.",
+ORG: "Companies, agencies, institutions, etc.",
+GPE: "Countries, cities, states",
+LOC: "Non-GPE locations, mountain ranges, bodies of water",
+PRODUCT: "Objects, vehicles, foods, etc. (not services)",
+EVENT: "Named hurricanes, battles, wars, sports events, etc.",
+WORK_OF_ART: "Titles of books, songs, etc.",
+LAW: "Named documents made into laws.",
+LANGUAGE: "Any named language",
+DATE: "Absolute or relative dates or periods",
+TIME: "Times smaller than a day",
+PERCENT: 'Percentage, including "%"',
+MONEY: "Monetary values, including unit",
+QUANTITY: "Measurements, as of weight or distance",
+ORDINAL: '"first", "second", etc.',
+CARDINAL: "Numerals that do not fall under another type",
 
 b. Trainable Entities
-These require examples for custom training:
+In cases where the entity is domain or use-case specific such below, examples need to be given to train a new entity extractor. This is the case of a Trainable Entity, which is first defined and then included in the intents section.
 
+An example of how to define entities in dFlow:
 ```dflow
 entities
-    Entity CustomEntity
-        example1,
-        example2,
-        example3
+    Entity Doctor
+        cardiologist,
+        dentist,
+        doc
     end
 end
 ```
 
-2. Synonyms
-Synonyms map various words or phrases to a single value. This is useful when users refer to the same concept in different ways:
+### **Synonyms**
+Synonyms map various words or phrases to a single value. This is useful when users refer to the same concept in different ways. After defined, they are incorporated in the intent examples.
 
+The textX grammar for defining synonyms is as follows:
+```
+Synonym:
+    'Synonym' name=ID
+        words+=Words[',']
+    'end'
+;
+```
+
+An example of how to define synonyms in dFlow:
 ```dflow
 synonyms
-    Synonym time_period
+    Synonym date_period
         day,
         week,
-        month
+        month,
+        tomorrow,
+        now
     end
 end
 ```
 
-3. Triggers
-Triggers define how a dialogue can be initiated, either by user intents or external events.
+### **Triggers**
+Triggers represent the two ways a dialogue can be initiated: when a user states a particular expression or Intent, or when an external Event is triggered, such as a reminder or a notification. In task-based dialogue systems, an Intent is a goal the user is trying to achieve or accomplish, such as retrieving specific information on the weather or setting a reminder. An Intent requires a set of phrase examples that are semantically similar to the expected user expressions. These examples can consist of combinations of text, pre-trained and trainable entities, as well as synonyms. Events are system-initiated and do not need any phrase examples.
 
-a. Intents
-Intents represent user goals and require example phrases:
+The textX grammar for defining triggers is as follows:
+```
+Trigger: Intent | Event;
+```
+
+#### **Intents**
+In a given user message, the thing that a user is trying to achieve or accomplish (e,g., greeting, ask for information) is called an Intent. An intent has a group of example user phrases with which an NLU model is trained, that consist of strings, references to Trainable Entities (TE), to Synonyms (S), and to Pretrained Entities (PE). Regarding the PEs, users can also give example words inside the brackets apart from the entity category (e.g., PE:PERSON["John"]).
+
+The textX grammar for defining intents is as follows:
+```
+Intent:
+    'Intent' name=ID
+        phrases+=IntentPhraseComplex[',']
+    'end'
+;
+IntentPhraseComplex: phrases+=IntentPhrase;
+
+IntentPhrase:
+    IntentPhraseStr |
+    IntentPhraseSynonym |
+    TrainableEntityRef |
+    PretrainedEntityRef
+;
+
+IntentPhraseStr: STRING;
+
+TrainableEntityRef: 'TE:' entity=[TrainableEntity|FQN|^entities*];
+
+PretrainedEntityRef: 'PE:' entity=[PretrainedEntity|FQN|^entities*] ('[' refPreValues*=STRING[','] ']')?;
+
+IntentPhraseSynonym: 'S:' synonym=[Synonym|FQN];
+```
+
+An example of how to define intents in dFlow:
+In the code block below a simple intent called greet has been added, which contains example messages like "Hi", "Hey" and "Good morning", and a more complex one called find_person that uses all the possible references.
 
 ```dflow
 triggers
     Intent greet
+        "hey",
         "hello",
         "hi",
-        "hey"
+        "good morning",
+        "good evening",
+        "hey there",
+        "Hey",
+        "Hi there",
+    end
+    Intent find_person
+        "I want" TE:name "please",
+        TE:name "please!",
+        "I want to call" TE:name,
+        "I want call" TE:name S:date_period,
+        "call" TE:name "now",
+        "I want to call" PE:PERSON "immediately",
+        "call" PE:PERSON["John"] "now"
     end
 end
 ```
-b. Events
-Events are system-initiated triggers:
 
+#### **Events**
+Events are external triggers, such as IoT events, notifications or reminders. An event is defined by its name and the URI from which it is triggered.
+
+The textX grammar for defining events is as follows:
+```
+Event:
+    'Event' name=ID
+        uri=STRING
+    'end'
+;
+```
+
+An example of how to define events in dFlow:
 ```dflow
 triggers
-    Event reminder
-        "bot/event/reminder"
-    end
+  Event external_1
+    "bot/event/external_1"
+  end
 end
 ```
 
-4. EServices
-External services are REST endpoints used in the VA’s responses. They are defined globally and called dynamically within dialogues:
+### **EServices**
+External services are REST endpoints that can be used as part of the VA’s responses. Their URL and HTTP method are defined globally as static attributes, while their parameters can be specified inside the dialogue section when called, in a more dynamic manner.
 
+The textX grammar for defining external services is as follows:
+```
+EServiceDef: EServiceDefHTTP;
+
+EServiceDefHTTP:
+    'EServiceHTTP' name=ID
+        (  'verb:' verb=HTTPVerb
+          'host:' host=STRING
+          ('port:' port=INT)?
+          ('path:' path=STRING)?
+        )#
+    'end'
+;
+
+HTTPVerb:
+    'GET'   |
+    'POST'  |
+    'PUT'
+;
+```
+
+An example of how to define external services in dFlow:
 ```dflow
 eservices
-    EServiceHTTP weather_service
+    EServiceHTTP weather_svc
         verb: GET
-        host: "http://api.weather.com"
-        path: "/current"
+        host: 'r4a.issel.ee.auth.gr'
+        port: 8080
+        path: '/weather'
     end
 end
 ```
 
-5. Global Slots
-Global slots store static information that the assistant can access across multiple dialogues:
+### **Global Slots**
+Slots are static information an assistant can access and use, offering multi-turn conversations, memory, and personalization. DFlow introduces the GSlot concept to define variables in the global scope so they can be accessed by various Dialogues, Forms, and Actions.
 
+The textX grammar for defining global slots is as follows:
+```
+GlobalSlotValue: ParameterValue;
+GlobalSlotType: ParameterTypeDef;
+GlobalSlotRef: slot=[GlobalSlot|FQN|^gslots];
+GlobalSlotIndex: FormParamRef('['ID('.'ID)*']')?;
+
+GlobalSlot:
+    name=ID ':' type=GlobalSlotType ('=' default=GlobalSlotValue)?
+;
+```
+
+An example of how to define global slots in dFlow:
 ```dflow
 gslots
     location: str = "New York",
     temperature: int = 25
 end
 ```
-6. Dialogues
-Dialogues define the conversational flows, consisting of triggers and responses. Responses can be forms or action groups.
 
-a. Forms
-Forms collect information from users:
+### **Dialogues**
+An important concept of the dFlow meta-model is the Dialogue. Dialogues are conversational flows the assistant supports in the form of trigger and response pairs, where each response is a sequence of Forms and ActionGroups in a one-turn conversation manner. Each trigger initiates only one dialogue. 
 
+The textX grammar for defining dialogues is as follows:
+```
+Dialogue:
+    'Dialogue' name=ID
+        'on:' onTrigger+=[Trigger|FQN|^triggers][',']
+        'responses:' responses+=Response[',']
+    'end'
+;
+
+Response: ActionGroup | Form;
+```
+
+An example of how to define dialogues in dFlow:
 ```dflow
 dialogues
-    Dialogue GetWeather
-        on: weather_intent
+    Dialogue DialA
+        on: external_1
         responses:
-            Form WeatherForm
-                location: str = HRI("Please provide your location", [PE:LOC]),
-                date: str = HRI("For which date?", [S:time_period])
+            ActionGroup hey_answers
+              Speak('Hello')
+	      Speak('Hey there!!')
+            end
+    end
+
+    Dialogue DialB
+        on: find_doctor
+        responses:
+            Form AF1
+                slot1: str = HRI('Give parameter 1', [PE:PERSON])
+                slot2: str = HRI('Give parameter 2',
+                    [find_doctor:True, external_1:False])
+                slot3: str = HRI('Give parameter 3 you' AF1.slot1, [TE:Doctor])
             end,
-            ActionGroup WeatherActions
-                Speak("Getting weather for" WeatherForm.location "on" WeatherForm.date)
+            ActionGroup answers
+              Speak('Hello' AF1.slot1 'how are you')
             end
     end
 end
 ```
 
-b. Action Groups
-Action groups define actions like speaking, firing events, calling REST services, etc.:
+#### **Forms**
+Regarding the responses, a Form is a conversational pattern to collect information and store it in form parameters or form slots, following business logic. Two interaction methods are supported by the dFlow DSL: Human-Robot Interaction (HRI) and External Services. Information can be collected via HRI, where the assistant sequentially collects the information from the user by requesting each slot using specified text and extracting data from the user expression. The expression can contain the entire text, an extracted entity, or a specific value set mapped to a particular intent. The second choice is the EServiceSource interaction, where the slot is filled with information received from an external service, previously defined as an EService in the dFlow model.
+A Form is a conversational pattern to collect information and store it in form parameters or slots following business logic. Information can be collected via an HRI interaction, in which the assistant collects the information from the user. It requests each slot using a specific text and extracts the data from the user expression. It can contain the entire processed text (the extract variable is not filled), an extracted entity, or a specific value set in case the user states a particular intent. The second choice is the EServiceParamSource interaction, in which the slot is filled with information received from an external service, that is defined above. Each slot is of one of the 6 types: int, float, str, bool, list or dict.
 
-```dflow
-dialogues
-    Dialogue GreetUser
-        on: greet
-        responses:
-            ActionGroup GreetActions
-                Speak("Hello! How can I help you today?")
-            end
-    end
-end
+The textX grammar for defining forms is as follows:
+```
+Form:
+    'Form' name=ID
+        params+=FormParam
+    'end'
+;
+
+FormParam:
+    name=ID ':' type=ParameterTypeDef '=' source=FormParamSource
+;
+
+FormParamRef: param=[FormParam|FQN|^dialogues*.responses.params];
+FormParamIndex: FormParamRef('['ID('.'ID)*']')?;
+
+FormParamSource: HRIParamSource | EServiceParamSource;
+
+HRIParamSource:
+    'HRI' '(' askSlot+=Text (',' '['extract+=ExtractionSource[','] ']')? ')'
+;
+
+ExtractionSource: ExtractFromEntity | ExtractFromIntent;
+ExtractFromIntent: intent=[Trigger|FQN|^triggers*] ':' value=ParameterValue;
+ExtractFromEntity: TrainableEntityRef | PretrainedEntityRef;
+
+EServiceParamSource: EServiceCallHTTP;
 ```
 
-7. Access Control (Optional)
-Define user roles and permissions for executing certain actions:
+#### **Action Groups**
+An ActionGroup is a set of Actions. The dFlow language supports five different types of actions: the assistant can state a given phrase (SpeakAction), fire a broker event (FireEventAction), call a REST endpoint (RESTCallAction), set a global slot (SetGSlot) or form slot (SetFSlot) with particular parameters. Actions can also use real-time environment parameters and functions grouped as UserProperties and SystemProperties. User properties are user information stored locally on the device that the assistant can use, such as the name, surname, age, email, phone, city, and address. System properties are in-built system functions to get the current time, location, and a random integer or float. This allows the assistant to access data while being device-agnostic and offering more dynamic and personalized dialogues.
 
+An action is an assistant response that can either:
+Speak a specific text (SpeakAction)
+Fire an Event (FireEventAction)
+Call an HTTP endpoint (RESTCallAction)
+Set a global or form slot with a specific value (SetFSlot and SetGSlot) (more on form slots in the forms section.)
+An ActionGroup is a collection of actions that are executed sequentially.
+
+Actions can also use real-time environment parameters, or data in general, grouped as user and system properties. User properties are user information stored locally in the device that the assistant can use, such as name, surname, age, email, phone, city and address. System properties are in-built system functions to get the current time, location, a random integer of float. That way the assistant has access to those data being device-agnostic on the same time.
+
+The textX grammar for defining actions is as follows:
+```
+ActionGroup:
+    'ActionGroup' name=ID
+        actions+=Action
+    'end'
+;
+
+Action:
+    SpeakAction     |
+    FireEventAction |
+    RESTCallAction  |
+    SetFormSlot     |
+    SetGlobalSlot
+;
+
+SpeakAction:
+    'Speak' '(' text+=Text ')'
+;
+
+SetFormSlot:
+    'SetFSlot' '(' slotRef=FormParamRef ',' value=ParameterValue ')'
+;
+
+SetGlobalSlot:
+    'SetGSlot' '(' slotRef=GlobalSlotRef ',' value=ParameterValue ')'
+;
+
+FireEventAction:
+    'FireEvent' '(' uri+=Text ',' msg+=Text ')'
+;
+
+RESTCallAction: EServiceCallHTTP;
+
+
+EServiceCallHTTP:
+    eserviceRef=[EServiceDef|FQN|eservices]'('
+        (
+        ('query=' '[' query_params*=EServiceParam[','] ']' ',')?
+        ('header=' '[' header_params*=EServiceParam[','] ']' ',')?
+        ('path=' '[' path_params*=EServiceParam[','] ']' ',')?
+        ('body=' '[' body_params*=EServiceParam[','] ']' ',')?
+        )#
+    ')' ('[' response_filter=EServiceResponseFilter ']')?
+;
+
+EServiceParam: name=ID '=' value=ParameterValue;
+
+ParameterValue:
+    INT                 |
+    FLOAT               |
+    STRING              |
+    BOOL                |
+    List                |
+    Dict                |
+    EnvPropertyDef		  |
+    FormParamIndex      |
+    GlobalSlotIndex     |
+	Text
+;
+
+ParameterTypeDef:
+    'int'   |
+    'float' |
+    'str'   |
+    'bool'  |
+    'list'  |
+    'dict'
+;
+
+EServiceResponseFilter: ID('.'ID)*;
+
+DictItem:
+    name=ID ':' value=DictTypes
+;
+
+DictTypes:
+  NUMBER | STRING | BOOL | Dict | List | FormParamIndex | GlobalSlotIndex
+;
+
+Dict:
+    '{' items*=DictItem[','] '}'
+;
+
+List:
+    '[' items*=ListElements[','] ']'
+;
+
+ListElements:
+    NUMBER | STRING | BOOL | List | Dict | FormParamIndex | GlobalSlotIndex
+;
+
+Text: TextStr | EnvPropertyDef | FormParamIndex | GlobalSlotIndex;
+
+TextStr: STRING;
+
+EnvPropertyDef: UserPropertyDef | SystemPropertyDef;
+UserPropertyDef: 'USER:' property=[UserProperty|FQN];
+SystemPropertyDef: 'SYSTEM:' property=[SystemProperty|FQN];
+
+UserProperty:
+    'NAME'      |
+    'SURNAME'   |
+    'AGE'       |
+    'EMAIL'     |
+    'PHONE'		  |
+    'CITY'		  |
+    'ADDRESS'
+;
+
+SystemProperty:
+	'TIME'			  |
+	'LOCATION'		|
+	'RANDOM_INT'	|
+	'RANDOM_FLOAT'
+;
+```
+
+### **Access Control**
+DFlow supports a fully functional user access control mechanism integrated into the generated bots. Using a Role-Based Access Control methodology, the bot's developer can create roles with different permissions for executing the bot's actions and assign them to users. In this way, dFlow enables the enforcement of the least privilege principle by allowing the separation of user access levels to the bot's resources. It also empowers the development of complex dialogue flows, providing the means to differentiate the bot's behavior according to the user's role.
+
+The textX grammar for defining access controls is as follows:
+```
+AccessControlDef:
+    (
+    roles=Roles
+    policies*=Policy
+    (path=Path)?
+    (users=Users)?
+    authentication=Authentication
+    )#
+;
+```
+
+An example of how to define access controls in dFlow:
 ```dflow
 access_controls
     Roles
-        admin,
-        user
-        default: user
+        role1,
+        role2
+
+        default: 
+            role2
     end
-    Policies
-        Policy1
-            role: admin
-            actions: [GetWeather, GreetUser]
-        end
-    end
+
     Users
-        admin_user: admin,
-        regular_user: user
+        role1:
+            role1@email.com
+
+        role2: 
+            role2@email.com
     end
+
+    Policy all_actions_policy
+        on: 
+            all_actions
+        roles: 
+            role1
+    end
+
+    Path
+        "/home/user/db/users/user_roles_policies.txt"
+    end
+
     Authentication
-        basic_auth
+        method: user_id
     end
 end
+```
+
+#### **Roles**
+Roles are granted permissions for accessing bot's actions. Each user can have one or multiple roles, inheriting all of their permissions. When defining the available roles, a default role should be provided, which is the role an unidentified/unauthenticated user will acquire.
+
+The textX grammar for defining roles is as follows:
+```
+Roles:
+    'Roles'
+        words+=Words[',']
+        'default:'
+            default=Words
+    'end'
+;
+```
+
+#### **Users**
+Each role can be assigned to one or many authenticated users. Users are dinstinguished by their unique id such as their email. To see the supported identifiers check the authentication section.
+
+The textX grammar for defining users is as follows:
+```
+Users:
+    'Users'
+        roles+=UserRoles
+    'end'
+;
+UserRoles: role=Word ':' users+=WordExt[','];
+```
+Users entity can be skipped if loading the user-role mappings from a file or a database is needed. This file should be specified using a path entity. DFlow supports user-role mappings imported from text files that conform with the following JSON format:
+{
+	"role1": ["user1_identifier"],
+	"role2": ["user2_identifier", "user3_identifier"],
+}
+
+#### **Policies**
+Access control policies serve as the basic layer of access control. They function to enforce a permit/deny access control on ActionGroups, ensuring that only the roles explicitly declared within the policy can execute the associated ActionGroup. It's important to note that each policy is dedicated to a single ActionGroup. In cases where there is no policy assigned to a particular ActionGroup, all roles gain the ability to execute it.
+
+The textX grammar for defining policies is as follows:
+```
+Policy:
+    'Policy' name=ID
+        'on:' actions+=Words[',']
+        'roles:' roles+=Words[',']
+    'end'
+;
+```
+
+##### **Inline Policies**
+To enable enhanced access control capabilities, dFlow also supports inline policies. These enable the developer to control the flow of the conversation and differentiate the executed actions within an ActionGroup.
+
+An inline policy example within a Dialogue is shown below:
+```dflow 
+ActionGroup inform_system_parameters
+    Speak("System's HostName:" SYSTEM: HOSTNAME "\nSystem's public IP" SYSTEM: PUBLIC_IP)[roles=user_admin]
+    Speak("Sorry, only admins are allowed to perform this action")[roles=user_paid]
+end
+```
+
+Keep in mind that for the inline action policies to work, the user must first have access to the associated ActionGroup.
+
+#### **Authentication**
+For an authorization and access control mechanism to function properly, the physical users must first be assosciated with their digital identity. This is usually achieved via authentication. DFlow supports two different types of authentication schemes:
+
+Third party authentication: This allows a third party connector to authenticate users. The default attribute used for user identification is their emails, fetched from the connector's channel.
+
+User ID authentication: This allows the user to be authenticated by utilizing the sender_id variable of the RASA API.
+
+Slot authentication: This allows the user to be authenticated using the content of a slot, which is filled during the conversation with the user, enabling the utilization of voice passwords.
+
+The textX grammar for defining authentication is as follows:
+```
+Authentication:
+    'Authentication'
+        'method:' method=AuthMethods
+        (
+        'slot_name:' slot_name=Words
+        )?
+    'end'
+;
+
+AuthMethods: 'slot' | 'user_id' | 'slack' | 'telegram';
+```
+
+#### **Path**
+Optional. User-role mappings are stored inside the file provided in the path entity. If the file doesn't exist it will be automatically generated. If no users entity is provided, dFlow will assume that the user-role mappings already exist within this file and attempt to load them.
+
+The textX grammar for defining paths is as follows:
+```
+Path:
+    'Path'
+        path=STRING
+    'end'
+;
 ```
 
 Example Models
@@ -283,79 +720,60 @@ These examples follow the detailed guidelines provided and demonstrate how dFlow
 Ensure your models align with these structures to maximize the efficiency and effectiveness of your VA development.
 """
 
-WRITE_DFLOW_MODEL = """
-DFlow is a Domain Specific Language (DSL) designed for creating complex automation scenarios for dialogue systems, particularly for managing conversations, integrations, and access controls. Below are comprehensive guidelines to assist you in writing effective DFlow models.
+DFLOW_DESCRIPTION = """
+dFlow is a Domain Specific Language (DSL) designed for creating complex automation scenarios for dialogue systems, particularly for managing conversations, integrations, and access controls.
+This DSL facilitates the development of chatbots by providing a framework for defining complex conversational patterns and integrating with external services.
+dFlow models consist of several components, including Entities, Synonyms, Triggers, Dialogues, EServices, Access Controls, and Global Slots, each with its own syntax and set of properties.
+dFlow models can be used to create task-based dialogue flows, virtual assistants, and chatbots for various applications and platforms.
+dFlow models are used to generate Rasa models, which are used to build conversational AI applications.
 
-General Structure
-A DFlow model consists of several main components:
+dFlow is a Domain-Specific Language (DSL) designed for creating Virtual Assistants (VAs) in a low-code, system-agnostic manner. The core objective of dFlow is to simplify VA development, making it accessible to both experienced developers and citizen developers (individuals with minimal programming experience). This DSL offers a textual interface and leverages open-source technologies to create task-specific VAs efficiently.
 
-Metadata: Contains meta-information about the model.
-Entities: Represents both trainable and pretrained entities.
-Synonyms: Defines synonym sets for entities.
-Triggers: Specifies the intents and events that trigger dialogues.
-Dialogues: Defines the logic and responses for dialogues.
-EServices: Describes external service integrations.
-Access Controls: Defines roles, policies, and authentication methods.
-Connectors: Defines integrations with external communication platforms.
-Each component has its own syntax and set of properties. Follow the detailed instructions below to structure each part of your DFlow model correctly.
+## Key Components of dFlow:
+
+### Entities & Synonyms:
+
+Entities: These represent structured pieces of information (e.g., person, location) extracted from user messages. dFlow supports both pre-trained Named Entity Recognition (NER) models for common entity types and trainable entities for domain-specific information.
+Synonyms: Words or phrases that map to the same underlying value. They are used to ensure the assistant understands different expressions of the same concept.
+
+### Triggers:
+
+Triggers define how a dialogue is initiated. This could be a user statement (intent) or an external event (e.g., a reminder).
+Intents: Goals or tasks that the user wants to achieve, such as asking for weather information. Each intent is associated with example phrases.
+Events: System-driven triggers like notifications that don’t require user input.
+
+### EServices:
+
+External services (REST APIs) are defined as reusable components within the dFlow model. They are called dynamically in dialogues to fetch or send data as needed.
+
+### Global Slots:
+
+Static information stored and accessed by the assistant throughout the conversation. These enable multi-turn dialogues and maintain memory across interactions.
+
+### Dialogues:
+
+Dialogues represent conversational flows. They consist of triggers paired with responses, which can include actions such as speaking, making API calls, or setting slot values.
+Forms: Used to gather information sequentially from the user or from external services.
+ActionGroups: Collections of actions that the assistant performs, such as responding to the user or interacting with services.
+
+### Access Controls:
+
+dFlow is the first Domain-Specific Language (DSL) to integrate a fully functional user access control mechanism directly into the generated bots. This feature employs a Role-Based Access Control (RBAC) methodology, allowing developers to create distinct roles with specific permissions for executing the bot's actions and assigning these roles to users. This enables the least privilege principle, where users are only granted access to the resources they need, enhancing security and control. Additionally, dFlow’s access control allows the development of complex dialogue flows, where the bot’s behavior adapts dynamically based on the user's role.
 """
 
 SYSTEM_ROLE = """
 I am an AI Assistant that can write dflow models. 
 dFlow is a DSL designed for creating task-based dialogue flows, particularly suited for virtual assistants in smart environments.
-Rasa Integration: It allows for the generation of complete Rasa models, which are used to build conversational AI applications.
-Metamodel: The metamodel defines the language’s concepts, providing a structure for creating dialogue flows.
-Grammar and Entities: The grammar includes entities, synonyms, services, global slots, triggers, dialogues, and actions, which are essential components for defining conversational logic.
-Access Control: dFlow supports role-based access control, enabling different permissions for users and enforcing security within the dialogue flows.
-This DSL facilitates the development of chatbots by providing a framework for defining complex conversational patterns and integrating with external services.
-In order to write a dflow model, you need to define the entities, synonyms, services, global slots, triggers, dialogues, and actions to define the conversational logic.
+I can generate dFlow models based on user requirements and guidelines.
+I generate dFlow models using the provided user utterance and following the dFlow modeling guidelines.
+Before I generate a dFlow model, I am taking my time to understand the user requirements and guidelines to ensure the model is accurate and efficient.
+Before I generate a dflow model, I am taking my time to figure out which of the dFlow concepts are needed to satisfy the user requirements.
 I always follow the provided instructions and guidelines 
 to ensure the model is valid and can be parsed by the provided textX grammar."""
 
-DFLOW_USECASES = """
-The dFlow DSL has several use cases, making it a valuable tool for creating conversational AI applications. Here are some scenarios where dFlow can be beneficial:
-
-Virtual Assistants: dFlow is particularly well-suited for building virtual assistants that interact with users in natural language. Whether it’s answering questions, providing recommendations, or assisting with tasks, dFlow allows developers to define complex dialogue flows efficiently.
-Smart Environments: In smart homes, offices, or other connected environments, dFlow can power voice-controlled interfaces. Users can interact with devices, request information, or perform actions using natural language commands.
-Task Automation: dFlow can automate repetitive tasks by understanding user intent and executing relevant actions. For example, a virtual assistant built with dFlow could schedule meetings, order groceries, or control smart home devices.
-Custom Chatbots: Developers can create custom chatbots tailored to specific domains or industries. Whether it’s customer support, healthcare, or finance, dFlow enables the design of chatbots with specialized knowledge.
-Integration with External Services: dFlow allows seamless integration with external services, APIs, and databases. Developers can define actions that interact with these services, enhancing the capabilities of their virtual assistants.
-Role-Based Access Control: With dFlow, access control can be enforced based on user roles. This is essential for maintaining security and ensuring that only authorized users can perform specific actions within the dialogue flows.
-Remember that dFlow is a domain-specific language, so its primary focus is on creating effective dialogue flows. Developers can leverage its features to build powerful conversational experiences across various applications and platforms.
-"""
-
-VA_CONCEPT_GENERATOR_PROMPT = """
-{input}
-Think about a virtual assistant concept that you would like to create using the dFlow DSL. Give it a name and describe its functionality.
-Write a detailed description of the virtual assistant, including its purpose, target users, key features, and any specific tasks it can perform.
-Consider how the virtual assistant will interact with users, what services or information it will provide, and how it will handle different types of requests.
-
-I'm providing you with small descriptions of other concepts to help you generate ideas for your virtual assistant concept.
-Your description should be as it has been requested from you.
-
-"greet": "I want to create a dialogue scenario for greeting a user. The scenario will consist of a generic intent and the assistant will respond with \"Hello there!\".",
-"ask_weather": "I want to create a dialogue scenario for telling the weather forecast. The assistant will ask for the city the user wants to learn the forecast for and will call the API http://services.issel.ee.auth.gr/general_information/weather_openweather with city as a query parameter and will present the retrieved information to the user via a speak event. The retrieved information is located in the temp field of the response object. The response expression will be \"The weather forecast will be \" retrieved_temp \" for \" requested_city.",
-"ask_weather_ac": "I want to create a dialogue scenario for telling the weather forecast. The assistant will ask for the city the user wants to learn the forecast for and will call the API http://services.issel.ee.auth.gr/general_information/weather_openweather with city as a query parameter and will present the retrieved information to the user via a speak event. The retrieved information is located in the temp field of the response object. The response expression will be \"The weather forecast will be \" retrieved_temp \" for \" requested_city. Retrieving the weather forecast should only be allowed to paid users and blocked for the other users. Protect this action using an explicit access control Policy and retrieve user's idenity from user_id. User-role mappings should be explicitly defined, where username1 is a paid user and username2 is a non-paid user.",
-"book_appointment": "I want to create a dialogue scenario for a doctor appointment scheduling. The assistant should ask the user to provide the doctor name, date and time, and then use all these parameters to call the API. It is a post API is https://health.com/medical/book_appointment  that receives the three parameters as body params. Then, if successful it should respond to the user with \"Doctor <doctor_name> is waiting for you at <date>, <time>\".",
-"book_appointment_ac": "I want to create a dialogue scenario for a doctor appointment scheduling. The assistant should ask the user to provide the doctor name, date and time, and then use all these parameters to call the API. It is a post API is https://health.com/medical/book_appointment  that receives the three parameters as body params. Then, if successful it should respond to the user with \"Doctor <doctor_name> is waiting for you at <date>, <time>\". Additionally, paid plan users should be informed that their appointment is covered by the insurance, and free plan users must be encouraged to upgrade their plan if they want insurance to cover their appointment. However, unregistered users should not be allowed to book an appointment. The users idenity should be extracted from a slack connector with token: xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH, channel: doctor_assistant and signing_secret: 123456798. User-role mappings should be retrieved from /home/Desktop/users_db.txt",    
-"remind_medicine": "Please write a dialogue for notifing a user for their medication of the day. The list is in https://health.com/profile/medication_list in response parameter medication. Create an intent with possible user utterances, call the api and state the message: \"Today you have to take\" <medication> .",
-"open_window": "I want an assistant interaction for opening a smart windown. There will be an access control system that uses user's ID, and if it belongs to the user_parent role it will fire an event to uri: `/window` with message `open` and say `Sure, I am opening it right now`. If not, it will be a user_child role (which is also the default role), then it will say `I am sorry, you are not authorized`. Include the username-role mappings from the /home/Desktop/ac_policies.txt file.",
-"user_profile": "Write an assistant interaction for registering a new user to our platform. We ask only for name and age and POST it to the https://platform.health.gr/user/regist API as query parameters. After that answer with 'Glad to meet you' and the name of the user.",
-"user_profile_ac": "Write an assistant interaction for registering a new user to our platform. We ask only for name and age and POST it to the https://platform.health.gr/user/regist API as query parameters. After that answer with 'Glad to meet you' and the name of the user. If the user's name has already been registered, omit the post request and reply only with 'It is nice seeing you again' and the name of the user. The registered names should be retrieved from /home/Desktop/registered_users_db.txt",
-"retrieve_steps": "Create a dialogue scenario for a user that wants to learn how many steps they have made in the current day. The steps are stored in the personal data registry in https://health.com/profile/steps under the 'steps' response object param. Retrieve it and say 'Today you have done <steps> steps so far.'",
-"take_notes": "We want to support a note taking functionality verbally. We have an api that gets a `note` body parameter and stores it internally in the user profile. The api is a post api in https://services.issel.auth.gr/profile/notes. Ask user for what they want to save, send it to the API and respond 'OK, noted!'",
-"buy_amazon": "Amazon buy assistant scenario, where user states a product (via an entity preferably) and the assistant calls the POST API: https://api.amazon.com/products/buy with body param `product`. Check the user's id if it is in parent or child role and if it a parent, do the process, send the product to the API and then say a successful response message. Otherwise, suggest them to ask their parents as they are not allowed to do that. the role username mappings are in the /home/Desktop/users.txt file.",
-"log_food": "Craft a meal logging interaction. When users want to store the meal they ate, ask them the exact dish and volume they consumed, store it and send it to https://services.issel.auth.gr/profile/meal POST api as body params with names dish and volume. Respond with `Thanks for letting me know!`.",
-"audiobook": "We want an audiobook assistant that users can use to listen to an audiobook whenever they greet the assistant and also change narrator's voice on demand. For now there are only two available audiobooks, Silmarilion by Tolkien and Dune by Frank Herbert, additionally there are only two available narrator voices, male and female. We distinguish the users into two roles, free (default) and paid. Free users are only given a sample of the audiobook, while paid users get the full audiobook. Additionally, free users cannot change narrator's voice and have to be encouranged to switch to a paid plan whenever they attempt to do so. To get the full/sample audiobook a GET request should be made at localhost:7777 and path full_book/sample_book respectively, with the name of the audiobook placed within the audiobook query parameter. To change narrator's voice, a PUT request at localhost:7777/change_narrator should be made, with the body parameter narrator containing the voice choice. User-role mappings should be retrieved from /home/Desktop/users.txt, while the identification of the users will be done via slack. The slack connector has the following parameters, token: xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH, channel: audiobook_assistant and signing_secret: 123456798.",
-"smart_car": "Write an assistant for a smart car that can start the engine of the vehicle and play music on demand. Only the driver should be able to start the engine, while all the passengers should be able to turn the radio on. To start the engine the event at /engine should be set to on, while to play music the event /radio should be set to on. Please inform the passengers whenever an action is performed. The default role should be the passenger. The user-role mappings must be retrieved from /home/Desktop/passengers.txt and the users must be authenticated by their user_id."
-"""
-
 CONSTRTUCT_DFLOW_MODEL_PROMPT = """
-Write entities, synonyms, services, global slots, trtiggers, and dialogues, write the complete dflow model for the virtual assistant concept:
-{va_concept}
-
-You can use the following template of a dflow model to help you structure your model, you have to replace ## with the actual values:
-{template_dflow} 
+Write a dFlow model that will satisfy the following requirements:
+{user_utterance} 
 
 Follow the guidelines provided for each component to ensure the model is correctly structured.
 
@@ -364,10 +782,13 @@ Put the code inbetween the ```dflow and ``` tags."""
 
 
 def get_few_shot_examples():
-    FEW_SHOT_DESCRIPTIONS = os.path.join(dflow_api.FEW_SHOT_MODELS_PATH, "descriptions.json")
+    """Returns the few-shot examples for dFlow model generation."""
+    descriptions_file_path = os.path.join(
+        dflow_api.FEW_SHOT_MODELS_PATH, "descriptions.json"
+    )
 
     try:
-        with open(FEW_SHOT_DESCRIPTIONS, "r", encoding="utf-8") as f:
+        with open(descriptions_file_path, "r", encoding="utf-8") as f:
             # Read the contents of the file
             descriptions = json.load(f)
     except FileNotFoundError:
@@ -389,7 +810,9 @@ def get_few_shot_examples():
             ) as f:
                 # Read the contents of the file
                 data = f.read()
-                few_shot_examples.append(({"input": descriptions[file], "output": data}))
+                few_shot_examples.append(
+                    ({"input": descriptions[file], "output": data})
+                )
         except FileNotFoundError:
             print("File not found.")
         except IOError:
@@ -397,7 +820,9 @@ def get_few_shot_examples():
 
     to_vectorize = [" ".join(example.values()) for example in few_shot_examples]
     embeddings = OpenAIEmbeddings()
-    vectorstore = Chroma.from_texts(to_vectorize, embeddings, metadatas=few_shot_examples)
+    vectorstore = Chroma.from_texts(
+        to_vectorize, embeddings, metadatas=few_shot_examples
+    )
 
     example_selector = SemanticSimilarityExampleSelector(
         vectorstore=vectorstore,
@@ -411,18 +836,15 @@ def get_few_shot_examples():
         ),
         examples=few_shot_examples,
     )
-    
+
     return few_shot_prompt_template
 
 
 def get_system_prompt():
     """Returns the system prompt containing the guidelines for dFlow model generation"""
     system_prompt = [
-        ("system", SYSTEM_ROLE),
-        ("system", dflow_paper),
-        ("system", DFLOW_USECASES),
+        ("system", DFLOW_DESCRIPTION),
         ("system", DFLOW_MODELING_GUIDELINES),
-        ("system", WRITE_DFLOW_MODEL),
-        get_few_shot_examples(),
+        ("system", SYSTEM_ROLE),
     ]
     return system_prompt
