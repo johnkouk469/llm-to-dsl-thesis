@@ -47,8 +47,9 @@ if __name__ == "__main__":
     for auto in smauto_files:
         with open(SMAUTO_EXAMPLES_PATH + "/" + auto, "r", encoding="utf-8") as file:
             validation = validate(file.read())
-            # print("The SmAuto's validator response for " + auto + " is:")
-            # print(validation.status_code)
+            print("The SmAuto's validator response for " + auto + " is:")
+            print(validation.json().get("message"))
+            print(validation.status_code)
             if validation.status_code != 200:
                 print("\n")
             else:

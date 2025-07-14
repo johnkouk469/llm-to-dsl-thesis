@@ -407,11 +407,18 @@ When combining two conditions or more into a more complex one using logical oper
 
 Make sure to not forget the parenthesis!!! This is crucial for the correct parsing of the condition by the textX grammar
 
+When you're writing a complex condition that involves combining two or more simple conditions using logical operators like AND, OR, etc., you must use parentheses around each condition. This is not just a stylistic choice—it’s essential for correct parsing by the textX grammar, which is used to interpret the structure of the model.
+
 condition_1 AND condition_2 AND condition_3
+This will likely cause a parsing error or lead to incorrect behavior because the parser sees it as a flat list, not a structured expression.
 
 will have to be rephrased to an equivalent like:
 
 ((condition_1) AND (condition_2)) AND (condition_3)
+This format makes the order of evaluation explicit and ensures the parser can correctly interpret the logic as nested binary operations:
+
+Combine condition_1 and condition_2 with AND
+Then combine the result with condition_3 using another AND
 
 ### Extended Example with All Features
 
@@ -895,6 +902,10 @@ GATHER_INFOMATION = """
     7. **Flexibility:** At any time, the user can review previous answers, clarify assumptions, or provide additional details if needed.
 
     Your goal is to systematically gather the information or make educated assumptions while keeping the process flexible and user-friendly.
+    
+    Never ask the user to confirm if the information that they have given you is correct, since they just gave it to you assume that it is correct. Your job is to identify if there is information that is missing that ask the user to provide you with this information, not confirming that some piece of information is correct, unless you are trying to sort out contradictions in the users input.
+    
+    If according to your analysis you have all the information needed for an SmAuto component, do not ask the user to specify any additional configurations or parameters unless something is missing or the user's intent is unclear.
     
     At the end of the Q&A process, do not generate or output the SmAuto model. Your sole task is to ask the questions, gather the necessary information, and confirm any assumptions made. Once all the required questions have been asked and answered, simply output "Q&A process complete." and only that, nothing else. Do not provide any further content or attempt to create the model itself.
     
