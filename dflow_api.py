@@ -37,11 +37,15 @@ def gen(model: str) -> requests.Response:
 
 
 if __name__ == "__main__":
-    for dflow in dflow_files:
-        with open(
-            DFLOW_GENERATED_MODELS_PATH + "/" + dflow, "r", encoding="utf-8"
-        ) as file:
-            validation = validate(file.read())
-            print("The Dflow's validator response for " + dflow + " is:")
-            print(validation.status_code)
-            print(validation.text)
+    with open("./task1.dflow", "r", encoding="utf-8") as file:
+        validation = validate(file.read())
+        print(validation.status_code)
+        print(validation.text)
+    # for dflow in dflow_files:
+    #     with open(
+    #         DFLOW_GENERATED_MODELS_PATH + "/" + dflow, "r", encoding="utf-8"
+    #     ) as file:
+    #         validation = validate(file.read())
+    #         print("The Dflow's validator response for " + dflow + " is:")
+    #         print(validation.status_code)
+    #         print(validation.text)

@@ -1,5 +1,5 @@
 """
-Module that contains all the prompts that are going to be given to the LLM 
+Module that contains all the prompts that are going to be given to the LLM
 as intructions for dFlow model generation.
 """
 
@@ -59,7 +59,7 @@ PretrainedEntity:
 ;
 
 Words:
-    /[-\w ]*\b/
+    /[-\\w ]*\\b/
 ;
 ```
 
@@ -434,7 +434,7 @@ DictTypes:
 ;
 
 Dict:
-    '{' items*=DictItem[','] '}'
+    '{{' items*=DictItem[','] '}}'
 ;
 
 List:
@@ -550,10 +550,10 @@ Users:
 UserRoles: role=Word ':' users+=WordExt[','];
 ```
 Users entity can be skipped if loading the user-role mappings from a file or a database is needed. This file should be specified using a path entity. DFlow supports user-role mappings imported from text files that conform with the following JSON format:
-{
+{{
 	"role1": ["user1_identifier"],
 	"role2": ["user2_identifier", "user3_identifier"],
-}
+}}
 
 #### **Policies**
 Access control policies serve as the basic layer of access control. They function to enforce a permit/deny access control on ActionGroups, ensuring that only the roles explicitly declared within the policy can execute the associated ActionGroup. It's important to note that each policy is dedicated to a single ActionGroup. In cases where there is no policy assigned to a particular ActionGroup, all roles gain the ability to execute it.
@@ -718,6 +718,218 @@ end
 
 These examples follow the detailed guidelines provided and demonstrate how dFlow models can be written for various functionalities of a Virtual Assistant. 
 Ensure your models align with these structures to maximize the efficiency and effectiveness of your VA development.
+
+
+### Formatting Rules for ActionGroups and RESTCall Parameters
+
+When defining `ActionGroup`s—especially those involving `RESTCall` actions—strict syntax compliance is required to ensure that the model is valid and parseable by the textX grammar.
+
+#### Common Mistakes to Avoid
+
+1. Misplaced Final Parenthesis Without Comma  
+   ❌ Incorrect:  
+   RESTCall(service_name(query=[...], header=[...]))  
+   ✅ Correct:  
+   RESTCall(service_name(query=[...], header=[...]),)  
+   Always place a comma after the closing parenthesis of the RESTCall(...) expression. This ensures that the grammar recognizes the RESTCall as an item in a list of actions.
+
+2. Comma at the End of Action Lines  
+   ❌ Incorrect:  
+   ActionGroup sample_group  
+       Speak("Welcome!"),  
+       RESTCall(service()),  
+   end  
+
+   ✅ Correct:  
+   ActionGroup sample_group  
+       Speak("Welcome!")  
+       RESTCall(service(),)  
+   end  
+
+   Never place commas at the end of each line inside ActionGroups. Each action is a standalone line and must **not be comma-separated**.
+
+#### Correct Structure Template
+
+ActionGroup my_actions  
+    Speak("Your message")  
+    RESTCall(my_service(query=[param1=value1, param2=value2], header=[Authorization='token']),)  
+end
+
+### Common Modeling Mistake: Redundant Trainable Entities
+
+#### Problem:
+A trainable entity is being defined for a concept that is already covered by a pre-trained entity, such as `PERSON`, `LOCATION`, or `DATE`.
+
+#### Invalid Example:
+entities
+    Entity Person
+        John,
+        Maria,
+        doctor
+    end
+end
+
+The above is unnecessary because dFlow already provides the pre-trained entity `PERSON`, which covers people’s names and professions.
+
+#### Correct Approach:
+Use a pre-trained entity instead of creating a new one:
+triggers
+    Intent greet_person
+        "Hi" PE:PERSON,
+        "Call" PE:PERSON["John"]
+    end
+end
+
+#### Fix Instructions:
+- Before creating a new `Entity`, check whether a corresponding pre-trained entity already exists.
+- Refer to the following list of available pre-trained entities:
+
+  PERSON, NORP, FAC, ORG, GPE, LOC, PRODUCT, EVENT,  
+  WORK_OF_ART, LAW, LANGUAGE, DATE, TIME, PERCENT,  
+  MONEY, QUANTITY, ORDINAL, CARDINAL
+
+- If your concept falls under one of the above, use `PE:<ENTITY_NAME>` or `PE:<ENTITY_NAME>["example"]` directly in your intent.
+- Only define a new trainable entity when:
+  - No matching pre-trained entity exists.
+  - You need to handle domain-specific concepts, such as "DeviceType" (`lamp, heater, speaker`) or "WeatherCondition" (`sunny, rainy, cloudy`).
+
+---
+
+Rule of Thumb:
+If you can express it with `PE:ENTITY`, don’t define a new `Entity`.
+
+
+### When Should a Service Be Called: In a Form or in an ActionGroup?
+
+This section explains when a service should be called using a Form and when it should be called inside an ActionGroup. The choice depends on whether the service is needed to collect data or to execute a response.
+
+#### What’s the Difference?
+
+| Aspect               | Form                                          | ActionGroup                                      |
+|----------------------|-----------------------------------------------|--------------------------------------------------|
+| Purpose              | To collect data (slot-filling)                | To perform actions (speak, call API, set slots)  |
+| Interaction type     | Usually multi-turn (asks the user questions)  | Single-turn or sequential execution              |
+| Slot values          | Fills slots via HRI or external service call  | Consumes already-filled slots to respond         |
+| When used            | When the response requires new information    | When the required info is already available      |
+
+#### When to Use a Form for Calling a Service
+
+Use a Form to call a service when:
+- The response depends on dynamic data that must be fetched before the assistant can respond.
+- The data from the service is stored in form slots and used later in the dialogue.
+- You need to query an API as part of collecting input.
+
+Example:
+
+Form WeatherForm
+    temperature: int = EService(weather_svc(query=[location=UserInput.location]))
+end
+
+ActionGroup WeatherResponse
+    Speak("The temperature is" WeatherForm.temperature)
+end
+
+#### When to Use an ActionGroup for Calling a Service
+
+Use an ActionGroup to call a service when:
+- The assistant already has all the necessary information to perform the call.
+- The goal is to immediately react to the result of the call (e.g., provide a response).
+- The service call is part of fulfilling an intent or reacting to a form.
+
+Example:
+
+ActionGroup GetWeather
+    RESTCall(weather_svc(query=[location=WeatherForm.location]),)
+    Speak("Here is the weather in" WeatherForm.location)
+end
+
+#### Summary Rules
+
+- If the service call is part of collecting information needed to continue the conversation → use a Form.
+- If the service call is part of executing a response or fulfilling an intent → use an ActionGroup.
+
+
+
+### Guidelines: When Should a Comma Be Placed at the End of a Line?
+
+Correct comma placement is essential for dFlow models to be valid and parsable. The rules depend on whether you're defining a **list**, **statement block**, or a **composite structure** (like `RESTCall(...)`).
+
+#### ✅ Use a Comma When:
+
+1. **Inside `RESTCall(...)`**:
+   - The entire `RESTCall(...)` must be followed by a comma when used in an `ActionGroup`.
+   - ✅ Example:
+     RESTCall(service(query=[...], header=[...]),)
+
+2. **In list-style sections (like `query=[...]`, `phrases=[...]`, `words=[...]`)**:
+   - Use commas **between** items inside square brackets.
+   - ✅ Example:
+     query=[latitude=value1, longitude=value2]
+
+3. **In Intent, Synonym, or Entity definitions**:
+   - Use commas between examples on the **same line or block**.
+   - ✅ Example:
+     "hi",
+     "hello",
+     "good morning"
+
+---
+
+#### ❌ Do Not Place a Comma When:
+
+1. **At the end of `Speak(...)`, `FireEvent(...)`, `SetFSlot(...)`, etc.**:
+   - These are not part of comma-separated lists.
+   - ❌ Incorrect:
+     Speak("Hello!"),
+   - ✅ Correct:
+     Speak("Hello!")
+
+2. **At the end of a Form parameter line**:
+   - Form parameters are separated by newlines, not commas.
+   - ❌ Incorrect:
+     slot1: str = HRI("Ask?", [TE:Something]),
+   - ✅ Correct:
+     slot1: str = HRI("Ask?", [TE:Something])
+
+3. **At the end of a block (e.g., after last phrase or action)**:
+   - Don't add commas after the last item in an Entity, Synonym, Intent, or ActionGroup block.
+   - ❌ Incorrect:
+     "hi",
+     "hello",
+     "hey",
+   - ✅ Correct:
+     "hi",
+     "hello",
+     "hey"
+
+---
+
+#### ⚠ Special Case: RESTCall(...) in ActionGroup
+
+When calling a REST service inside an ActionGroup:
+- The `RESTCall(...)` line **must end in a comma**, even if it is the last action.
+- This is because all actions in an ActionGroup form a **comma-separated list**.
+
+✅ Correct:
+ActionGroup example
+    Speak("Requesting")
+    RESTCall(my_svc(query=[...]),)
+end
+
+---
+
+In Summary:
+
+| Context                        | Comma Required | Example                                |
+|-------------------------------|----------------|----------------------------------------|
+| Items in lists (`[...]`)      | ✅ Yes         | query=[a=1, b=2]                        |
+| Multiple examples (phrases)   | ✅ Yes         | "hello", "hi", "hey"                   |
+| RESTCall in ActionGroup       | ✅ Yes         | RESTCall(...)**,)                       |
+| Individual actions (Speak...) | ❌ No          | Speak("Hello")                         |
+| Form parameters                | ❌ No          | name: str = HRI("Name?", [PE:PERSON])  |
+
+Always double-check whether you are in a **list** context (comma required) or a **block** context (no comma at end).
+
 """
 
 DFLOW_DESCRIPTION = """
@@ -776,9 +988,177 @@ Write a dFlow model that will satisfy the following requirements:
 {user_utterance} 
 
 Follow the guidelines provided for each component to ensure the model is correctly structured.
+Be careful when placing commas.
 
 Output only the dflow model code.
 Put the code inbetween the ```dflow and ``` tags."""
+
+
+INVALID_MODEL_PROMPT = """
+The model you have written is invalid.
+You should rewrite the model based on the guidelines and the error message.
+The error message contains the first error that was found in the model as it was parsed by the textX grammar.
+You will be provided with error message. 
+Each error is described with a specific format indicating the location and nature of the error.
+Your task is to identify and correct these errors. 
+The format of the error message is as follows:
+:<line>:<column>: <error_description>
+Where:
+<line> is the line number where the error occurs.
+<column> is the column number where the error starts.
+<error_description> is a detailed message describing the error.
+An * in the error description indicates the position of the error in the model.
+The error message is:
+{validation_message}
+Please make all the nessesary adjustments to the model based on the guidelines and the error message.
+Output only the dflow model code.
+Put the code inbetween the ```dflow and ``` tags.
+
+Below are common mistakes and how to fix them:
+
+---
+
+## Common Error: Missing Comma After RESTCall in ActionGroup
+
+If the error message contains:
+
+    Expected ',' => ...),
+
+It means you are using a RESTCall(...) in an ActionGroup but forgot to add a comma at the end of the call.
+
+To fix it:
+- Add a comma immediately after the closing `)` of the RESTCall.
+- Example: RESTCall(my_service(...),)
+
+Do not add commas at the end of Speak(...) or other actions—only RESTCall(...) needs this trailing comma due to grammar requirements.
+
+---
+
+## Common Error: Invalid use of `response_filter` with multiple fields
+
+If the error message refers to an unexpected character (like a comma) in a `response_filter`, it likely means that the filter was defined with **multiple comma-separated fields**, which is not allowed.
+
+The `response_filter` must be a **single dotted path**, not a list.
+
+Incorrect:
+    my_service(...)[response_filter=field1, field2]
+
+Correct:
+    my_service(...)[response_filter=field1.subfield2]
+
+Fix Instructions:
+- Use only **one** response filter.
+- It must be a **single identifier or a dot-separated path** (e.g., `response.data.value`)
+- Do **not** use commas or provide multiple values.
+
+Summary:
+The `response_filter` must conform to the grammar rule: `ID('.'ID)*`. That means one valid identifier or a path like `a.b.c`, not `a, b, c`.
+"""
+
+
+IDENTIFY_USER_INTENT_DFLOW = """
+Your task is to analyze the user's input in order to identify what functionality they want the virtual assistant to perform and determine which dFlow components are necessary to fulfill this functionality.
+
+A dFlow model is composed of various modular components such as Entities, Synonyms, Triggers (Intents or Events), EServices, Global Slots, Dialogues (Forms and ActionGroups), and optionally Access Control. However, not all components are required for every model. The goal is to determine whether the user's input provides enough information to generate a valid and meaningful dFlow model for their use case.
+
+Process
+
+1. Understand the User Goal:
+   - Analyze the user’s request to identify what kind of assistant behavior is expected.
+   - Examples: answering questions, calling an external API, asking the user for information, responding to an event.
+
+2. Map User Intent to dFlow Concepts:
+   Determine which dFlow components are needed based on the user's description.
+
+   - Entities: Are there domain-specific pieces of information the assistant needs to extract from user input (e.g., cities, devices, values)?
+   - Synonyms: Are there multiple terms referring to the same concept?
+   - Triggers:
+     - Intent: Does the assistant need to recognize a user intention?
+     - Event: Should the assistant respond to an external system event?
+   - Dialogues:
+     - Form: Does the assistant need to ask the user for more info?
+     - ActionGroup: Should the assistant say something, call a service, or perform an action?
+   - EServices: Is there any external data (e.g., from a REST API) the assistant must retrieve?
+   - Global Slots: Are there static variables that need to persist across dialogues?
+   - Access Control (optional): Does the assistant need to behave differently based on user roles?
+
+3. Assess Model Readiness:
+   - If all required components are identified for the described functionality, the model is ready to be built.
+   - If any components are missing or underspecified, engage the user to extract more details.
+
+Output Format
+
+User Goal Summary:
+Summarize what the user wants the assistant to do.
+
+Mapped dFlow Components:
+List the components that are relevant and identified in the user input. Indicate if the information is complete or incomplete.
+
+- Entities:
+- Synonyms:
+- Triggers (Intents / Events):
+- Dialogues (Forms / ActionGroups):
+- EServices:
+- Global Slots:
+- Access Control (optional):
+
+Missing or Incomplete Information:
+List the components that need more detail to be usable.
+
+Questions to Clarify Requirements:
+Ask specific, structured questions to gather missing information. These may include:
+- What specific information should the assistant extract from the user?
+- What example phrases would the user say to trigger the assistant?
+- Does the assistant need to call an external API? If yes, what is the endpoint and expected response?
+- What should the assistant say or do in response to the user’s input?
+"""
+
+
+GATHER_INFORMATION_DFLOW = """
+Your task is to behave as a Q&A assistant that guides the user through the process of providing the necessary details to build a valid and useful dFlow model. You will do this by asking questions one at a time. dFlow models are composed of modular components—Entities, Synonyms, Triggers (Intents or Events), EServices, Global Slots, Dialogues (Forms and ActionGroups), and optionally Access Control—and **not all components are required in every case**. Your goal is to collect the minimum viable set of information required to model the functionality described by the user.
+
+Follow these steps:
+
+1. **Question Generation:** Based on the previous analysis, you have identified specific missing or incomplete components needed for the dFlow model. Ask the user one targeted question at a time to gather this missing information.
+
+2. **Wait for Response:** After asking each question, pause and wait for the user to respond. Do not proceed to the next question until a response or skip is received.
+
+3. **Skip and Assumption Option:** If the user chooses to skip a question, make a reasonable assumption based on typical dialogue assistant behaviors, domain practices, or default modeling patterns. Inform the user of the assumption you’ve made and allow them to revise it if needed.
+
+4. **Clarification:** If the user’s answer is vague, ambiguous, or incomplete, ask a follow-up question or suggest commonly used options. Your goal is to ensure enough detail is provided to define the corresponding dFlow component.
+
+5. **Confirmation:** Once all required information for a given component (e.g., an Intent, Dialogue, or EService) is gathered—either from the user or by assumption—briefly summarize the component’s configuration and move to the next open gap. Do **not** ask the user to confirm information they just provided unless you are resolving ambiguity or contradictions.
+
+6. **Completion:** Repeat this process until you have gathered or assumed everything needed for all relevant dFlow components based on the described functionality. Only ask for information that is actually missing. Do not prompt the user to define optional components unless required for functionality.
+
+7. **Flexibility:** At any point, the user can revisit, revise, or clarify previous answers or assumptions. Accept updates and adjust your understanding accordingly.
+
+Your job is to identify what is missing or undefined and ask the necessary questions—**not** to confirm already-provided input, unless it contradicts something else.
+
+When all required questions have been asked and answered (or assumptions made), output only the following message:  
+**"Q&A process complete."**
+
+Do not output the dFlow model or provide any additional text beyond that line.
+"""
+
+
+CONSTRUCT_DFLOW_MODEL_AFTER_QA = """
+With all the information you have gathered from the user, you are now ready to construct the complete dFlow model. Based on the responses provided during the Q&A process, you will write a valid and well-structured dFlow model that satisfies the user's intended functionality.
+
+Follow the dFlow modeling guidelines precisely to ensure that the model is correctly structured and parsable by the provided textX grammar.
+
+Only include components (Entities, Synonyms, Triggers, Dialogues, etc.) that are necessary to fulfill the described use case. Do not add extra components unless they are required for functionality.
+
+Pay close attention to syntax rules:
+- Be careful with comma placement—refer to formatting rules for RESTCall and ActionGroup sections.
+- Do not use comments in the model output.
+- Do not add placeholder components or content not grounded in the user’s input or reasonable assumptions made during the Q&A.
+- When calling REST APIs inside ActionGroups, always include a comma after the closing parenthesis of RESTCall(...).
+- Do not end Speak(...) or SetSlot(...) lines with commas.
+
+Output only the dFlow model code.  
+Put the code in between the ```dflow and ``` tags.
+"""
 
 
 def get_few_shot_examples():
