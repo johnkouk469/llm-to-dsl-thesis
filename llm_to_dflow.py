@@ -439,31 +439,29 @@ def conversation_with_feedback():
 
 
 def main():
-    """Main function."""
-    conversation_with_feedback()
+    """
+    Main function to interact with the user via the terminal console.
+    """
+    
+    while True:
+        # Get user input
+        print("Choose an option to interact with the SmAuto assistant:")
+        print("1. Have a conversation")
+        print("2. Have converation with feedback")
+        print("3. Exit")
+        choice = input("Enter the number of your choice: ")
 
+        # Process based on user's choice
+        if choice == "1":
+            conversation()
+        elif choice == "2":
+            conversation_with_feedback()
+        elif choice == "3":
+            print("Exiting the program.")
+            break
+        else:
+            print("Invalid choice, please try again.")
 
-#     while True:
-
-#         for i in range(10):
-#             utterance = """
-# The assistant should support three types of location-based functionality. It can retrieve the coordinates of a requested city by asking the user for the city name and calling the API at https://services.issel.ee.auth.gr/geospatial/get_coords using the GET method, with city as a query parameter and the header Authorization: Q5eJZ8sSLEX6XNmOHyMlWagI. The response contains the fields lat and lon, which should be extracted using response filtering and returned in a sentence such as: “The coordinates of Athens are: latitude 37.97, longitude 23.73.” It can also present nearby electric vehicle charging stations by asking the user to enter latitude, longitude, and a search radius (all floats). These values are passed to the API at https://services.issel.ee.auth.gr/openstreetmaps/get_charging_stations using the GET method with the same authorization header. This functionality should be available only to paid users. If a free user requests it, the assistant should respond with a message such as: “This feature is available only to paid users.” For paid users, the assistant should parse the response and extract from each entry the fields tags.name, tags.operator, latitude, and longitude. Each result should be presented as a readable sentence such as: “Polis Park – operated by fortizo at latitude 37.99, longitude 23.73.” If name or operator is not available, those parts should be omitted. In addition, the assistant can provide general information about the city based on coordinates and radius by calling three APIs: https://services.issel.ee.auth.gr/openstreetmaps/get_taxi_stations, https://services.issel.ee.auth.gr/openstreetmaps/get_batteries_recycling_points, and https://services.issel.ee.auth.gr/openstreetmaps/get_public_toilets, each using the GET method with the same query parameters and authorization header. This feature should be available to both free and paid users. Paid users should receive the full results from all three APIs. Free users should receive only the recycling points and should be informed that the remaining information is available through a paid plan. For taxi stations, the assistant should extract tags.name, latitude, and longitude and present each item as a sentence such as: “Taxi stand at Πλ. Συντάγματος – latitude 37.97, longitude 23.73.” For recycling points, the assistant should extract only tags.name and tags.description and present them in a sentence such as: “Battery recycling bin – Ανακύκλωση μπαταριών.” For public toilets, the assistant should extract tags.fee, tags.wheelchair, latitude, and longitude and describe each facility with a sentence such as: “Public toilet – free of charge, not wheelchair accessible – latitude 37.97, longitude 23.73.”
-# """
-#             conversation_history = []
-#             print("Generating model " + str(i))
-#             conversation_history = generate_dflow_model(utterance, conversation_history)
-#             print("---------------------")
-
-#             with open(
-#                 os.path.join(EXP3_PATH, str(i) + "dflow_model_" + str(i) + ".dflow"),
-#                 "w",
-#                 encoding="utf-8",
-#             ) as file:
-#                 file.write(
-#                     conversation_history[-1][1]
-#                     .removeprefix(CODE_PREFIX)
-#                     .removesuffix(CODE_SUFFIX)
-#                 )
 
 
 if __name__ == "__main__":

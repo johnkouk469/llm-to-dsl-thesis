@@ -502,13 +502,6 @@ def conversation_with_feedback():
 def main():
     """
     Main function to interact with the user via the terminal console.
-
-    Prompts the user to choose between inputting an utterance or providing a YAML file.
-    Based on the user's choice, the appropriate function is called to process the input.
-    The user can also choose to exit the program.
-
-    Returns:
-        None
     """
 
     while True:
