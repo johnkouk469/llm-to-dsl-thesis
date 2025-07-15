@@ -4,14 +4,6 @@ Module that contains all the prompts to be given to the LLM for the generation o
 
 import os
 
-# Load the files used to construct the prompts from the DSL repository
-with open("./smauto-readme.md", "r", encoding="utf-8") as file:
-    smauto_readme = file.readlines()
-
-smauto_textX_grammar = [
-    f for f in os.listdir("./smauto-textX-grammar") if f.endswith(".tx")
-]
-
 SYSTEM_ROLE = """
 I am an AI Assistant that can write smauto models. 
 SmAuto is a DSL designed for creating automation applications in smart environments, enabling complex scenarios.
