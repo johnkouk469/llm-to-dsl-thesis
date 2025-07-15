@@ -52,6 +52,7 @@ Here’s an example of the required `.env` file:
 OPENAI_API_KEY="sk-proj-******"
 SMAUTO_API_KEY="API_KEY"
 DFLOW_API_KEY="123"
+```
 
 ### Default Keys
 If you’re using the default local REST API setup for validation:
