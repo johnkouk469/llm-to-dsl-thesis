@@ -8,9 +8,8 @@ load_dotenv()
 
 DFLOW_EXAMPLES_PATH = "./dflow_examples"
 FEW_SHOT_MODELS_PATH = "./dflow_examples/llm_4_dflow"
-DFLOW_GENERATED_MODELS_PATH = "./logs_dflow"
 dflow_files = [
-    f for f in os.listdir(DFLOW_GENERATED_MODELS_PATH) if f.endswith(".dflow")
+    f for f in os.listdir(DFLOW_EXAMPLES_PATH) if f.endswith(".dflow")
 ]
 
 
@@ -37,15 +36,11 @@ def gen(model: str) -> requests.Response:
 
 
 if __name__ == "__main__":
-    with open("./task1.dflow", "r", encoding="utf-8") as file:
-        validation = validate(file.read())
-        print(validation.status_code)
-        print(validation.text)
-    # for dflow in dflow_files:
-    #     with open(
-    #         DFLOW_GENERATED_MODELS_PATH + "/" + dflow, "r", encoding="utf-8"
-    #     ) as file:
-    #         validation = validate(file.read())
-    #         print("The Dflow's validator response for " + dflow + " is:")
-    #         print(validation.status_code)
-    #         print(validation.text)
+    for dflow in dflow_files:
+        with open(
+            DFLOW_EXAMPLES_PATH + "/" + dflow, "r", encoding="utf-8"
+        ) as file:
+            validation = validate(file.read())
+            print("The Dflow's validator response for " + dflow + " is:")
+            print(validation.status_code)
+            print(validation.text)
