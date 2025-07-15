@@ -22,8 +22,6 @@ load_dotenv()
 timestamp = time.strftime("%Y%m%d-%H%M%S")
 LOGS_FOLDER = "logs_dflow"
 os.makedirs(LOGS_FOLDER, exist_ok=True)
-os.makedirs(os.path.join(LOGS_FOLDER, "exp3_" + timestamp), exist_ok=True)
-EXP3_PATH = os.path.join(LOGS_FOLDER, "exp3_" + timestamp)
 
 MAX_REGENERATIONS = 5
 CODE_PREFIX = "```dflow\n"
@@ -442,7 +440,7 @@ def main():
     """
     Main function to interact with the user via the terminal console.
     """
-    
+
     while True:
         # Get user input
         print("Choose an option to interact with the SmAuto assistant:")

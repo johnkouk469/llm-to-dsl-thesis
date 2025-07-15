@@ -37,8 +37,6 @@ CODE_PREFIX = "```smauto\n"
 CODE_SUFFIX = "\n```"
 SMAUTO_FILE_NAME_EXTENSION = ".auto"
 RESULTS_PATH = os.path.join(LOGS_FOLDER, RESULTS_FOLDER)
-os.makedirs(os.path.join(RESULTS_PATH, "exp3"), exist_ok=True)
-EXP3_PATH = os.path.join(RESULTS_PATH, "exp3")
 
 
 llm = ChatOpenAI(api_key=os.getenv("OPENAI_API_KEY"), model="gpt-4o")
