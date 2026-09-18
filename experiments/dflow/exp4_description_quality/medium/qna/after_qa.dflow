@@ -1,0 +1,119 @@
+entities
+    Entity City
+        Athens,
+        Thessaloniki,
+        Patras,
+        Heraklion
+    end
+end
+
+triggers
+    Intent get_city_coordinates
+        "What are the coordinates of" TE:City "?",
+        "Can you give me the latitude and longitude of" TE:City "?",
+        "I need the coordinates for the city of" TE:City ".",
+        "Where is" TE:City "located on the map?"
+    end
+
+    Intent find_charging_stations
+        "Find me the nearest charging stations",
+        "I need to locate charging stations around my location",
+        "Can you show me the closest electric vehicle charging points?",
+        "Where are the charging stations near me?",
+        "I’m looking for EV charging stations in my area",
+        "Help me find charging stations within a certain radius",
+        "Provide me with a list of charging stations near my coordinates"
+    end
+
+    Intent find_places
+        "Show me nearby taxi ranks and public facilities",
+        "Are there any battery recycling points around here?",
+        "Where is the closest place to drop off used batteries?",
+        "Can I find a public toilet close to this location?",
+        "Give me city information around my area — like recycling bins, taxis, or toilets"
+    end
+end
+
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_batteries_recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+dialogues
+    Dialogue GetCityCoordinatesDialogue
+        on: get_city_coordinates
+        responses:
+            Form city_form
+                city_name: str = HRI('Which city are you interested in?', [TE:City])
+            end,
+            ActionGroup get_city_coords_action
+                get_coords_svc(query=[city=city_form.city_name], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('The coordinates for ' city_form.city_name ' are latitude: <lat>, longitude: <lon>')
+                Speak('I couldn’t find coordinates for the city you mentioned. Please double-check the spelling or try a different location.')
+            end
+    end
+
+    Dialogue FindChargingStationsDialogue
+        on: find_charging_stations
+        responses:
+            Form location_form
+                latitude: str = HRI('Please provide your latitude')
+                longitude: str = HRI('Please provide your longitude')
+                radius: str = HRI('Please provide the search radius')
+            end,
+            ActionGroup find_charging_stations_action
+                get_charging_stations_svc(query=[latitude=location_form.latitude, longitude=location_form.longitude, radius=location_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('The nearest charging stations are located at <location> and operated by <operator>')
+                Speak('I tried to fetch the information, but the data was incomplete. Let’s try again or use a different location.')
+            end
+    end
+
+    Dialogue FindPlacesDialogue
+        on: find_places
+        responses:
+            Form location_form
+                latitude: str = HRI('Please provide your latitude')
+                longitude: str = HRI('Please provide your longitude')
+                radius: str = HRI('Please provide the search radius')
+            end,
+            ActionGroup find_places_action
+                get_taxi_stations_svc(query=[latitude=location_form.latitude, longitude=location_form.longitude, radius=location_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Nearby taxi ranks are located at <location>')
+                
+                get_batteries_recycling_points_svc(query=[latitude=location_form.latitude, longitude=location_form.longitude, radius=location_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Recycling points are available at <location> with description: <description>')
+                
+                get_public_toilets_svc(query=[latitude=location_form.latitude, longitude=location_form.longitude, radius=location_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Public toilets are located at <location>')
+                
+                Speak('I tried to fetch the information, but the data was incomplete. Let’s try again or use a different location.')
+            end
+    end
+end

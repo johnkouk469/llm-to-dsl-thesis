@@ -1,0 +1,140 @@
+Metadata
+    name: SmartHomeAutomation
+    version: "1.0.0"
+    description: "Automates home appliances based on temperature and humidity conditions."
+    author: "Jane Doe"
+    email: "janedoe@example.com"
+end
+
+RTMonitor
+    broker: logs_broker
+    namespace: "smart_home.logs"
+    eventTopic: "events"
+    logsTopic: "logs"
+end
+
+Broker<MQTT> main_broker
+    host: "192.168.1.100"
+    port: 1883
+    ssl: false
+    auth:
+        username: "main_user"
+        password: "main_pass"
+end
+
+Broker<MQTT> logs_broker
+    host: "192.168.1.101"
+    port: 1883
+    ssl: false
+    auth:
+        username: "logs_user"
+        password: "logs_pass"
+end
+
+Entity bedroom_temperature_sensor
+    type: sensor
+    topic: "bedroom.temperature"
+    broker: main_broker
+    attributes:
+        - temperature: float -> gaussian(18, 25, 2) // Simulating temperature readings
+end
+
+Entity living_room_temperature_sensor
+    type: sensor
+    topic: "living_room.temperature"
+    broker: main_broker
+    attributes:
+        - temperature: float -> gaussian(22, 28, 1.5) // Simulating temperature readings
+end
+
+Entity living_room_humidity_sensor
+    type: sensor
+    topic: "living_room.humidity"
+    broker: main_broker
+    attributes:
+        - humidity: float -> gaussian(40, 60, 5) // Simulating humidity readings
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: main_broker
+    attributes:
+        - power: bool
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "living_room.lamp"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity air_conditioner
+    type: actuator
+    topic: "bedroom.ac"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity air_purifier
+    type: actuator
+    topic: "living_room.purifier"
+    broker: main_broker
+    attributes:
+        - power: bool
+end
+
+Automation turn_on_bedroom_lamp
+    condition:
+        bedroom_temperature_sensor.temperature < 16
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_lamp.power: true
+end
+
+Automation control_living_room_purifier
+    condition:
+        ((living_room_temperature_sensor.temperature > 30) AND 
+        (living_room_humidity_sensor.humidity > 70)) AND 
+        (living_room_lamp.power is false)
+    enabled: true
+    continuous: true
+    actions:
+        - air_purifier.power: true
+end
+
+Automation turn_off_purifier
+    condition:
+        ((living_room_temperature_sensor.temperature <= 30) OR 
+        (living_room_humidity_sensor.humidity <= 70))
+    enabled: true
+    continuous: true
+    actions:
+        - air_purifier.power: false
+end
+
+Automation monitor_bedroom_temperature
+    condition:
+        mean(bedroom_temperature_sensor.temperature, 10) > 28
+    enabled: true
+    continuous: true
+    actions:
+        - air_conditioner.power: true
+        - air_conditioner.mode: "cool"
+end
+
+Automation evening_living_room_lamp
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 50
+end

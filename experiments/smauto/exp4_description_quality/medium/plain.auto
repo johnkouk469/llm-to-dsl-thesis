@@ -1,0 +1,140 @@
+Metadata
+    name: SmartHomeAutomation
+    version: "1.0.0"
+    description: "Automates temperature and humidity control with lighting in a smart home."
+    author: "Automated Home Solutions"
+    email: "support@automatedhomesolutions.com"
+end
+
+RTMonitor
+    broker: monitoring_redis_broker
+    namespace: "smart_home.monitoring"
+    eventTopic: "monitoring.events"
+    logsTopic: "monitoring.logs"
+end
+
+Broker<MQTT> home_mqtt_broker
+    host: "mqtt.home.local"
+    port: 1883
+    ssl: false
+    auth:
+        username: "casa_nova"
+        password: "TooSmart4U@home"
+end
+
+Broker<Redis> monitoring_redis_broker
+    host: "redis.monitoring.local"
+    port: 6379
+    db: 0
+    ssl: false
+    auth:
+        username: "monitor_user"
+        password: "monitor_pass"
+end
+
+Entity living_room_sensor
+    type: sensor
+    topic: "livingroom.sensor"
+    freq: 5
+    broker: home_mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(22, 30, 2) with noise gaussian(0, 0.5)
+        - humidity: float -> gaussian(40, 70, 5) with noise uniform(0, 2)
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "livingroom.lamp"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity living_room_purifier
+    type: actuator
+    topic: "livingroom.purifier"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity bedroom_sensor
+    type: sensor
+    topic: "bedroom.sensor"
+    freq: 5
+    broker: home_mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(20, 28, 3) with noise gaussian(0, 0.5)
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+end
+
+Entity bedroom_ac
+    type: actuator
+    topic: "bedroom.ac"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+        - temperature: float
+        - mode: str
+end
+
+Automation bedroom_temp_low
+    condition:
+        bedroom_sensor.temperature < 18
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_lamp.power: true
+end
+
+Automation living_room_temp_humidity_high
+    condition:
+        ((living_room_sensor.temperature > 25) AND (living_room_sensor.humidity > 60)) AND (living_room_lamp.power is false)        
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_purifier.power: true
+        - living_room_purifier.mode: "auto"
+    stops:
+        - living_room_temp_humidity_normal
+end
+
+Automation living_room_temp_humidity_normal
+    condition:
+        (living_room_sensor.temperature < 24) AND (living_room_sensor.humidity < 50)
+    enabled: false
+    actions:
+        - living_room_purifier.power: false
+    starts:
+        - living_room_temp_humidity_high
+end
+
+Automation bedroom_temp_high_unstable
+    condition:
+        (mean(bedroom_sensor.temperature, 10) > 26) AND (std(bedroom_sensor.temperature, 10) > 1)
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_ac.power: true
+        - bedroom_ac.mode: "cool"
+        - bedroom_ac.temperature: 23.0
+end
+
+Automation living_room_lamp_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: true
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 30
+end

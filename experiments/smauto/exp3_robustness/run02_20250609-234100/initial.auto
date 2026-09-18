@@ -1,0 +1,95 @@
+Metadata
+    name: llm_to_smauto_model
+    version: "1.0"
+    description: "A model generated for transforming LLM output to SmAuto."
+    author: "John K"
+    email: "johnk@example.com"
+end
+
+RTMonitor
+    broker: monitor_broker
+    namespace: "llm_to_smauto.monitoring"
+    eventTopic: "events"
+    logsTopic: "logs"
+end
+
+Broker<MQTT> main_broker
+    host: "mqtt.example.local"
+    port: 1883
+    ssl: true
+    auth:
+        username: "mqtt_user"
+        password: "mqtt_password"
+end
+
+Broker<Redis> monitor_broker
+    host: "redis.example.local"
+    port: 6380
+    db: 1
+    ssl: true
+    auth:
+        key: "redis-api-key"
+end
+
+Entity living_room_sensor
+    type: sensor
+    topic: "living_room.sensor"
+    freq: 30
+    broker: main_broker
+    attributes:
+        - temperature: float -> gaussian(22, 35, 1) with noise gaussian(0, 1)
+        - humidity: float -> gaussian(45, 70, 2) with noise uniform(0, 1)
+end
+
+Entity living_room_light
+    type: actuator
+    topic: "living_room.light"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - brightness: float
+end
+
+Entity air_purifier
+    type: actuator
+    topic: "living_room.air_purifier"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Automation activate_air_purifier
+    condition:
+        (((living_room_sensor.temperature > 25) AND (living_room_sensor.humidity > 60)) AND (living_room_light.power is false))
+    enabled: true
+    continuous: false
+    freq: 90
+    actions:
+        - air_purifier.power: true
+        - air_purifier.mode: "auto"
+    starts:
+        - deactivate_air_purifier
+end
+
+Automation deactivate_air_purifier
+    condition:
+        ((living_room_sensor.temperature < 24) AND (living_room_sensor.humidity < 50))
+    enabled: false
+    continuous: false
+    freq: 120
+    actions:
+        - air_purifier.power: false
+    starts:
+        - activate_air_purifier
+end
+
+Automation evening_light
+    condition:
+        (system_clock.time == 22:00)
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_light.power: true
+        - living_room_light.brightness: 30.0
+end

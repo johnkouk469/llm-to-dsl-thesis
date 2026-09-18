@@ -1,0 +1,51 @@
+Write your message to the dFlow assistant or Exit to quit:The assistant should support giving the coordinates of a city and finding places nearby based on user location. It should use an API to get the coordinates from a city name and also allow the user to find nearby charging stations, taxis, recycling spots, and toilets using location inputs. All requests need to include authorization and should be formatted with a GET method.The assistant should show the information that it gets from these APIs in a clear way. When looking for charging stations, it should tell the user where they are and who runs them. For the recycling points, it should only use the name and description if available. The assistant should also know what to say if something goes wrong or if the data is incomplete.
+Instructing the LLM to to analyze the user's utterance, identify missing information,     and ask follow-up questions to gather all necessary details to write the SmAuto model.
+dFlow assistant: %s User Goal Summary:
+The user wants an assistant that can provide the coordinates of a city and find nearby places (charging stations, taxis, recycling spots, and toilets) based on the user's location. The assistant should use APIs to retrieve this data, show it clearly, and handle errors or incomplete data gracefully.
+
+Mapped dFlow Components:
+- Entities:
+  - City names for which coordinates are requested.
+  - Locations for which nearby places are found (charging stations, taxis, recycling spots, toilets).
+
+- Triggers (Intents / Events):
+  - Intent to get the coordinates of a city.
+  - Intent to find nearby places based on the user's location.
+
+- Dialogues (Forms / ActionGroups):
+  - Form for collecting user's input (e.g., city name or location query).
+  - ActionGroup for displaying the retrieved information and handling errors or incomplete data.
+
+- EServices:
+  - API to retrieve city coordinates.
+  - API to find nearby places (charging stations, taxis, recycling spots, toilets) with authorization and GET method.
+thorization and GET method.
+
+- Access Control (optional):
+  - Authorization for API requests.
+
+Missing or Incomplete Information:
+- Specific API endpoints for retrieving city coordinates - Authorization method needed for API requests.
+- Example phrases users will say to trigger the assistant for each intent.
+- Error messages or fallback responses if something goes wrong or data is incomplete.
+
+Questions to Clarify Requirements:
+1. What are the specific API endpoints for retrieving city coordinates and nearby places?
+2. What type of authorization is required for the API requests?
+3. Can you provide example phrases users might say to trigger the requests for city coordinates and nearby places?
+4. What should the assistant say if the API request fails or returns incomplete data?
+Instructing the LLM to initializing the Q&A process.     
+dFlow assistant: %s What are the specific API endpoints for retrieving city coordinates and nearby places (charging stations, taxis, recycling spots, toilets)?
+Write your message to the dFlow assistant or Exit to quit:To retrieve city coordinates:Endpoint: https://services.issel.ee.auth.gr/geospatial/get_coordsMethod: GETQuery parameter: cityHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagITo retrieve nearby charging stations:Endpoint: https://services.issel.ee.auth.gr/openstreetmaps/get_charging_stationsMethod: GETQuery parameters: latitude, longitude, radiusHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagITrging_stationsMethod: GETQuery parameters: latitude, longitude, radiusHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagITo retrieve nearby taxi stations:Endpoint: https://services.issel.ee.auth.gr/openstreetmaps/get_taxi_stationsMethod: GETQuery parameters: latitude, longitude, radiusHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagITo retrieve battery recycling points:Endpoint: https://services.issel.ee.auth.gr/openstreetmaps/get_batteries_recycling_pointsMethod: GETQuery parameters: latitude, longitude, radiusHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagITo retrieve public toilets:Endpoint: https://services.issel.ee.auth.gr/openstreetmaps/get_public_toiletsMethod: GETQuery parameters: latitude, longitude, radiusHeader: Authorization: Q5eJZ8sSLEX6XNmOHyMlWagI
+Providing the LLM with the user's response to ask follow-up questions.
+dFlow assistant: %s Can you provide example phrases users might say to trigger the requests for city coordinates and nearby places?
+Write your message to the dFlow assistant or Exit to quit:To retrieve city coordinates:“What are the coordinates of Athens?”“Can you give me the latitude and longitude of Thessaloniki?”“I need the coordinates for the city of Patras.”“Where is Heraklion located on the map?”To find nearby electric vehicle charging stations:“Find me the nearest charging stations.”“I need to locate charging stations around my location.”“Can you show me the closest electric vehicle charging points?”“Where are the charging stations near me?”“I’m looking for EV charging stations in my area.”“Help me find charging stations within a certain radius.”“Provide me with a list of charging stations near my coordinates.”To find general city-related information (taxis, batteries, toilets):“Show me nearby taxi ranks and public facilities.”“Are there any battery recycling points around here?”“Where is the closest place to drop off used batteries?”“Can I find a public toilet close to this location?”“Give me city information around my area — like recycling bins, taxis, or toilets.”
+User: %s To retrieve city coordinates:“What are the coordinates of Athens?”“Can you give me the latitude and longitude of Thessaloniki?”“I need the coordinates for the city of Patras.”“Where is Heraklion located on the map?”To find nearby electric vehicle charging stations:“Find me the nearest charging stations.”“I need to locate charging stations around my location.”“Can you show me the closest electric vehicle charging points?”“Where are the charging stations near me?”“I’m looking for EV charging stations in my area.”“Help me find charging stations within a certain radius.”“Provide me with a list of charging stations near my coordinates.”To find general city-related information (taxis, batteries, toilets):“Show me nearby taxi ranks and public facilities.”“Are there any battery recycling points around here?”“Where is the closest place to drop off used batteries?”“Can I find a public toilet close to this location?”“Give me city information around my area — like recycling bins, taxis, or toilets.”      
+Providing the LLM with the user's response to ask follow-up questions.
+dFlow assistant: %s What should the assistant say if the API request fails or returns incomplete data?
+Write your message to the dFlow assistant or Exit to quit:General API failure (e.g., network issue, 500 error):“I wasn’t able to retrieve the information right now due to a technical issue. Please try again in a few moments.”Missing expected fields in thew due to a technical issue. Please try again in a few moments.”Missing expected fields in the response (e.g., no lat/lon, malformed data):“I received an unexpected response from the service and couldn’t extract the required information. Please make sure the city or coordinates you provided are valid.”For city coordinates request with an invalid or unknown city:“I couldn’t find coordinates for the city you mentioned. Please double-check the spelling or try a different location.”For location-based services (charging stations, taxis, recycling, toilets):“I tried to fetch the information, but the data was incomplete. Let’s try again or use a different location.”
+Providing the LLM with the user's response to ask follow-up questions.
+dFlow assistant: %s Q&A process complete.
+Instructing the LLM to generate a dFlow model after the Q&A process     by using all the information gathered.
+{"status":200,"message":"Model validation success"}
+The dFlow model is syntactically valid.

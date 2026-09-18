@@ -1,0 +1,57 @@
+triggers
+    Intent get_coordinates
+        "Can you tell me the coordinates of" PE:GPE,
+        "What are the coordinates for" PE:GPE,
+        "I'd like to know the coordinates of" PE:GPE,
+        "Get me the coordinates for" PE:GPE
+    end
+
+    Intent find_charging_stations
+        "Find nearest charging stations",
+        "Locate EV charging stations",
+        "Where can I charge my electric vehicle",
+        "Show me nearby charging stations"
+    end
+end
+
+eservices
+    EServiceHTTP get_coords_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+end
+
+dialogues
+    Dialogue CoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form coords_form
+                city: str = HRI('Which city coordinates would you like to know?', [PE:GPE])
+            end,
+            ActionGroup coords_action
+                get_coords_service(query=[city=coords_form.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[lat, lon]
+                Speak('The coordinates of ' coords_form.city ' are: latitude ' lat ', longitude ' lon '.')
+            end
+    end
+
+    Dialogue ChargingStationsDialogue
+        on: find_charging_stations
+        responses:
+            Form stations_form
+                latitude: float = HRI('Please provide the latitude.')
+                longitude: float = HRI('Please provide the longitude.')
+                radius: float = HRI('What search radius do you want?')
+            end,
+            ActionGroup stations_action
+                get_charging_stations_service(query=[latitude=stations_form.latitude, longitude=stations_form.longitude, radius=stations_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name, tags.operator, latitude, longitude]
+                Speak('' tags.name ' - operated by ' tags.operator ' at latitude ' latitude ', longitude ' longitude '.')
+            end
+    end
+end

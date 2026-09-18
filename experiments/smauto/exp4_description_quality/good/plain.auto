@@ -1,0 +1,143 @@
+Metadata
+    name: smart_home_env_control
+    version: "1.4"
+    description: "This model automates environmental controls in the living room and bedroom based on temperature, humidity, and time conditions."
+    author: "Lucas Navarro"
+    email: "nova@homehub.tech"
+end
+
+RTMonitor
+    broker: monitor_broker
+    namespace: "casa.nova.universe"
+    eventTopic: "epic_events"
+    logsTopic: "chaotic_logs"
+end
+
+Broker<MQTT> mqtt_broker
+    host: "mqtt.smarthome.local"
+    port: 8883
+    ssl: true
+    auth:
+        username: "casa_nova"
+        password: "TooSmart4U@home"
+end
+
+Broker<Redis> monitor_broker
+    host: "redis.monitor.local"
+    port: 6380
+    db: 2
+    ssl: true
+    auth:
+        key: "redis-4a9f1e7b3c2d6f8912a3b4c5d678e9f0"
+end
+
+Entity living_room_sensor
+    type: sensor
+    topic: "living_room.sensor"
+    freq: 30
+    broker: mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(22, 35, 1) with noise gaussian(0, 1)
+        - humidity: float -> gaussian(45, 70, 2) with noise uniform(0, 1)
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "living_room.lamp"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - brightness: float
+end
+
+Entity living_room_purifier
+    type: actuator
+    topic: "living_room.purifier"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Entity bedroom_sensor
+    type: sensor
+    topic: "bedroom.sensor"
+    freq: 60
+    broker: mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(20, 30, 1) with noise gaussian(0, 1)
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+end
+
+Entity bedroom_ac
+    type: actuator
+    topic: "bedroom.ac"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - temperature: float
+        - mode: str
+end
+
+Automation bedroom_temp_low
+    condition:
+        bedroom_sensor.temperature < 18
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom_lamp.power: true
+end
+
+Automation living_room_purifier_on
+    condition:
+        ((living_room_sensor.temperature > 25) AND (living_room_sensor.humidity > 60)) AND (living_room_lamp.power is false)
+    enabled: true
+    continuous: false
+    freq: 90
+    actions:
+        - living_room_purifier.power: true
+        - living_room_purifier.mode: "auto"
+    starts:
+        - living_room_purifier_off
+end
+
+Automation living_room_purifier_off
+    condition:
+        ((living_room_sensor.temperature < 24) AND (living_room_sensor.humidity < 50))
+    enabled: true
+    continuous: false
+    freq: 120
+    actions:
+        - living_room_purifier.power: false
+    starts:
+        - living_room_purifier_on
+end
+
+Automation bedroom_ac_on
+    condition:
+        (mean(bedroom_sensor.temperature, 10) > 26) AND (std(bedroom_sensor.temperature, 10) > 1)
+    enabled: true
+    continuous: false
+    freq: 180
+    actions:
+        - bedroom_ac.power: true
+        - bedroom_ac.temperature: 23
+        - bedroom_ac.mode: "cool"
+end
+
+Automation living_room_lamp_night
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 30.0
+end

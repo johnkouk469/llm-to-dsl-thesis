@@ -1,0 +1,88 @@
+triggers
+    Intent get_coordinates
+        "What are the coordinates of" PE:GPE "?",
+        "Tell me the coordinates for" PE:GPE
+    end
+
+    Intent find_nearby
+        "Find nearby charging stations",
+        "Locate nearby taxis",
+        "Show me recycling points nearby",
+        "Are there any toilets nearby?"
+    end
+end
+
+eservices
+    EServiceHTTP city_coordinates_svc
+        verb: GET
+        host: 'https://api.example.com'
+        path: '/get_coordinates'
+        port: 443
+    end
+
+    EServiceHTTP nearby_charging_stations_svc
+        verb: GET
+        host: 'https://api.example.com'
+        path: '/nearby/charging_stations'
+        port: 443
+    end
+
+    EServiceHTTP nearby_taxis_svc
+        verb: GET
+        host: 'https://api.example.com'
+        path: '/nearby/taxis'
+        port: 443
+    end
+
+    EServiceHTTP nearby_recycling_svc
+        verb: GET
+        host: 'https://api.example.com'
+        path: '/nearby/recycling'
+        port: 443
+    end
+
+    EServiceHTTP nearby_toilets_svc
+        verb: GET
+        host: 'https://api.example.com'
+        path: '/nearby/toilets'
+        port: 443
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form city_form
+                city: str = HRI("Which city are you interested in?", [PE:GPE])
+            end,
+            ActionGroup coordinates_action
+                city_coordinates_svc(query=[city=city_form.city],)[coordinates],
+                Speak('The coordinates for' city_form.city 'are' coordinates_action.coordinates)
+            end
+    end
+
+    Dialogue FindNearbyDialogue
+        on: find_nearby
+        responses:
+            Form nearby_form
+                location: str = HRI("What is your current location?")
+            end,
+            ActionGroup nearby_action
+                Speak('Searching for nearby places...'),
+                nearby_charging_stations_svc(query=[location=nearby_form.location],),
+                Speak('Charging stations located at: <location>, operated by: <operator>'),
+
+                nearby_taxis_svc(query=[location=nearby_form.location],),
+                Speak('Nearby taxis are available at: <location>'),
+
+                nearby_recycling_svc(query=[location=nearby_form.location],),
+                Speak('Recycling points: <name>, <description>'),
+
+                nearby_toilets_svc(query=[location=nearby_form.location],),
+                Speak('Toilets are available at: <location>'),
+
+                Speak('If no results are found or data is incomplete, please check your input or try again later.')
+            end
+    end
+end

@@ -1,0 +1,97 @@
+target	original path in the results folder
+smauto/exp1_complexity/simple/description.txt	Experiments SmAuto/exp1_1 simple/exp1_1.txt
+smauto/exp1_complexity/simple/model.auto	Experiments SmAuto/exp1_1 simple/exp1_1.auto
+smauto/exp1_complexity/complex/description.txt	Experiments SmAuto/exp1_2 complex/user_utterance.txt
+smauto/exp1_complexity/complex/model.auto	Experiments SmAuto/exp1_2 complex/smauto_model.auto
+smauto/exp1_complexity/special/description.txt	Experiments SmAuto/exp1_3 special/user_utterance.txt
+smauto/exp1_complexity/special/model.auto	Experiments SmAuto/exp1_3 special/smauto_model.auto
+smauto/exp2_incremental/step1_simple/description.txt	Experiments SmAuto/exp2_1 simple/user_utterance.txt
+smauto/exp2_incremental/step1_simple/model.auto	Experiments SmAuto/exp2_1 simple/smauto_model.auto
+smauto/exp2_incremental/step2_complex/description.txt	Experiments SmAuto/exp2_2 from simple to complex/user_utterance.txt
+smauto/exp2_incremental/step2_complex/model.auto	Experiments SmAuto/exp2_2 from simple to complex/smauto_model.auto
+smauto/exp2_incremental/step3_special/description.txt	Experiments SmAuto/exp2_3 from complex to simple/user_utterance.txt
+smauto/exp2_incremental/step3_special/model.auto	Experiments SmAuto/exp2_3 from complex to simple/smauto_model.auto
+smauto/exp3_robustness/description.txt	Experiments SmAuto/exp3/20250609-233556/user_utterance.txt
+smauto/exp3_robustness/run01_20250609-233556/regenerated_1.auto	Experiments SmAuto/exp3/20250609-233556/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run01_20250609-233556/regenerated_2.auto	Experiments SmAuto/exp3/20250609-233556/regenerated_smauto_model_2.auto
+smauto/exp3_robustness/run01_20250609-233556/initial.auto	Experiments SmAuto/exp3/20250609-233556/smauto_model.auto
+smauto/exp3_robustness/run02_20250609-234100/run_log.txt	Experiments SmAuto/exp3/20250609-234100/comments.txt
+smauto/exp3_robustness/run02_20250609-234100/regenerated_1.auto	Experiments SmAuto/exp3/20250609-234100/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run02_20250609-234100/regenerated_2.auto	Experiments SmAuto/exp3/20250609-234100/regenerated_smauto_model_2.auto
+smauto/exp3_robustness/run02_20250609-234100/initial.auto	Experiments SmAuto/exp3/20250609-234100/smauto_model.auto
+smauto/exp3_robustness/run03_20250609-234318/run_log.txt	Experiments SmAuto/exp3/20250609-234318/comments.txt
+smauto/exp3_robustness/run03_20250609-234318/regenerated_1.auto	Experiments SmAuto/exp3/20250609-234318/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run03_20250609-234318/regenerated_2.auto	Experiments SmAuto/exp3/20250609-234318/regenerated_smauto_model_2.auto
+smauto/exp3_robustness/run03_20250609-234318/regenerated_3.auto	Experiments SmAuto/exp3/20250609-234318/regenerated_smauto_model_3.auto
+smauto/exp3_robustness/run03_20250609-234318/regenerated_4.auto	Experiments SmAuto/exp3/20250609-234318/regenerated_smauto_model_4.auto
+smauto/exp3_robustness/run03_20250609-234318/regenerated_5.auto	Experiments SmAuto/exp3/20250609-234318/regenerated_smauto_model_5.auto
+smauto/exp3_robustness/run03_20250609-234318/initial.auto	Experiments SmAuto/exp3/20250609-234318/smauto_model.auto
+smauto/exp3_robustness/run04_20250609-234617/run_log.txt	Experiments SmAuto/exp3/20250609-234617/comments.txt
+smauto/exp3_robustness/run04_20250609-234617/regenerated_1.auto	Experiments SmAuto/exp3/20250609-234617/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run04_20250609-234617/initial.auto	Experiments SmAuto/exp3/20250609-234617/smauto_model.auto
+smauto/exp3_robustness/run05_20250609-235310/run_log.txt	Experiments SmAuto/exp3/20250609-235310/comments.txt
+smauto/exp3_robustness/run05_20250609-235310/regenerated_1.auto	Experiments SmAuto/exp3/20250609-235310/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run05_20250609-235310/initial.auto	Experiments SmAuto/exp3/20250609-235310/smauto_model.auto
+smauto/exp3_robustness/run06_20250609-235453/run_log.txt	Experiments SmAuto/exp3/20250609-235453/comments.txt
+smauto/exp3_robustness/run06_20250609-235453/regenerated_1.auto	Experiments SmAuto/exp3/20250609-235453/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run06_20250609-235453/regenerated_2.auto	Experiments SmAuto/exp3/20250609-235453/regenerated_smauto_model_2.auto
+smauto/exp3_robustness/run06_20250609-235453/regenerated_3.auto	Experiments SmAuto/exp3/20250609-235453/regenerated_smauto_model_3.auto
+smauto/exp3_robustness/run06_20250609-235453/regenerated_4.auto	Experiments SmAuto/exp3/20250609-235453/regenerated_smauto_model_4.auto
+smauto/exp3_robustness/run06_20250609-235453/initial.auto	Experiments SmAuto/exp3/20250609-235453/smauto_model.auto
+smauto/exp3_robustness/run07_20250609-235836/run_log.txt	Experiments SmAuto/exp3/20250609-235836/comments.txt
+smauto/exp3_robustness/run07_20250609-235836/regenerated_1.auto	Experiments SmAuto/exp3/20250609-235836/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run07_20250609-235836/initial.auto	Experiments SmAuto/exp3/20250609-235836/smauto_model.auto
+smauto/exp3_robustness/run08_20250610-000046/run_log.txt	Experiments SmAuto/exp3/20250610-000046/comments.txt
+smauto/exp3_robustness/run08_20250610-000046/regenerated_1.auto	Experiments SmAuto/exp3/20250610-000046/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run08_20250610-000046/initial.auto	Experiments SmAuto/exp3/20250610-000046/smauto_model.auto
+smauto/exp3_robustness/run09_20250610-000220/run_log.txt	Experiments SmAuto/exp3/20250610-000220/comments.txt
+smauto/exp3_robustness/run09_20250610-000220/regenerated_1.auto	Experiments SmAuto/exp3/20250610-000220/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run09_20250610-000220/initial.auto	Experiments SmAuto/exp3/20250610-000220/smauto_model.auto
+smauto/exp3_robustness/run10_20250610-000324/run_log.txt	Experiments SmAuto/exp3/20250610-000324/comments.txt
+smauto/exp3_robustness/run10_20250610-000324/regenerated_1.auto	Experiments SmAuto/exp3/20250610-000324/regenerated_smauto_model_1.auto
+smauto/exp3_robustness/run10_20250610-000324/initial.auto	Experiments SmAuto/exp3/20250610-000324/smauto_model.auto
+smauto/exp4_description_quality/good/plain.auto	Experiments SmAuto/exp4 good/regenerated_smauto_model_1.auto
+smauto/exp4_description_quality/good/qna.auto	Experiments SmAuto/exp4 good/qa.auto
+smauto/exp4_description_quality/medium/plain.auto	Experiments SmAuto/exp4 mediore/no_feedback_valid.auto
+smauto/exp4_description_quality/medium/qna.auto	Experiments SmAuto/exp4 mediore/regenerated_smauto_model_5.auto
+smauto/exp4_description_quality/poor/plain.auto	Experiments SmAuto/exp4 bad/regenerated_smauto_model_3.auto
+smauto/exp4_description_quality/poor/qna.auto	Experiments SmAuto/exp4 bad/qa_bad.txt
+dflow/exp1_complexity/simple/initial.dflow	Experiments dFlow/exp1_1/20250620-144012_dflow_model.dflow
+dflow/exp1_complexity/simple/regenerated_1.dflow	Experiments dFlow/exp1_1/20250620-144012_regenerated_dflow_model_1.dflow
+dflow/exp1_complexity/simple/run_log.txt	Experiments dFlow/exp1_1/comments.txt
+dflow/exp1_complexity/complex/initial.dflow	Experiments dFlow/exp1_2/20250620-152709_dflow_model.dflow
+dflow/exp1_complexity/complex/regenerated_1.dflow	Experiments dFlow/exp1_2/20250620-152709_regenerated_dflow_model_1.dflow
+dflow/exp1_complexity/complex/regenerated_2.dflow	Experiments dFlow/exp1_2/20250620-152709_regenerated_dflow_model_2.dflow
+dflow/exp1_complexity/complex/regenerated_3.dflow	Experiments dFlow/exp1_2/20250620-152709_regenerated_dflow_model_3.dflow
+dflow/exp1_complexity/complex/run_log.txt	Experiments dFlow/exp1_2/comments.txt
+dflow/exp2_incremental/step1_simple/initial.dflow	Experiments dFlow/exp2_1/20250620-184912_dflow_model.dflow
+dflow/exp2_incremental/step1_simple/regenerated_1.dflow	Experiments dFlow/exp2_1/20250620-184912_regenerated_dflow_model_1.dflow
+dflow/exp2_incremental/step1_simple/regenerated_2.dflow	Experiments dFlow/exp2_1/20250620-184912_regenerated_dflow_model_2.dflow
+dflow/exp2_incremental/step1_simple/regenerated_3.dflow	Experiments dFlow/exp2_1/20250620-184912_regenerated_dflow_model_3.dflow
+dflow/exp3_robustness/run00.dflow	Experiments dFlow/exp3_20250621-151436/0dflow_model_0.dflow
+dflow/exp3_robustness/run01.dflow	Experiments dFlow/exp3_20250621-151436/1dflow_model_1.dflow
+dflow/exp3_robustness/run02.dflow	Experiments dFlow/exp3_20250621-151436/2dflow_model_2.dflow
+dflow/exp3_robustness/run03.dflow	Experiments dFlow/exp3_20250621-151436/3dflow_model_3.dflow
+dflow/exp3_robustness/run04.dflow	Experiments dFlow/exp3_20250621-151436/4dflow_model_4.dflow
+dflow/exp3_robustness/run05.dflow	Experiments dFlow/exp3_20250621-151436/5dflow_model_5.dflow
+dflow/exp3_robustness/run06.dflow	Experiments dFlow/exp3_20250621-151436/6dflow_model_6.dflow
+dflow/exp3_robustness/run07.dflow	Experiments dFlow/exp3_20250621-151436/7dflow_model_7.dflow
+dflow/exp3_robustness/run08.dflow	Experiments dFlow/exp3_20250621-151436/8dflow_model_8.dflow
+dflow/exp3_robustness/run09.dflow	Experiments dFlow/exp3_20250621-151436/9dflow_model_9.dflow
+dflow/exp4_description_quality/good/plain/initial.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_dflow_model.dflow
+dflow/exp4_description_quality/good/plain/regenerated_1.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_regenerated_dflow_model_1.dflow
+dflow/exp4_description_quality/good/plain/regenerated_2.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_regenerated_dflow_model_2.dflow
+dflow/exp4_description_quality/good/plain/regenerated_3.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_regenerated_dflow_model_3.dflow
+dflow/exp4_description_quality/good/plain/regenerated_4.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_regenerated_dflow_model_4.dflow
+dflow/exp4_description_quality/good/plain/regenerated_5.dflow	Experiments dFlow/exp4_1 good/no feedback/20250621-164200_regenerated_dflow_model_5.dflow
+dflow/exp4_description_quality/good/qna/after_qa.dflow	Experiments dFlow/exp4_1 good/feedback/20250621-162937_dflow_model_after_qa.dflow
+dflow/exp4_description_quality/good/qna/regenerated_1.dflow	Experiments dFlow/exp4_1 good/feedback/20250621-162937_regenerated_dflow_model_1.dflow
+dflow/exp4_description_quality/good/qna/regenerated_2.dflow	Experiments dFlow/exp4_1 good/feedback/20250621-162937_regenerated_dflow_model_2.dflow
+dflow/exp4_description_quality/good/qna/session_log.txt	Experiments dFlow/exp4_1 good/feedback/commetns.txt
+dflow/exp4_description_quality/medium/plain/initial.dflow	Experiments dFlow/exp4_2 mediocre/20250621-171320_dflow_model.dflow
+dflow/exp4_description_quality/medium/plain/regenerated_1.dflow	Experiments dFlow/exp4_2 mediocre/20250621-171320_regenerated_dflow_model_1.dflow
+dflow/exp4_description_quality/medium/plain/regenerated_2.dflow	Experiments dFlow/exp4_2 mediocre/20250621-171320_regenerated_dflow_model_2.dflow
+dflow/exp4_description_quality/medium/qna/after_qa.dflow	Experiments dFlow/exp4_2 mediocre/feedback/20250621-171820_dflow_model_after_qa.dflow
+dflow/exp4_description_quality/medium/qna/session_log.txt	Experiments dFlow/exp4_2 mediocre/feedback/comments.txt
+dflow/exp4_description_quality/poor/plain/initial.dflow	Experiments dFlow/exp4_3 bad/20250622-134657_dflow_model.dflow
+dflow/exp4_description_quality/poor/qna/after_qa.dflow	Experiments dFlow/exp4_3 bad/20250622-141320_dflow_model_after_qa.dflow

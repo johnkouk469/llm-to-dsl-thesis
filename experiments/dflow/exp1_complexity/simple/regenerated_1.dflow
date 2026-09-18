@@ -1,0 +1,61 @@
+eservices
+    EServiceHTTP charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP geospatial_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+end
+
+triggers
+    Intent find_charging_stations
+        "Where can I find nearby electric vehicle charging stations?",
+        "Locate charging stations near me.",
+        "Find EV charging stations in my area."
+    end
+
+    Intent get_city_coordinates
+        "What are the coordinates of" PE:GPE "?",
+        "Can you give me the latitude and longitude of" PE:GPE "?"
+    end
+end
+
+dialogues
+    Dialogue ChargingStationsDialogue
+        on: find_charging_stations
+        responses:
+            Form ChargingStationsForm
+                latitude: float = HRI('Please provide the latitude:')
+                longitude: float = HRI('Please provide the longitude:')
+                radius: float = HRI('What radius (in meters) should I search within?')
+            end,
+            ActionGroup retrieve_stations_action
+                charging_stations_svc(query=[latitude=ChargingStationsForm.latitude, 
+                                             longitude=ChargingStationsForm.longitude, 
+                                             radius=ChargingStationsForm.radius],
+                                      header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Here are the nearby charging stations:')
+                // Assuming a function parse_charging_stations_response to format the result
+                Speak(parse_charging_stations_response())
+            end
+    end
+
+    Dialogue CityCoordinatesDialogue
+        on: get_city_coordinates
+        responses:
+            Form CityCoordinatesForm
+                city_name: str = HRI('Which city are you interested in?')
+            end,
+            ActionGroup retrieve_coords_action
+                geospatial_coords_svc(query=[city=CityCoordinatesForm.city_name],
+                                      header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=lat]
+                Speak('The coordinates of ' CityCoordinatesForm.city_name ' are: latitude ' 
+                      'lat' ', longitude ' 'lon')
+            end
+    end
+end

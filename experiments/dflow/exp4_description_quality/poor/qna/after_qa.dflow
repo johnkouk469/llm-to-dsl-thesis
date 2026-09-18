@@ -1,0 +1,141 @@
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_batteries_recycling_points_svc
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+triggers
+    Intent get_coords
+        "What are the coordinates of" PE:GPE,
+        "Give me the latitude and longitude of" PE:GPE
+    end
+
+    Intent find_charging_stations
+        "Find charging stations near me",
+        "Show nearby electric vehicle chargers",
+        "List EV charging spots around here"
+    end
+
+    Intent find_taxi_stations
+        "Where can I find a taxi stand?",
+        "Are there any taxis nearby?",
+        "Locate taxi stations close to me"
+    end
+
+    Intent find_recycling_points
+        "Where can I recycle batteries?",
+        "Show me recycling bins near my location",
+        "Any battery drop-off points nearby?"
+    end
+
+    Intent find_public_toilets
+        "Where’s the nearest public toilet?",
+        "Find bathrooms around me",
+        "Locate public restrooms nearby"
+    end
+end
+
+dialogues
+    Dialogue CityCoordinatesDialogue
+        on: get_coords
+        responses:
+            Form coords_form
+                city: str = HRI('Which city do you want coordinates for?', [PE:GPE])
+            end,
+            ActionGroup coords_action
+                get_coords_svc(query=[city=coords_form.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Retrieving coordinates for ' coords_form.city)
+            end
+    end
+
+    Dialogue ChargingStationsDialogue
+        on: find_charging_stations
+        responses:
+            ActionGroup charging_action
+                get_charging_stations_svc(query=[latitude=USER:LATITUDE, longitude=USER:LONGITUDE, radius=1000], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Finding charging stations near you...')
+            end
+    end
+
+    Dialogue TaxiStationsDialogue
+        on: find_taxi_stations
+        responses:
+            ActionGroup taxi_action
+                get_taxi_stations_svc(query=[latitude=USER:LATITUDE, longitude=USER:LONGITUDE, radius=1000], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[roles=premium]
+                Speak('Finding taxi stations near you...')[roles=premium]
+                Speak('This feature is available only to premium users.')[roles=free]
+            end
+    end
+
+    Dialogue RecyclingPointsDialogue
+        on: find_recycling_points
+        responses:
+            ActionGroup recycling_action
+                get_batteries_recycling_points_svc(query=[latitude=USER:LATITUDE, longitude=USER:LONGITUDE, radius=1000], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[roles=premium]
+                Speak('Finding recycling points near you...')[roles=premium]
+                Speak('This feature is available only to premium users.')[roles=free]
+            end
+    end
+
+    Dialogue PublicToiletsDialogue
+        on: find_public_toilets
+        responses:
+            ActionGroup toilets_action
+                get_public_toilets_svc(query=[latitude=USER:LATITUDE, longitude=USER:LONGITUDE, radius=1000], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[roles=premium]
+                Speak('Locating public toilets near you...')[roles=premium]
+                Speak('This feature is available only to premium users.')[roles=free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        premium,
+        free
+        
+        default: 
+            free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack        
+    end
+end
+
+connectors
+    Connector slack
+        token: "xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH"
+        channel: "audiobook_assistant"
+        signing_secret: "123456798"
+    end
+end

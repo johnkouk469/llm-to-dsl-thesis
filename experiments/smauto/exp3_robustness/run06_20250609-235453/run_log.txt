@@ -1,0 +1,13 @@
+2025-06-09 23:55:20,765 The generated SmAuto model is not syntactically valid.
+2025-06-09 23:55:20,883 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-24ad5111.auto:5:13: Expected STRING => '  author: *Lucas Nava'"}
+2025-06-09 23:55:26,816 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:55:27,075 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-4c878584.auto:92:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => 'lse))     *enabled: t'"}
+2025-06-09 23:55:32,389 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:55:32,643 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-0950b1f7.auto:91:101: Expected ')' => 'ity > 60) *AND (livin'"}
+2025-06-09 23:55:39,212 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:55:39,745 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-f60e0054.auto:92:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => 'lse))     *enabled: t'"}
+2025-06-09 23:55:40,403 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-09 23:55:40,404 Retrying request to /chat/completions in 3.930000 seconds
+2025-06-09 23:55:52,800 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:55:52,934 The same validation error appeared two consecutive times.
+2025-06-09 23:55:52,934 Max regeneration attempts reached or unable to fix error. Terminating process.

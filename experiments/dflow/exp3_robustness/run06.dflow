@@ -1,0 +1,122 @@
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+        header: [Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+        header: [Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+        header: [Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']
+    end
+
+    EServiceHTTP get_batteries_recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+        header: [Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+        header: [Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']
+    end
+end
+
+triggers
+    Intent get_coords
+        "What are the coordinates of" PE:GPE,
+        "Get me the coordinates for" PE:GPE,
+        "Coordinates for" PE:GPE "please"
+    end
+
+    Intent get_charging_stations
+        "Where are the EV charging stations around here?",
+        "Show me nearby charging stations",
+        "I need an electric vehicle charger close by"
+    end
+
+    Intent get_general_info
+        "Tell me about the area",
+        "What's around here?"
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coords
+        responses:
+            Form CoordinatesForm
+                city: str = HRI('Which city do you want the coordinates for?', [PE:GPE])
+            end,
+            ActionGroup GetCoordinatesAction
+                get_coords_svc(query=[city=CoordinatesForm.city],)[lat]
+                Speak('The coordinates of' CoordinatesForm.city 'are: latitude' get_coords_svc.lat ', longitude' get_coords_svc.lon '.')
+            end
+    end
+
+    Dialogue GetChargingStationsDialogue
+        on: get_charging_stations
+        responses:
+            Form ChargingStationsForm
+                latitude: float = HRI('Enter latitude:')
+                longitude: float = HRI('Enter longitude:')
+                radius: float = HRI('Enter search radius:')
+            end,
+            ActionGroup ChargingStationsAction
+                get_charging_stations_svc(query=[latitude=ChargingStationsForm.latitude, longitude=ChargingStationsForm.longitude, radius=ChargingStationsForm.radius],)
+                Speak('This feature is available only to paid users.')[roles=user_free]
+                Speak('Polis Park – operated by fortizo at latitude' get_charging_stations_svc.tags.latitude ', longitude' get_charging_stations_svc.tags.longitude)[roles=user_paid]
+            end
+    end
+
+    Dialogue GetGeneralInfoDialogue
+        on: get_general_info
+        responses:
+            Form GeneralInfoForm
+                latitude: float = HRI('Enter latitude:')
+                longitude: float = HRI('Enter longitude:')
+                radius: float = HRI('Enter search radius:')
+            end,
+            ActionGroup GeneralInfoAction
+                get_taxi_stations_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius],)
+                get_batteries_recycling_points_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius],)
+                get_public_toilets_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius],)
+                Speak('Battery recycling bin –' get_batteries_recycling_points_svc.tags.name ' – ' get_batteries_recycling_points_svc.tags.description)[roles=user_free]
+                Speak('Battery recycling bin –' get_batteries_recycling_points_svc.tags.name ' – ' get_batteries_recycling_points_svc.tags.description)[roles=user_paid]
+                Speak('Taxi stand at' get_taxi_stations_svc.tags.name '– latitude' get_taxi_stations_svc.tags.latitude ', longitude' get_taxi_stations_svc.tags.longitude)[roles=user_paid]
+                Speak('Public toilet – free of charge, not wheelchair accessible – latitude' get_public_toilets_svc.tags.latitude ', longitude' get_public_toilets_svc.tags.longitude)[roles=user_paid]
+                Speak('The remaining information is available through a paid plan.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+
+        default: 
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end

@@ -1,0 +1,95 @@
+triggers
+    Intent get_coordinates
+        "Get coordinates of" PE:GPE["Athens", "Thessaloniki"],
+        "What are the coordinates for" PE:GPE,
+        "Find the coordinates of" PE:GPE
+    end
+
+    Intent find_charging_stations
+        "Find charging stations",
+        "Where are the nearest charging stations?",
+        "Locate charging stations nearby"
+    end
+
+    Intent advanced_city_info
+        "Give me city info for taxis, recycling, and toilets",
+        "Provide advanced city information",
+        "I need detailed city-related information"
+    end
+end
+
+eservices
+    EServiceHTTP coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form CoordsForm
+                city: str = HRI('Which city do you want the coordinates for?', [PE:GPE])
+            end,
+            ActionGroup CoordsAction
+                coords_svc(query=[city=CoordsForm.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[lat, lon]
+                Speak('The coordinates of ' CoordsForm.city ' are: latitude ' lat ', longitude ' lon '.')
+            end
+    end
+
+    Dialogue FindChargingStationsDialogue
+        on: find_charging_stations
+        responses:
+            Form ChargingStationsForm
+                latitude: float = HRI('Enter latitude:', []),
+                longitude: float = HRI('Enter longitude:', []),
+                radius: float = HRI('Enter search radius:', [])
+            end,
+            ActionGroup ChargingStationsAction
+                charging_stations_svc(query=[latitude=ChargingStationsForm.latitude, longitude=ChargingStationsForm.longitude, radius=ChargingStationsForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Here are the nearest charging stations with useful tags.')
+            end
+    end
+
+    Dialogue AdvancedCityInfoDialogue
+        on: advanced_city_info
+        responses:
+            Form CityInfoForm
+                latitude: float = HRI('Enter latitude:', []),
+                longitude: float = HRI('Enter longitude:', []),
+                radius: float = HRI('Enter search radius:', [])
+            end,
+            ActionGroup CityInfoAction
+                taxi_stations_svc(query=[latitude=CityInfoForm.latitude, longitude=CityInfoForm.longitude, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                recycling_points_svc(query=[latitude=CityInfoForm.latitude, longitude=CityInfoForm.longitude, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                public_toilets_svc(query=[latitude=CityInfoForm.latitude, longitude=CityInfoForm.longitude, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Here is the advanced city-related information.')
+            end
+    end
+end

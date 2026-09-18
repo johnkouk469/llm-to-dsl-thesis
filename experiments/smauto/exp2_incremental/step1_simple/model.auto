@@ -1,0 +1,67 @@
+Metadata
+    name: SmartHomeAutomation
+    version: "1.0.0"
+    description: "Automates lighting based on temperature and time conditions in a smart home."
+    author: "Your Name"
+    email: "yourname@example.com"
+end
+
+RTMonitor
+    broker: home_mqtt_broker
+    namespace: "smart_home"
+    eventTopic: "events"
+    logsTopic: "logs"
+end
+
+Broker<MQTT> home_mqtt_broker
+    host: "mqtt.smarthome.local"
+    port: 8883
+    ssl: true
+    auth:
+        username: "casa_nova"
+        password: "TooSmart4U@home"
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "living_room.lamp"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+        - brightness: int
+end
+
+Entity bedroom_temperature_sensor
+    type: sensor
+    topic: "bedroom.temperature_sensor"
+    broker: home_mqtt_broker
+    attributes:
+        - temperature: float
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: home_mqtt_broker
+    attributes:
+        - power: bool
+end
+
+Automation bedroom_cozy_automation
+    condition:
+        bedroom_temperature_sensor.temperature < 18.0
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_lamp.power: true
+end
+
+Automation evening_lighting_automation
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 30
+end

@@ -1,13 +1,15 @@
-"""This script sends requests to the SmAuto API endpoints."""
+"""This script sends requests to the SmAuto API endpoints.
+
+Run it directly to validate one or more model files against the running API:
+    python smauto_api.py experiments/smauto/exp1_complexity/simple/model.auto
+"""
 
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 
 load_dotenv()
-
-SMAUTO_EXAMPLES_PATH = "./smauto_examples_from_repo"
-smauto_files = [f for f in os.listdir(SMAUTO_EXAMPLES_PATH) if f.endswith(".auto")]
 
 
 def validate(model: str) -> requests.Response:
@@ -44,16 +46,13 @@ def genv(model: str) -> requests.Response:
 
 
 if __name__ == "__main__":
-    for auto in smauto_files:
-        with open(SMAUTO_EXAMPLES_PATH + "/" + auto, "r", encoding="utf-8") as file:
-            validation = validate(file.read())
-            print("The SmAuto's validator response for " + auto + " is:")
-            print(validation.json().get("message"))
-            print(validation.status_code)
-            if validation.status_code != 200:
-                print("\n")
-            else:
-                generation = gen(file.read())
-                print("The SmAuto's generator response for " + auto + " is:")
-                print(generation.status_code)
-                print(generation.text)
+    if len(sys.argv) < 2:
+        print("Usage: python smauto_api.py <model.auto> [<model.auto> ...]")
+        sys.exit(1)
+    for path in sys.argv[1:]:
+        with open(path, "r", encoding="utf-8") as file:
+            model_text = file.read()
+        validation = validate(model_text)
+        print("The SmAuto validator response for " + path + " is:")
+        print(validation.status_code)
+        print(validation.text)

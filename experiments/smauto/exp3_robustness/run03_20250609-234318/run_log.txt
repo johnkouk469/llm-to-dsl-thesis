@@ -1,0 +1,14 @@
+2025-06-09 23:43:54,433 The generated SmAuto model is not syntactically valid.
+2025-06-09 23:43:54,570 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-af5637a0.auto:105:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => ' 50))     *enabled: f'"}
+2025-06-09 23:44:03,134 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:44:03,394 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-3a9f65a4.auto:105:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => ' 50))     *enabled: t'"}
+2025-06-09 23:44:11,047 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:44:11,361 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-fee358b3.auto:91:87: Expected ')' => 'ity > 60) *AND (livin'"}
+2025-06-09 23:44:19,209 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:44:19,453 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-f8ab6d75.auto:105:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => ' 50))     *enabled: t'"}
+2025-06-09 23:44:28,518 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:44:28,810 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-f3464629.auto:92:5: Expected 'AND' or 'OR' or 'NOT' or 'XOR' or 'NOR' or 'XNOR' or 'NAND' => 'lse))     *enabled: t'"}
+2025-06-09 23:44:30,926 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 429 Too Many Requests"
+2025-06-09 23:44:30,926 Retrying request to /chat/completions in 16.444000 seconds
+2025-06-09 23:44:57,666 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:44:57,799 Max regeneration attempts reached or unable to fix error. Terminating process.

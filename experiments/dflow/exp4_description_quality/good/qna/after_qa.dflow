@@ -1,0 +1,119 @@
+entities
+    Entity CITY
+        Athens,
+        Thessaloniki
+    end
+end
+
+triggers
+    Intent get_coordinates
+        "What are the coordinates of" TE:CITY "?",
+        "Can you give me the latitude and longitude of" TE:CITY "?"
+    end
+
+    Intent find_ev_stations
+        "Find EV charging stations near me",
+        "Charging points around latitude" PE:FLOAT "and longitude" PE:FLOAT
+    end
+
+    Intent get_city_info
+        "Show me what’s near" PE:FLOAT "," PE:FLOAT,
+        "Are there any toilets or recycling bins nearby?"
+    end
+end
+
+eservices
+    EServiceHTTP coords_service
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP ev_stations_service
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP taxi_stations_service
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP recycling_points_service
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP public_toilets_service
+        verb: GET
+        host: 'services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form get_coords_form
+                city: str = HRI('Which city?', [TE:CITY])
+            end,
+            ActionGroup coords_action
+                coords_service(query=[city=get_coords_form.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[lat, lon]
+                Speak('The coordinates of' get_coords_form.city 'are: latitude' lat ', longitude' lon '.')
+                Speak('I couldn’t find that location. Could you please try again?')
+            end
+    end
+    
+    Dialogue FindEVStationsDialogue
+        on: find_ev_stations
+        responses:
+            Form ev_stations_form
+                latitude: float = HRI('Provide latitude:'),
+                longitude: float = HRI('Provide longitude:'),
+                radius: float = HRI('Enter search radius in km:')
+            end,
+            ActionGroup ev_stations_action
+                ev_stations_service(query=[latitude=ev_stations_form.latitude, longitude=ev_stations_form.longitude, radius=ev_stations_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('Polis Park – operated by fortizo at latitude 37.99, longitude 23.73.')[roles=paid]
+                Speak('This feature is available only to paid users.')[roles=free]
+            end
+    end
+
+    Dialogue GetCityInfoDialogue
+        on: get_city_info
+        responses:
+            Form city_info_form
+                latitude: float = HRI('Provide latitude:'),
+                longitude: float = HRI('Provide longitude:'),
+                radius: float = HRI('Enter search radius in km:')
+            end,
+            ActionGroup city_info_action
+                taxi_stations_service(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                recycling_points_service(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                public_toilets_service(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)
+                Speak('This feature requires a paid subscription.')[roles=free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        paid,
+        free
+
+        default:
+            free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end

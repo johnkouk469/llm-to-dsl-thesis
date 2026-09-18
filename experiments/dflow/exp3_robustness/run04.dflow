@@ -1,0 +1,126 @@
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+triggers
+    Intent get_coordinates
+        "What are the coordinates of Athens?",
+        "Can you tell me the coordinates of Athens?",
+        "Coordinates of Athens please."
+    end
+
+    Intent get_charging_stations
+        "Find charging stations near me.",
+        "Show me electric vehicle charging stations nearby.",
+        "Charging stations around here."
+    end
+
+    Intent get_general_info
+        "Give me general information about this area.",
+        "What can you tell me about nearby facilities?",
+        "Nearby facilities information."
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form CoordinatesForm
+                city: str = HRI('Which city do you want the coordinates for?')
+            end,
+            ActionGroup GetCoordinatesAction
+                get_coords_svc(query=[city=CoordinatesForm.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=lat]
+                Speak('The coordinates of ' CoordinatesForm.city ' are: latitude ' lat ', longitude ' lon '.')
+            end
+    end
+
+    Dialogue GetChargingStationsDialogue
+        on: get_charging_stations
+        responses:
+            Form ChargingStationsForm
+                latitude: float = HRI('Enter the latitude:')
+                longitude: float = HRI('Enter the longitude:')
+                radius: float = HRI('Enter the search radius:')
+            end,
+            ActionGroup GetChargingStationsAction
+                get_charging_stations_svc(query=[latitude=ChargingStationsForm.latitude, longitude=ChargingStationsForm.longitude, radius=ChargingStationsForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=tags.name][roles=user_paid]
+                Speak('This feature is available only to paid users.')[roles=user_free]
+            end
+    end
+
+    Dialogue GetGeneralInfoDialogue
+        on: get_general_info
+        responses:
+            Form GeneralInfoForm
+                latitude: float = HRI('Enter the latitude:')
+                longitude: float = HRI('Enter the longitude:')
+                radius: float = HRI('Enter the search radius:')
+            end,
+            ActionGroup GetGeneralInfoAction
+                get_taxi_stations_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=tags.name][roles=user_paid]
+                get_recycling_points_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=tags.name]
+                get_public_toilets_svc(query=[latitude=GeneralInfoForm.latitude, longitude=GeneralInfoForm.longitude, radius=GeneralInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[response_filter=tags.fee][roles=user_paid]
+                
+                Speak('Taxi stand at ' tags.name ' – latitude ' latitude ', longitude ' longitude '.')[roles=user_paid]
+                Speak('Battery recycling bin – ' tags.name ' ' tags.description '.')
+                Speak('Public toilet – ' tags.fee ', ' tags.wheelchair ' – latitude ' latitude ', longitude ' longitude '.')[roles=user_paid]
+                
+                Speak('Additional information is available through a paid plan.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+
+        default: 
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end
+
+connectors
+    Connector slack
+        token: "xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH"
+        channel: "audiobook_assistant"
+        signing_secret: "123456798"
+    end
+end

@@ -1,0 +1,137 @@
+entities
+    Entity CITY
+        Athens,
+        Thessaloniki,
+        Patras
+    end
+end
+
+triggers
+    Intent get_coords
+        "What are the coordinates of " TE:CITY "?",
+        "Can you give me the latitude and longitude of " TE:CITY "?"
+    end
+    Intent get_ev_stations
+        "Find EV charging stations near me",
+        "Charging points around latitude 37.97 and longitude 23.73.",
+        "Where can I charge my electric vehicle",
+        "Show me charging stations near latitude 37.97 and longitude 23.73."
+    end
+    Intent get_city_info
+        "Show me what's near 37.97, 23.73",
+        "Are there any toilets or recycling bins nearby?",
+        "What's around here at latitude 37.97 and longitude 23.73?",
+        "Can you find me nearby recycling points and public toilets?"
+    end
+end
+
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_ev_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+dialogues
+    Dialogue GetCoordinates
+        on: get_coords
+        responses:
+            Form coord_form
+                city: str = HRI('Which city are you interested in?', [TE:CITY])
+            end,
+            ActionGroup coord_action
+                get_coords_svc(query=[city=coord_form.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[lat]
+                Speak('The coordinates of ' coord_form.city ' are: latitude ' lat ', longitude ' lon '.')
+                Speak('I couldn’t find that location. Could you please try again?')
+                Speak('Something went wrong while trying to access this information. Please try again later.')
+            end
+    end
+
+    Dialogue GetEVStations
+        on: get_ev_stations
+        responses:
+            Form ev_form
+                latitude: float = HRI('What is the latitude?')
+                longitude: float = HRI('What is the longitude?')
+                radius: float = HRI('What is the radius in kilometers?')
+            end,
+            ActionGroup ev_action
+                get_ev_stations_svc(query=[latitude=ev_form.latitude, longitude=ev_form.longitude, radius=ev_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Polis Park - operated by ' tags.operator ' at latitude ' latitude ', longitude ' longitude '.')
+                Speak('This feature is available only to paid users.')[roles=user_free]
+            end
+    end
+
+    Dialogue GetCityInfo
+        on: get_city_info
+        responses:
+            Form city_info_form
+                latitude: float = HRI('What is the latitude?')
+                longitude: float = HRI('What is the longitude?')
+                radius: float = HRI('What is the radius in kilometers?')
+            end,
+            ActionGroup city_info_action
+                get_taxi_stations_svc(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Taxi stand at ' tags.name ' - latitude ' latitude ', longitude ' longitude '.')
+                Speak('This feature requires a paid subscription.')[roles=user_free]
+
+                get_recycling_points_svc(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Battery recycling bin - ' tags.description '.')
+
+                get_public_toilets_svc(query=[latitude=city_info_form.latitude, longitude=city_info_form.longitude, radius=city_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.fee]
+                Speak('Public toilet - free of charge, not wheelchair accessible - latitude ' latitude ', longitude ' longitude '.')
+                Speak('This feature requires a paid subscription.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+        
+        default:
+            user_free
+    end
+    
+    Authentication
+        method: slack        
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+end
+
+connectors
+    Connector slack
+        token: "xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH"
+        channel: "audiobook_assistant"
+        signing_secret: "123456798"
+    end
+end

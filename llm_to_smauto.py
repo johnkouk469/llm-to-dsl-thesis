@@ -506,7 +506,7 @@ def main():
         # Get user input
         print("Choose an option to interact with the SmAuto assistant:")
         print("1. Have a conversation")
-        print("2. Have converation with feedback")
+        print("2. Have a conversation with feedback")
         print("3. Exit")
         choice = input("Enter the number of your choice: ")
 

@@ -1,0 +1,157 @@
+Metadata
+    name: smart_home_env_control
+    version: "1.4"
+    description: "This model manages temperature, humidity, and lighting conditions in the living room and bedroom through automated control of lamps, air purifiers, and air conditioners, ensuring optimal comfort and energy efficiency."
+    author: "Lucas Navarro"
+    email: "nova@homehub.tech"
+end
+
+Broker<MQTT> mqtt_broker
+    host: "mqtt.smarthome.local"
+    port: 8883
+    ssl: true
+    auth:
+        username: "casa_nova"
+        password: "TooSmart4U@home"
+end
+
+Broker<Redis> redis_monitor
+    host: "redis.monitor.local"
+    port: 6380
+    ssl: true
+    db: 2
+    auth:
+        key: "redis-4a9f1e7b3c2d6f8912a3b4c5d678e9f0"
+end
+
+Entity living_room_temp_humidity
+    type: sensor
+    topic: "livingroom.sensors.temphumidity"
+    freq: 30
+    broker: mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(22, 35, 1) with noise gaussian(0, 1)
+        - humidity: float -> gaussian(45, 70, 2) with noise uniform(0, 1)
+    description: "A dual sensor tracking temperature and humidity levels in the living room, facilitating climate control automations."
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "livingroom.devices.lamp"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - brightness: float = 50.0
+end
+
+Entity living_room_air_purifier
+    type: actuator
+    topic: "livingroom.devices.airpurifier"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - mode: str = "auto"
+    description: "An air purifier that maintains optimal air quality by adjusting modes based on living room temperature and humidity conditions."
+end
+
+Entity bedroom_temp_sensor
+    type: sensor
+    topic: "bedroom.sensors.temperature"
+    freq: 60
+    broker: mqtt_broker
+    attributes:
+        - temperature: float -> gaussian(20, 30, 1) with noise gaussian(0, 1)
+    description: "A sensor monitoring the bedroom's temperature, providing data for automations to maintain a comfortable environment."
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.devices.lamp"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+end
+
+Entity bedroom_air_conditioner
+    type: actuator
+    topic: "bedroom.devices.airconditioner"
+    broker: mqtt_broker
+    attributes:
+        - power: bool
+        - temperature: float
+        - mode: str = "dry"
+    description: "An air conditioning unit that provides precise climate control in the bedroom, automatically adjusting settings based on temperature conditions."
+end
+
+Automation bedroom_temp_low
+    condition:
+        bedroom_temp_sensor.temperature < 18
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom_lamp.power: true
+    starts:
+        - bedroom_temp_low
+end
+
+Automation living_room_hot_humid
+    condition:
+        ((living_room_temp_humidity.temperature > 25) AND 
+        (living_room_temp_humidity.humidity > 60)) AND 
+        (living_room_lamp.power is false)
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_air_purifier.power: true
+        - living_room_air_purifier.mode: "auto"
+    starts:
+        - living_room_normal_levels
+    freq: 90
+end
+
+Automation living_room_normal_levels
+    condition:
+        (living_room_temp_humidity.temperature < 24) AND 
+        (living_room_temp_humidity.humidity < 50)
+    enabled: false
+    continuous: false
+    actions:
+        - living_room_air_purifier.power: false
+    starts:
+        - living_room_hot_humid
+    freq: 120
+end
+
+Automation bedroom_temp_high_unstable
+    condition:
+        (mean(bedroom_temp_sensor.temperature, 10) > 26) AND 
+        (std(bedroom_temp_sensor.temperature, 10) > 1)
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_air_conditioner.power: true
+        - bedroom_air_conditioner.mode: "cool"
+        - bedroom_air_conditioner.temperature: 23.0
+    starts:
+        - bedroom_temp_high_unstable
+    freq: 180
+end
+
+Automation living_room_night_light
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 30.0
+    starts:
+        - living_room_night_light
+end
+
+RTMonitor
+    broker: redis_monitor
+    namespace: "casa.nova.universe"
+    eventTopic: "epic_events"
+    logsTopic: "chaotic_logs"
+end

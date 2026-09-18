@@ -1,4 +1,4 @@
-"""Python module for AI Assistant writing SmAuto models."""
+"""Python module for AI Assistant writing dFlow models."""
 
 import os
 import time
@@ -166,7 +166,7 @@ def regenerate_dflow_model(history: List[Tuple[str, str]]) -> List[Tuple[str, st
         print("Unable to fix the error. Terminating the regeneration process.")
         return history
     except Exception as e:
-        print("Error regenerating SmAuto model: %s", e)
+        print("Error regenerating dFlow model: %s", e)
         raise
 
 
@@ -174,7 +174,8 @@ def analyze_user_utterance(
     user_utterance: str, history: Optional[List[Tuple[str, str]]] = None
 ) -> Tuple[str, List[Tuple[str, str]]]:
     """
-    Generates an SmAuto model based on the user's utterance.
+    Analyzes the user's utterance to identify missing information before a dFlow
+    model is written.
 
     Parameters:
     user_utterance (str): The input provided by the user to generate the model.
@@ -182,8 +183,8 @@ def analyze_user_utterance(
     the conversation. Defaults to None.
 
     Returns:
-    Tuple[str, List[Tuple[str, str]]]: A tuple containing the generated SmAuto
-    model (str) and the updated conversation history (list).
+    Tuple[str, List[Tuple[str, str]]]: A tuple containing the analysis produced by
+    the LLM (str) and the updated conversation history (list).
     """
     try:
         if history is None:
@@ -202,8 +203,8 @@ def analyze_user_utterance(
         )
         model_chain = prompt_template | model | StrOutputParser()
         print(
-            "Instructing the LLM to to analyze the user's utterance, identify missing information, \
-    and ask follow-up questions to gather all necessary details to write the SmAuto model."
+            "Instructing the LLM to analyze the user's utterance, identify missing information, \
+    and ask follow-up questions to gather all necessary details to write the dFlow model."
         )
         analyzed_utterance = model_chain.invoke(
             {
@@ -331,11 +332,11 @@ def generate_dflow_model_after_qna(
             file.close()
 
         if not validate_model(dflow_model):
-            dflow_model, history = regenerate_dflow_model(history)
+            history = regenerate_dflow_model(history)
 
         return history
     except Exception as e:
-        print("Error generating SmAuto model: %s", e)
+        print("Error generating dFlow model: %s", e)
         raise
 
 
@@ -389,7 +390,7 @@ def conversation():
 def conversation_with_feedback():
     """Initiates an interactive conversation with the dFlow assistant
     where the assistant will be analyzing the user's request identify missing information,
-    and ask follow-up questions to gather all necessary details to write the SmAuto model
+    and ask follow-up questions to gather all necessary details to write the dFlow model
     before writing it."""
 
     conversation_history = []
@@ -427,11 +428,11 @@ def conversation_with_feedback():
             print("dFlow assistant: %s", assistant_response)
 
             if "Q&A process complete." in assistant_response:
-                smauto_model, conversation_history = generate_dflow_model_after_qna(
+                conversation_history = generate_dflow_model_after_qna(
                     conversation_history, qna_history
                 )
 
-                print("dFlow assistant: %s", smauto_model)
+                print("dFlow assistant: %s", conversation_history[-1][1])
 
                 break
 
@@ -443,9 +444,9 @@ def main():
 
     while True:
         # Get user input
-        print("Choose an option to interact with the SmAuto assistant:")
+        print("Choose an option to interact with the dFlow assistant:")
         print("1. Have a conversation")
-        print("2. Have converation with feedback")
+        print("2. Have a conversation with feedback")
         print("3. Exit")
         choice = input("Enter the number of your choice: ")
 

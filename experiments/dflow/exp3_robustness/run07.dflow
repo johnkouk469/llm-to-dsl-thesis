@@ -1,0 +1,128 @@
+triggers
+    Intent get_coordinates
+        "Can you find the coordinates for" PE:GPE,
+        "What are the coordinates of" PE:GPE,
+        "I need the latitude and longitude of" PE:GPE
+    end
+
+    Intent get_charging_stations
+        "Find charging stations near me",
+        "Where can I charge my electric vehicle",
+        "Show me EV charging stations nearby"
+    end
+
+    Intent get_general_info
+        "Tell me about the city near me",
+        "Provide general information on my location",
+        "What can you tell me about this area?"
+    end
+end
+
+eservices
+    EServiceHTTP geospatial_coords_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+        header: Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP charging_stations_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+        header: Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP taxi_stations_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+        header: Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP recycling_points_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+        header: Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP public_toilets_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+        header: Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+end
+
+dialogues
+    Dialogue CoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form coords_form
+                city_slot: str = HRI('Which city do you need coordinates for?', [PE:GPE])
+            end,
+            ActionGroup coords_action
+                geospatial_coords_service(query=[city=coords_form.city_slot])[lat]
+                Speak('The coordinates of ' coords_form.city_slot ' are: latitude ' lat ', longitude ' lon '.')
+            end
+    end
+
+    Dialogue ChargingStationsDialogue
+        on: get_charging_stations
+        responses:
+            Form charging_form
+                lat: float = HRI('Enter latitude')
+                lon: float = HRI('Enter longitude')
+                radius: float = HRI('Enter search radius')
+            end,
+            ActionGroup charging_action
+                charging_stations_service(query=[lat=charging_form.lat, lon=charging_form.lon, radius=charging_form.radius])[tags.name]
+                Speak('Polis Park – operated by fortizo at latitude ' latitude ', longitude ' longitude)[roles=user_paid]
+                Speak('This feature is available only to paid users.')[roles=user_free]
+            end
+    end
+
+    Dialogue GeneralInfoDialogue
+        on: get_general_info
+        responses:
+            Form info_form
+                lat: float = HRI('Enter latitude')
+                lon: float = HRI('Enter longitude')
+                radius: float = HRI('Enter search radius')
+            end,
+            ActionGroup general_info_action
+                taxi_stations_service(query=[lat=info_form.lat, lon=info_form.lon, radius=info_form.radius])[tags.name]
+                Speak('Taxi stand at ' tags.name ' – latitude ' latitude ', longitude ' longitude)[roles=user_paid]
+                Speak('Battery recycling bin – ' tags.description)
+                Speak('Public toilet – ' tags.fee ', ' tags.wheelchair ' accessible – latitude ' latitude ', longitude ' longitude)[roles=user_paid]
+                Speak('Additional information is available through a paid plan.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+
+        default: 
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end
+
+connectors
+    Connector slack
+        token: "xoxb-4883692765252-4884029447172-rH1b8v6PMj22OaTsaIQrtpfH"
+        channel: "location_assistant"
+        signing_secret: "123456798"
+    end
+end

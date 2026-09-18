@@ -1,0 +1,9 @@
+2025-06-09 23:46:44,940 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:46:45,118 The generated SmAuto model is not syntactically valid.
+2025-06-09 23:46:45,275 The regenerated model still has errors: {"detail":"Validation error: /tmp/smauto/model_for_validation-1bd66bc7.auto:133:11: Unknown object \"air_conditioner.temperature\" of class \"IntAttribute\""}
+2025-06-09 23:46:52,064 HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-06-09 23:46:52,238 Error regenerating SmAuto model: 'NoneType' object has no attribute 'index'
+2025-06-09 23:46:52,239 Error generating SmAuto model: 'NoneType' object has no attribute 'index'
+
+
+Valid

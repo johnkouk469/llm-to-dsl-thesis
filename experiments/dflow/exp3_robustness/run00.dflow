@@ -1,0 +1,115 @@
+eservices
+    EServiceHTTP get_coords_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_batteries_recycling_points_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_service
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+triggers
+    Intent get_coordinates
+        "What are the coordinates of" PE:GPE
+    end
+
+    Intent find_charging_stations
+        "Find charging stations near me",
+        "Show me electric vehicle charging stations",
+        "Locate EV charging stations"
+    end
+
+    Intent get_city_info
+        "What can you tell me about this city",
+        "Give me general information about the city",
+        "Tell me about the city"
+    end
+end
+
+dialogues
+    Dialogue RetrieveCoordinates
+        on: get_coordinates
+        responses:
+            Form CoordinatesForm
+                city: str = HRI('Which city would you like the coordinates for?', [PE:GPE])
+            end,
+            ActionGroup RetrieveCoordinatesAction
+                get_coords_service(query=[city=CoordinatesForm.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[lat]
+                Speak('The coordinates of' CoordinatesForm.city 'are: latitude ' CoordinatesForm.lat ', longitude ' CoordinatesForm.lon '.')
+            end
+    end
+
+    Dialogue FindChargingStations
+        on: find_charging_stations
+        responses:
+            Form ChargingStationsForm
+                lat: float = HRI('Please provide the latitude')
+                lon: float = HRI('Please provide the longitude')
+                radius: float = HRI('Specify the search radius')
+            end,
+            ActionGroup FindChargingStationsAction
+                Speak('This feature is available only to paid users.')[roles=user_free]
+                get_charging_stations_service(query=[lat=ChargingStationsForm.lat, lon=ChargingStationsForm.lon, radius=ChargingStationsForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Polis Park – operated by fortizo at latitude ' ChargingStationsForm.lat ', longitude ' ChargingStationsForm.lon '.')[roles=user_paid]
+            end
+    end
+
+    Dialogue GetCityInfo
+        on: get_city_info
+        responses:
+            Form CityInfoForm
+                lat: float = HRI('Please provide the latitude')
+                lon: float = HRI('Please provide the longitude')
+                radius: float = HRI('Specify the search radius')
+            end,
+            ActionGroup GetCityInfoAction
+                get_taxi_stations_service(query=[lat=CityInfoForm.lat, lon=CityInfoForm.lon, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Taxi stand at Πλ. Συντάγματος – latitude ' CityInfoForm.lat ', longitude ' CityInfoForm.lon '.')[roles=user_paid]
+                get_batteries_recycling_points_service(query=[lat=CityInfoForm.lat, lon=CityInfoForm.lon, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.name]
+                Speak('Battery recycling bin – Ανακύκλωση μπαταριών.')
+                get_public_toilets_service(query=[lat=CityInfoForm.lat, lon=CityInfoForm.lon, radius=CityInfoForm.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI'],)[tags.fee]
+                Speak('Public toilet – free of charge, not wheelchair accessible – latitude ' CityInfoForm.lat ', longitude ' CityInfoForm.lon '.')[roles=user_paid]
+                Speak('Additional information is available through a paid plan.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+        
+        default: 
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end

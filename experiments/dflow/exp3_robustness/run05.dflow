@@ -1,0 +1,120 @@
+triggers
+    Intent get_coordinates
+        "Get coordinates for" PE:GPE["Athens", "Thessaloniki"],
+        "What are the coordinates for" PE:GPE,
+        "Show me the coordinates of" PE:GPE
+    end
+
+    Intent get_charging_stations
+        "Show me charging stations",
+        "Find electric vehicle charging stations",
+        "Charging stations nearby",
+        "I need to find a charging station"
+    end
+
+    Intent get_general_info
+        "Show me general information for the city",
+        "Get info about the city",
+        "Tell me about the city",
+        "I want public info about this area"
+    end
+end
+
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+        header: 'Authorization=Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+        header: 'Authorization=Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+        header: 'Authorization=Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP get_batteries_recycling_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+        header: 'Authorization=Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+        header: 'Authorization=Q5eJZ8sSLEX6XNmOHyMlWagI'
+    end
+end
+
+dialogues
+    Dialogue coordinates_dialogue
+        on: get_coordinates
+        responses:
+            Form coordinates_form
+                city: str = HRI('For which city do you want the coordinates?', [PE:GPE])
+            end,
+            ActionGroup coordinates_action
+                get_coords_svc(query=[city=coordinates_form.city])[lat],
+                Speak('The coordinates of' coordinates_form.city 'are: latitude' lat ', longitude' lon '.')
+            end
+    end
+
+    Dialogue charging_stations_dialogue
+        on: get_charging_stations
+        responses:
+            Form charging_stations_form
+                latitude: float = HRI('Enter latitude:')
+                longitude: float = HRI('Enter longitude:')
+                radius: float = HRI('Enter search radius:')
+            end,
+            ActionGroup charging_stations_action
+                get_charging_stations_svc(query=[latitude=charging_stations_form.latitude, longitude=charging_stations_form.longitude, radius=charging_stations_form.radius])[tags],
+                Speak('This feature is available only to paid users.')[roles=user_free]
+            end
+    end
+
+    Dialogue general_info_dialogue
+        on: get_general_info
+        responses:
+            Form general_info_form
+                latitude: float = HRI('Enter latitude:')
+                longitude: float = HRI('Enter longitude:')
+                radius: float = HRI('Enter search radius:')
+            end,
+            ActionGroup general_info_action
+                get_taxi_stations_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius])[tags],
+                get_batteries_recycling_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius])[tags],
+                get_public_toilets_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius])[tags],
+                Speak('This feature is available only to paid users.')[roles=user_free]
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+
+        default:
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: slack
+    end
+end

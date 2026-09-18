@@ -1,0 +1,125 @@
+eservices
+    EServiceHTTP get_coords_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/geospatial/get_coords'
+    end
+
+    EServiceHTTP get_charging_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_charging_stations'
+    end
+
+    EServiceHTTP get_taxi_stations_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_taxi_stations'
+    end
+
+    EServiceHTTP get_recycling_points_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_batteries_recycling_points'
+    end
+
+    EServiceHTTP get_public_toilets_svc
+        verb: GET
+        host: 'https://services.issel.ee.auth.gr'
+        path: '/openstreetmaps/get_public_toilets'
+    end
+end
+
+triggers
+    Intent get_coordinates
+        "What are the coordinates of" PE:GPE,
+        "Get coordinates for" TE:City
+    end
+
+    Intent get_charging_stations
+        "Find nearby charging stations",
+        "Where can I charge my electric vehicle"
+    end
+
+    Intent get_general_info
+        "Tell me about the city",
+        "Get general information about this area"
+    end
+end
+
+entities
+    Entity City
+        Athens,
+        Thessaloniki,
+        Heraklion
+    end
+end
+
+dialogues
+    Dialogue GetCoordinatesDialogue
+        on: get_coordinates
+        responses:
+            Form coords_form
+                city: str = HRI('Please provide the city name', [TE:City])
+            end,
+            ActionGroup coords_action
+                RESTCall(get_coords_svc(query=[city=coords_form.city], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']))[lat]
+                Speak('The coordinates of ' coords_form.city ' are: latitude ' get_coords_svc.lat ', longitude ' get_coords_svc.lon)
+            end
+    end
+
+    Dialogue GetChargingStationsDialogue
+        on: get_charging_stations
+        responses:
+            Form charging_form
+                latitude: float = HRI('Please provide the latitude')
+                longitude: float = HRI('Please provide the longitude')
+                radius: float = HRI('Please provide the search radius')
+            end,
+            ActionGroup charging_action
+                RESTCall(get_charging_stations_svc(query=[latitude=charging_form.latitude, longitude=charging_form.longitude, radius=charging_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']))[tags.name]
+                Speak('Polis Park – operated by ' get_charging_stations_svc.tags.operator ' at latitude ' get_charging_stations_svc.latitude ', longitude ' get_charging_stations_svc.longitude)[roles=paid_user]
+                Speak('This feature is available only to paid users.')[roles=free_user]
+            end
+    end
+
+    Dialogue GetGeneralInfoDialogue
+        on: get_general_info
+        responses:
+            Form general_info_form
+                latitude: float = HRI('Please provide the latitude')
+                longitude: float = HRI('Please provide the longitude')
+                radius: float = HRI('Please provide the search radius')
+            end,
+            ActionGroup general_info_action
+                RESTCall(get_taxi_stations_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']))[tags.name]
+                Speak('Taxi stand at ' get_taxi_stations_svc.tags.name ' – latitude ' get_taxi_stations_svc.latitude ', longitude ' get_taxi_stations_svc.longitude)[roles=paid_user]
+                
+                RESTCall(get_recycling_points_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']))[tags.name]
+                Speak('Battery recycling bin – ' get_recycling_points_svc.tags.name ', ' get_recycling_points_svc.tags.description)
+                
+                RESTCall(get_public_toilets_svc(query=[latitude=general_info_form.latitude, longitude=general_info_form.longitude, radius=general_info_form.radius], header=[Authorization='Q5eJZ8sSLEX6XNmOHyMlWagI']))[tags.fee]
+                Speak('Public toilet – free of charge, ' get_public_toilets_svc.tags.wheelchair ' wheelchair accessible – latitude ' get_public_toilets_svc.latitude ', longitude ' get_public_toilets_svc.longitude)[roles=paid_user]
+              
+                Speak('Full information is available with a paid plan.')[roles=free_user]
+            end
+    end
+end
+
+access_controls
+    Roles
+        paid_user,
+        free_user
+        
+        default: 
+            free_user
+    end
+
+    Path
+        "/home/Desktop/users.txt"
+    end
+
+    Authentication
+        method: user_id        
+    end
+end

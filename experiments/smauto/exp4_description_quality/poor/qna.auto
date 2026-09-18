@@ -1,0 +1,125 @@
+Metadata
+    name: smart_home_env_control
+    version: "1.4"
+    description: "This model automates climate control and lighting in a smart home environment by using environmental sensors and scheduled routines. It dynamically responds to changes in temperature and humidity across different rooms and uses value generators to simulate realistic sensor behavior for testing purposes."
+    author: "Lucas Navarro"
+    email: "nova@homehub.tech"
+end
+
+RTMonitor
+    broker: logs_broker
+    namespace: "casa.nova.universe"
+    eventTopic: "epic_events"
+    logsTopic: "chaotic_logs"
+end
+
+Broker<MQTT> main_broker
+    host: "mqtt.smarthome.local"
+    port: 8883
+    ssl: true
+    auth:
+        username: "casa_nova"
+        password: "TooSmart4U@home"
+end
+
+Broker<Redis> logs_broker
+    host: "redis.monitor.local"
+    port: 6380
+    ssl: true
+    auth:
+        key: "redis-4a9f1e7b3c2d6f8912a3b4c5d678e9f0"
+end
+
+Entity bedroom_temp_sensor
+    type: sensor
+    topic: "bedroom.temperature"
+    freq: 60
+    broker: main_broker
+    attributes:
+        - temperature: float -> gaussian(20, 30, 1) with noise gaussian(0, 1)
+end
+
+Entity bedroom_lamp
+    type: actuator
+    topic: "bedroom.lamp"
+    broker: main_broker
+    attributes:
+        - power: bool
+end
+
+Entity living_room_temp_sensor
+    type: sensor
+    topic: "living_room.temperature"
+    freq: 30
+    broker: main_broker
+    attributes:
+        - temperature: float -> gaussian(22, 35, 1) with noise gaussian(0, 1)
+end
+
+Entity living_room_lamp
+    type: actuator
+    topic: "living_room.lamp"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - brightness: float
+end
+
+Entity bedroom_ac
+    type: actuator
+    topic: "bedroom.ac"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - temperature: float
+        - mode: str
+end
+
+Entity living_room_purifier
+    type: actuator
+    topic: "living_room.purifier"
+    broker: main_broker
+    attributes:
+        - power: bool
+        - mode: str
+end
+
+Automation bedroom_lamp_on_cold
+    condition:
+        bedroom_temp_sensor.temperature < 18
+    enabled: true
+    continuous: false
+    actions:
+        - bedroom_lamp.power: true
+end
+
+Automation living_room_purifier_control
+    condition:
+        (living_room_temp_sensor.temperature > 25) AND (living_room_humidity_sensor.humidity > 60) AND (living_room_lamp.power is false)
+    enabled: true
+    continuous: true
+    actions:
+        - living_room_purifier.power: true
+        - living_room_purifier.mode: "auto"
+end
+
+Automation bedroom_ac_control
+    condition:
+        ((mean(bedroom_temp_sensor.temperature, 10) > 26) AND (std(bedroom_temp_sensor.temperature, 10) > 1))
+    enabled: true
+    continuous: true
+    actions:
+        - bedroom_ac.power: true
+        - bedroom_ac.mode: "cool"
+        - bedroom_ac.temperature: 23
+end
+
+Automation living_room_lamp_scheduled
+    condition:
+        system_clock.time == 22:00
+    enabled: true
+    continuous: false
+    actions:
+        - living_room_lamp.power: true
+        - living_room_lamp.brightness: 30.0
+end

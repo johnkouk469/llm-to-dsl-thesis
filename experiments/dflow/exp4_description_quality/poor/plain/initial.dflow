@@ -1,0 +1,89 @@
+entities
+    Entity Location
+        Athens,
+        Thessaloniki,
+        Patras
+    end
+end
+
+triggers
+    Intent find_location
+        "Tell me what's near in " TE:Location,
+        "What's around in " TE:Location,
+        "Show me points of interest in " TE:Location,
+        "I want to know what's near " TE:Location,
+        "What's nearby " TE:Location
+    end
+
+    Intent find_services
+        "Where can I find a charging station near me",
+        "Locate toilets near " TE:Location,
+        "Find petrol stations around " TE:Location,
+        "What's the nearest charging station",
+        "I need to find restrooms near " TE:Location
+    end
+end
+
+eservices
+    EServiceHTTP location_svc
+        verb: GET
+        host: 'https://api.location.com'
+        path: '/points_of_interest'
+    end
+
+    EServiceHTTP premium_services_svc
+        verb: GET
+        host: 'https://api.location.com'
+        path: '/premium_services'
+    end
+end
+
+dialogues
+    Dialogue FindLocationDialogue
+        on: find_location
+        responses:
+            Form location_form
+                location_slot: str = HRI('Which location are you interested in?', [TE:Location])
+            end,
+            ActionGroup location_action
+                location_svc(query=[location=location_form.location_slot],)
+                Speak('Here is what I found near ' location_form.location_slot)[roles=user_paid]
+                Speak('Here are some free points of interest around ' location_form.location_slot)[roles=user_free]
+            end
+    end
+
+    Dialogue FindServicesDialogue
+        on: find_services
+        responses:
+            Form services_form
+                location_slot: str = HRI('Which location are you interested in?', [TE:Location])
+            end,
+            ActionGroup services_action
+                premium_services_svc(query=[location=services_form.location_slot],)[roles=user_paid]
+                Speak('Here are premium services near ' services_form.location_slot)[roles=user_paid]
+
+                location_svc(query=[location=services_form.location_slot],)[roles=user_free]
+                Speak('Here are some services around ' services_form.location_slot)[roles=user_free]
+
+                Speak('Sorry, I couldn’t find anything around ' services_form.location_slot)
+            end
+    end
+end
+
+access_controls
+    Roles
+        user_paid,
+        user_free
+        
+        default: 
+            user_free
+    end
+
+    Path
+        "/home/Desktop/users_roles.txt"
+    end
+
+    Authentication
+        method: user_id        
+    end
+end
