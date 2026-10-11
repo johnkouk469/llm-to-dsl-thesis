@@ -249,7 +249,7 @@ Chapter 5 describes the pipeline and the prompt design, chapter 6 the evaluation
 
 ## Acknowledgments
 
-The thesis was supervised by members of the Intelligent Systems and Software Engineering Labgroup (ISSEL) at AUTh, which develops both target languages. [SmAuto](https://github.com/robotics-4-all/smauto) and [dFlow](https://github.com/robotics-4-all/dFlow) are their projects; the example models under `dflow_examples/` come from the dFlow repository and remain under its terms.
+The thesis was supervised by members of the Intelligent Systems and Software Engineering Labgroup (ISSEL) at AUTh, which develops both target languages. [SmAuto](https://github.com/robotics-4-all/smauto) and [dFlow](https://github.com/robotics-4-all/dFlow) are their projects; the example models under `dflow_examples/` come from the dFlow repository and remain under its MIT licence; see [`THIRD_PARTY.md`](THIRD_PARTY.md).
 
 ## License
 
